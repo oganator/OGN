@@ -1,9 +1,9 @@
-{{template "header"}}
+[[template "header"]]
     <body>
         <br>
         <br>
         <div class="container-fluid">
-            {{template "UnitSettings" .unit}}
+            [[template "UnitSettings" .unit]]
         </div>
         <div class="tabs-wrapper">
             <ul class="nav nav-tabs tabPinned" role="tablist">
@@ -20,15 +20,15 @@
         </div>
         <div class="tab-content">
             <div class="tab-pane fade in show active" id="cf" role="tabpanel">
-                {{template "CFTable" .unit.Model}}
+                [[template "CFTable" .unit.Model]]
             </div>
             <div class="tab-pane fade" id="rs" role="tabpanel">
-                {{template "rentschedule" .unit.RentSchedule}}
+                [[template "rentschedule" .unit.RentSchedule]]
             </div>
             <div class="tab-pane fade" id="ind" role="tabpanel">
-                {{template "indexation" .unit.RentSchedule}}
+                [[template "indexation" .unit.RentSchedule]]
             </div>
         </div>
-{{template "footer"}}
+[[template "footer"]]
 </body>
 

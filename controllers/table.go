@@ -2,7 +2,7 @@ package controllers
 
 // MakeTable - Date, COA, Amount
 func (e *Entity) MakeTable(coas BoolCOA) {
-	e.CreateTableHeader()
+	e.CreateTableHeader(false, false, true)
 	e.Table = make([]TableJSON, 0)
 	marketvalue := make(map[int]string)
 	totalerv := make(map[int]string)
@@ -457,27 +457,36 @@ type FloatCOA struct {
 }
 
 // CreateTableHeader -
-func (e *Entity) CreateTableHeader() {
-	ForecastMonthly := make([]Datetype, 0)
-	ForecastQuarterly := make([]Datetype, 0)
-	ForecastYearly := make([]Datetype, 0)
-	for mdate := Dateadd(e.StartDate, -1); mdate.Dateint <= e.EndDate.Dateint; mdate = Dateadd(mdate, 1) {
-		if mdate.Dateint <= e.SalesDate.Dateint {
-			mdate.Bool = true
+func (e *Entity) CreateTableHeader(month, quarter, year bool) {
+	// Month
+	if month {
+		ForecastMonthly := make([]Datetype, 0)
+		for mdate := Dateadd(e.StartDate, -1); mdate.Dateint <= e.EndDate.Dateint; mdate = Dateadd(mdate, 1) {
+			if mdate.Dateint <= e.SalesDate.Dateint {
+				mdate.Bool = true
+			}
+			if mdate.Dateint >= Dateadd(e.StartDate, -1).Dateint {
+				ForecastMonthly = append(ForecastMonthly, mdate)
+			}
 		}
-		if mdate.Dateint >= Dateadd(e.StartDate, -1).Dateint {
-			ForecastMonthly = append(ForecastMonthly, mdate)
-		}
+		e.TableHeader.Monthly = ForecastMonthly
 	}
-	for ydate := Dateadd(e.StartDate, -1); ydate.Year <= e.EndDate.Year; ydate = Dateadd(ydate, 12) {
-		if ydate.Dateint <= e.SalesDate.Dateint {
-			ydate.Bool = true
-		}
-		if ydate.Dateint >= Dateadd(e.StartDate, -1).Dateint {
-			ForecastYearly = append(ForecastYearly, ydate)
-		}
+	// Quarter
+	if quarter {
+		ForecastQuarterly := make([]Datetype, 0)
+		e.TableHeader.Quarterly = ForecastQuarterly
 	}
-	e.TableHeader.Monthly = ForecastMonthly
-	e.TableHeader.Quarterly = ForecastQuarterly
-	e.TableHeader.Yearly = ForecastYearly
+	// Year
+	if year {
+		ForecastYearly := make([]Datetype, 0)
+		for ydate := Dateadd(e.StartDate, -1); ydate.Year <= e.EndDate.Year; ydate = Dateadd(ydate, 12) {
+			if ydate.Dateint <= e.SalesDate.Dateint {
+				ydate.Bool = true
+			}
+			if ydate.Dateint >= Dateadd(e.StartDate, -1).Dateint {
+				ForecastYearly = append(ForecastYearly, ydate)
+			}
+		}
+		e.TableHeader.Yearly = ForecastYearly
+	}
 }

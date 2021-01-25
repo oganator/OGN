@@ -1,4 +1,4 @@
-{{define "AddChildUnitModal"}}
+[[define "AddChildUnitModal"]]
     <form id="unitmodal" class="form-horizontal form-well" style="color: #006A4D;" role="form" method="post" action="/AddChildUnit">
         <div class="modal fade" id="unitmodalLRForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabelunit" aria-hidden="true">
             <div class="modal-dialog cascading-modal" role="document">
@@ -25,7 +25,7 @@
                                     <div class="form-group">
                                         <div class="form-group">
                                             <label for="parent">Parent</label>
-                                            <input type="text" readonly class="form-control" id="parent" name="parent" Value="{{.}}">
+                                            <input type="text" readonly class="form-control" id="parent" name="parent" Value="[[.]]">
                                         </div>
                                     </div>
                                     <div class="form-group">
@@ -157,4 +157,4 @@
             document.getElementById('expiryyear').value = '';
         }
     </script>
-{{end}}
+[[end]]

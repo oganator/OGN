@@ -12,7 +12,7 @@ type ViewEntityController struct {
 	beego.Controller
 }
 
-// ChanveEntityController -
+// ChangeEntityController -
 type ChangeEntityController struct {
 	beego.Controller
 }
@@ -31,88 +31,67 @@ func (c *ViewEntityController) Get() {
 	c.Data = temp
 }
 
+// GetString -
+func GetString(c *ViewEntityController, field string) string {
+	c.Data[field] = c.GetString(field)
+	return c.Data[field].(string)
+}
+
+// GetFloat -
+func GetFloat(c *ViewEntityController, field string) (result float64) {
+	c.Data[field] = c.GetString(field)
+	temp := c.Data[field].(string)
+	result, _ = strconv.ParseFloat(temp, 64)
+	return result
+}
+
+// GetInt -
+func GetInt(c *ViewEntityController, field string) (result int) {
+	c.Data[field] = c.GetString(field)
+	temp := c.Data[field].(string)
+	result, _ = strconv.Atoi(temp)
+	return result
+}
+
 // Post -
 func (c *ViewEntityController) Post() {
-	// select model
-	c.Data["name"] = c.GetString("name")
-	name := c.Data["name"].(string)
-	Key = ModelsList[name]
-	// hold period
-	c.Data["holdperiod"] = c.GetString("holdperiod")
-	holdperiod := c.Data["holdperiod"].(string)
-	EntityStore[Key].HoldPeriod, _ = strconv.Atoi(holdperiod)
-	// Entry Yield
-	c.Data["entryyield"] = c.GetString("entryyield")
-	entryyield := c.Data["entryyield"].(string)
-	EntityStore[Key].EntryYield, _ = strconv.ParseFloat(entryyield, 64)
-	EntityStore[Key].EntryYield = EntityStore[Key].EntryYield / 100
-	// Yield Shift
-	c.Data["yieldshift"] = c.GetString("yieldshift")
-	yieldshift := c.Data["yieldshift"].(string)
-	EntityStore[Key].YieldShift, _ = strconv.ParseFloat(yieldshift, 64)
-	// LTV
-	c.Data["ltv"] = c.GetString("ltv")
-	ltv := c.Data["ltv"].(string)
-	EntityStore[Key].LTV, _ = strconv.ParseFloat(ltv, 64)
-	// rate
-	c.Data["rate"] = c.GetString("rate")
-	rate := c.Data["rate"].(string)
-	EntityStore[Key].LoanRate, _ = strconv.ParseFloat(rate, 64)
-	// Discount rate
-	c.Data["discount"] = c.GetString("discount")
-	discount := c.Data["discount"].(string)
-	EntityStore[Key].GLA.DiscountRate, _ = strconv.ParseFloat(discount, 64)
-	EntityStore[Key].GLA.DiscountRate = EntityStore[Key].GLA.DiscountRate / 100
-	// sold rent
-	c.Data["soldrent"] = c.GetString("soldrent")
-	soldrent := c.Data["soldrent"].(string)
-	EntityStore[Key].GLA.PercentSoldRent, _ = strconv.ParseFloat(soldrent, 64)
-	EntityStore[Key].GLA.PercentSoldRent = EntityStore[Key].GLA.PercentSoldRent / 100
-	// strategy
-	c.Data["strategy"] = c.GetString("strategy")
-	strategy := c.Data["strategy"].(string)
-	EntityStore[Key].Strategy = strategy
-	// balloon percent
-	c.Data["balpercent"] = c.GetString("balpercent")
-	balpercent := c.Data["balpercent"].(string)
-	EntityStore[Key].BalloonPercent, _ = strconv.ParseFloat(balpercent, 64)
-	EntityStore[Key].BalloonPercent = EntityStore[Key].BalloonPercent / 100
-	// erv
-	c.Data["erv"] = c.GetString("erv")
-	erv := c.Data["erv"].(string)
-	EntityStore[Key].ERVGrowth, _ = strconv.ParseFloat(erv, 64)
-	EntityStore[Key].ERVGrowth = EntityStore[Key].ERVGrowth / 100
-	// cpi
-	c.Data["cpi"] = c.GetString("cpi")
-	cpi := c.Data["cpi"].(string)
-	EntityStore[Key].CPIGrowth, _ = strconv.ParseFloat(cpi, 64)
-	EntityStore[Key].CPIGrowth = EntityStore[Key].CPIGrowth / 100
-	// opex
-	c.Data["opex"] = c.GetString("opex")
-	opex := c.Data["opex"].(string)
-	EntityStore[Key].OpExpercent, _ = strconv.ParseFloat(opex, 64)
-	EntityStore[Key].OpExpercent = EntityStore[Key].OpExpercent / 100
-	// fees
-	c.Data["fees"] = c.GetString("fees")
-	fees := c.Data["fees"].(string)
-	EntityStore[Key].Fees, _ = strconv.ParseFloat(fees, 64)
-	//
-	c.TplName = "EntityView.tpl"
-	// c.TplName = "test.tpl"
+	Key = ModelsList[GetString(c, "name")]
+	EntityStore[Key].HoldPeriod = GetInt(c, "holdperiod")
+	EntityStore[Key].EntryYield = GetFloat(c, "entryyield") / 100
+	EntityStore[Key].LTV = GetFloat(c, "ltv") / 100
+	EntityStore[Key].LoanRate = GetFloat(c, "rate") / 100
+	EntityStore[Key].GLA.DiscountRate = GetFloat(c, "discount") / 100
+	EntityStore[Key].GLA.PercentSoldRent = GetFloat(c, "soldrent") / 100
+	EntityStore[Key].Strategy = GetString(c, "strategy")
+	EntityStore[Key].BalloonPercent = GetFloat(c, "balpercent") / 100
+	EntityStore[Key].ERVGrowth = GetFloat(c, "erv") / 100
+	EntityStore[Key].CPIGrowth = GetFloat(c, "cpi") / 100
+	EntityStore[Key].YieldShift = GetFloat(c, "yieldshift")
+	EntityStore[Key].GLA.Void = GetInt(c, "void")
+	EntityStore[Key].GLA.EXTDuration = GetInt(c, "duration")
+	EntityStore[Key].GLA.RentRevisionERV = GetFloat(c, "rentrevision") / 100
+	EntityStore[Key].GLA.Probability = GetFloat(c, "probability") / 100
+	EntityStore[Key].OpExpercent = GetFloat(c, "opex") / 100
+	EntityStore[Key].Fees = GetFloat(c, "fees")
+	EntityStore[Key].GLA.Default.Hazard = GetFloat(c, "hazard") / 100
+	mcsetup := MCSetup{
+		Sims:        GetInt(c, "sims"),
+		ERV:         GetFloat(c, "ervsigma") / 100,
+		CPI:         GetFloat(c, "cpisigma") / 100,
+		YieldShift:  GetFloat(c, "yieldshiftsigma"),
+		Void:        GetInt(c, "voidsigma"),
+		Probability: GetFloat(c, "probabilitysigma") / 100,
+		OpEx:        GetFloat(c, "opexsigma") / 100,
+		Hazard:      GetFloat(c, "hazardsigma") / 100,
+	}
 	temp := make(map[interface{}]interface{})
-	// wg := sync.WaitGroup{}
-	// for i := 0; i < 1000; i++ {
-	// 	wg.Add(1)
-	// 	go func() {
-	// 		defer wg.Done()
-	// 		Models[Key].UpdateEntity()
-	// 	}()
-	// }
-	// wg.Wait()
-	Models[Key].UpdateEntity()
+	Models[Key].UpdateEntity(false, EntityStore[Models[Key].MasterID])
+	Models[Key].MCSetup = mcsetup
+	Models[Key].MonteCarlo()
 	Models[Key].MultiplyInputs()
 	temp["entity"] = Models[Key]
 	temp["modelslist"] = ModelsList
+	c.TplName = "EntityView.tpl"
 	c.Data = temp
 }
 
@@ -125,7 +104,17 @@ func (e *Entity) MultiplyInputs() {
 	e.BalloonPercent = math.Round(e.BalloonPercent*100000) / 1000
 	e.GrowthInput["ERV"] = math.Round(e.GrowthInput["ERV"]*100000) / 1000
 	e.GrowthInput["CPI"] = math.Round(e.GrowthInput["CPI"]*100000) / 1000
+	e.GLA.RentRevisionERV = math.Round(e.GLA.RentRevisionERV*100000) / 1000
+	e.GLA.Probability = math.Round(e.GLA.Probability*100000) / 1000
 	e.OpEx.PercentOfTRI = math.Round(e.OpEx.PercentOfTRI*100000) / 1000
+	e.DebtInput.LTV = math.Round(e.DebtInput.LTV*100000) / 1000
+	e.DebtInput.InterestRate = math.Round(e.DebtInput.InterestRate*100000) / 1000
+	e.GLA.Default.Hazard = math.Round(e.GLA.Default.Hazard*100000) / 1000
+	e.MCSetup.ERV = math.Round(e.MCSetup.ERV*100000) / 1000
+	e.MCSetup.CPI = math.Round(e.MCSetup.CPI*100000) / 1000
+	e.MCSetup.Probability = math.Round(e.MCSetup.Probability*100000) / 1000
+	e.MCSetup.OpEx = math.Round(e.MCSetup.OpEx*100000) / 1000
+	e.MCSetup.Hazard = math.Round(e.MCSetup.Hazard*100000) / 1000
 }
 
 // Post -
@@ -141,20 +130,3 @@ func (c *ChangeEntityController) Post() {
 	temp["modelslist"] = ModelsList
 	c.Data = temp
 }
-
-// Post -
-// func (c *ViewUnitController) Post() {
-// 	// parent
-// 	c.Data["parent"] = c.GetString("parent")
-// 	parent := c.Data["parent"].(string)
-// 	pkey := EntityStore.Keys[parent]
-// 	// unit
-// 	c.Data["name"] = c.GetString("name")
-// 	name := c.Data["name"].(string)
-// 	ukey := EntityStore.Array[pkey].ChildUnits.Keys[name]
-// 	//
-// 	temp := make(map[interface{}]interface{})
-// 	temp["unit"] = EntityStore.Array[pkey].ChildUnits.Array[ukey]
-// 	c.TplName = "UnitView.tpl"
-// 	c.Data = temp
-// }

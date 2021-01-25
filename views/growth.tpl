@@ -1,4 +1,4 @@
-{{define "growthinput"}}
+[[define "growthinput"]]
     <br>
     <div class="container-fluid">
         <table class="table table-hover rounded tableFixHead" id="growth">
@@ -6,31 +6,31 @@
                 <tr>
                     <th scope="col">Series</th>
                     <th scope="col">Is ERV</th>
-                    {{$header := .Model.TableHeader.Blended.Yearly}}
-                    {{range $header}}
-                    <th scope="col">&nbsp&nbsp&nbsp&nbsp{{.Year}}</th>
-                    {{end}}
+                    [[$header := .Model.TableHeader.Blended.Yearly]]
+                    [[range $header]]
+                    <th scope="col">&nbsp&nbsp&nbsp&nbsp[[.Year]]</th>
+                    [[end]]
                 </tr>
             </thead>
             <tbody id="growthbody">
-                {{$growth := .Model.GrowthInput}}
-                {{$data := .Model.GrowthInputData}}
-                {{range $key, $value := $growth}}
-                {{$iserv := index $data $key }}
+                [[$growth := .Model.GrowthInput]]
+                [[$data := .Model.GrowthInputData]]
+                [[range $key, $value := $growth]]
+                [[$iserv := index $data $key ]]
                 <tr>
                     <td>
-                        <input readonly type ="text" class="form-control" id="{{$key}}" name="growthitem" value="{{$key}}" >
+                        <input readonly type ="text" class="form-control" id="[[$key]]" name="growthitem" value="[[$key]]" >
                     </td>
                     <td>
-                        <input type ="text" class="form-control" id="{{$key}}iserv" name="{{$key}}iserv" value="{{$iserv.IsERV}}" >
+                        <input type ="text" class="form-control" id="[[$key]]iserv" name="[[$key]]iserv" value="[[$iserv.IsERV]]" >
                     </td>
-                    {{range $header}}
+                    [[range $header]]
                         <td>
-                            <input type="text" class="form-control" id="{{$key}}{{.Year}}" name="{{$key}}{{.Year}}" value={{index $value.Value .Year}}>
+                            <input type="text" class="form-control" id="[[$key]][[.Year]]" name="[[$key]][[.Year]]" value=[[index $value.Value .Year]]>
                         </td>
-                    {{end}}
+                    [[end]]
                 </tr>
-                {{end}}
+                [[end]]
             </tbody>
         </table>
     </div>
@@ -93,7 +93,7 @@
         }
 
         function addGrowthRow() {
-            var header = {{.Model.TableHeader.Blended.Yearly}};
+            var header = [[.Model.TableHeader.Blended.Yearly]];
             var len = header.length;
             var growthitem = document.getElementById('growthitem').value;
             var iserv = false;
@@ -145,4 +145,4 @@
             td.appendChild(ele);
         }
     </script>
-{{end}}
+[[end]]

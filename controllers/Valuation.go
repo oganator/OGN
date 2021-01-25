@@ -1,6 +1,8 @@
 package controllers
 
-import "math"
+import (
+	"math"
+)
 
 // ValuationCalc -
 func (e *Entity) ValuationCalc() {

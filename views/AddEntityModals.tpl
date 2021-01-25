@@ -1,26 +1,26 @@
 <!-- both the CreateEntityModal and AddChildEntityModal use the EntityModal, and should be used in their proper contexts -->
 
-{{define "CreateEntityModal"}}
+[[define "CreateEntityModal"]]
     <form id="modelform" class="form-horizontal form-well" style="color: #006A4D;" role="form" method="post" action="/CreateEntity">
-        {{template "EntityModal"}}
+        [[template "EntityModal"]]
     </form>
     <div class="text-center">
         <a href="" class="btn btn-default btn-rounded my-3" data-toggle="modal" data-target="#modalLRForm">Add new Investment</a>
     </div>
-{{end}}
+[[end]]
 
 
-{{define "AddChildEntityModal"}}
+[[define "AddChildEntityModal"]]
     <form id="modelform" class="form-horizontal form-well" style="color: #006A4D;" role="form" method="post" action="/AddChildEntity">
-        {{template "EntityModal" .}}
+        [[template "EntityModal" .]]
     </form>
     <div class="text-center">
         <a href="" class="btn btn-default btn-rounded my-3" data-toggle="modal" data-target="#modalLRForm">Add new Investment</a>
     </div>
-{{end}}
+[[end]]
 
 
-{{define "EntityModal"}}
+[[define "EntityModal"]]
     <div class="modal fade" id="modalLRForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog cascading-modal" role="document">
             <!--Content-->
@@ -46,7 +46,7 @@
                                 <div class="form-group">
                                     <div class="form-group">
                                         <label for="contract">Parent</label>
-                                        <input type="text" readonly class="form-control" id="parent" name="parent" Value="{{.Name}}">
+                                        <input type="text" readonly class="form-control" id="parent" name="parent" Value="[[.Name]]">
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -77,4 +77,4 @@
             </div>
         </div>
     </div>
-{{end}}
+[[end]]

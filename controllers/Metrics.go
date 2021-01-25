@@ -57,5 +57,9 @@ func (e *Entity) Duration() {
 		weight := e.COA[date.Dateint].BondExpense / sum
 		dur = weight*i + dur
 	}
-	e.Metrics.BondHolder.Duration = math.Round((dur/12)*100) / 100
+	duration := math.Round((dur/12)*100) / 100
+	if sum == 0.0 {
+		duration = 0.0
+	}
+	e.Metrics.BondHolder.Duration = duration
 }

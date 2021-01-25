@@ -1,7 +1,7 @@
-{{template "header" .header}}
+[[template "header" .header]]
 <body>
     <br>
     <br>
     
 </body>
-{{template "footer"}}
+[[template "footer"]]

@@ -8,6 +8,7 @@ require (
 	github.com/360EntSecGroup-Skylar/excelize v1.4.1
 	github.com/beego/bee v1.12.3 // indirect
 	github.com/flosch/pongo2 v0.0.0-20200913210552-0d938eb266f3 // indirect
+	github.com/jinzhu/copier v0.2.0
 	github.com/lib/pq v1.9.0 // indirect
 	github.com/magiconair/properties v1.8.4 // indirect
 	github.com/mattn/go-colorable v0.1.8 // indirect
@@ -27,6 +28,8 @@ require (
 	golang.org/x/arch v0.0.0-20201207233722-1e68675e650f // indirect
 	golang.org/x/sys v0.0.0-20201221093633-bc327ba9c2f0 // indirect
 	golang.org/x/text v0.3.4 // indirect
+	gonum.org/v1/gonum v0.8.2
+	gonum.org/v1/plot v0.0.0-20190515093506-e2840ee46a6b
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

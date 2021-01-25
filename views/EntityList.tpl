@@ -1,12 +1,12 @@
-{{template "header"}}
+[[template "header"]]
 <body>
     <br>
     <br>
     <div class="container-fluid">
-        {{template "EntityTable" .entitymap}}
+        [[template "EntityTable" .entitymap]]
     </div>
     <div class="container-fluid">
-        {{template "CreateEntityModal" .parent}}
+        [[template "CreateEntityModal" .parent]]
     </div>
 </body>
-{{template "footer"}}
+[[template "footer"]]

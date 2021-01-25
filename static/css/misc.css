@@ -1,7 +1,7 @@
 @charset "utf-8";
 .tableFixHead {
     overflow-y: scroll;
-    overflow-x: visible;
+    overflow-x: scroll;
     height: 100px;
 }
 
@@ -65,4 +65,9 @@ tr {
 .btn {
     background-color: #006A4D;
     color: white
+}
+
+  .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    color: #fff;
+    background-color: #006A4D;
 }

@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/360EntSecGroup-Skylar/excelize"
+	// "github.com/360EntSecGroup-Skylar/excelize"
 )
 
 // EntityData -
@@ -29,6 +30,8 @@ type EntityData struct {
 	WOZpercent          float64
 	DeprPeriod          int
 	Landvalue           float64
+	CarryBackYrs        int
+	CarryForwardYrs     int
 	LTV                 float64
 	LoanRate            float64
 	OpExpercent         float64
@@ -77,10 +80,12 @@ type GrowthData struct {
 
 // ReadXLSX - Reads Data.xlsx and populates data stores (Entity, Unit and GrowthItems)
 func ReadXLSX() {
-	xlsx, _ := excelize.OpenFile("./Models/Data.xlsx")
+	xlsx, _ := excelize.OpenFile("./models/Data.xlsx")
 
+	// entityfile, _ := os.Open("./models/Entities.csv")
 	// ENTITIES
 	entities := xlsx.GetRows("Entities")
+	// entities, _ := csv.NewReader(entityfile).ReadAll()
 	for i, row := range entities {
 		if i < 2 {
 			continue
@@ -106,6 +111,8 @@ func ReadXLSX() {
 		tempentity.WOZpercent, _ = strconv.ParseFloat(row[18], 64)
 		tempentity.DeprPeriod, _ = strconv.Atoi(row[19])
 		tempentity.Landvalue, _ = strconv.ParseFloat(row[20], 64)
+		tempentity.CarryBackYrs, _ = strconv.Atoi(row[24])
+		tempentity.CarryForwardYrs, _ = strconv.Atoi(row[25])
 		tempentity.LTV, _ = strconv.ParseFloat(row[21], 64)
 		tempentity.LoanRate, _ = strconv.ParseFloat(row[22], 64)
 		tempentity.OpExpercent, _ = strconv.ParseFloat(row[23], 64)
@@ -116,9 +123,10 @@ func ReadXLSX() {
 		tempentity.Fees, _ = strconv.ParseFloat(row[28], 64)
 		EntityStore[tempentity.MasterID] = &tempentity
 	}
-
 	// UNITS
 	units := xlsx.GetRows("Units")
+	// unitfile, _ := os.Open("./models/Units.csv")
+	// units, _ := csv.NewReader(unitfile).ReadAll()
 	for i, row := range units {
 		if i < 2 {
 			continue
@@ -151,17 +159,17 @@ func ReadXLSX() {
 	}
 
 	// GROWTHITEMSRAW
-	growth := xlsx.GetRows("Growth Items")
-	for i, row := range growth {
-		if i < 2 {
-			continue
-		}
-		tempgrowth := GrowthData{}
-		tempgrowth.EntityMasterID, _ = strconv.Atoi(row[1])
-		tempgrowth.Item = row[2]
-		tempgrowth.Amount, _ = strconv.ParseFloat(row[3], 64)
-		GrowthItemsRaw = append(GrowthItemsRaw, tempgrowth)
-	}
+	// growth := xlsx.GetRows("Growth Items")
+	// for i, row := range growth {
+	// 	if i < 2 {
+	// 		continue
+	// 	}
+	// 	tempgrowth := GrowthData{}
+	// 	tempgrowth.EntityMasterID, _ = strconv.Atoi(row[1])
+	// 	tempgrowth.Item = row[2]
+	// 	tempgrowth.Amount, _ = strconv.ParseFloat(row[3], 64)
+	// 	GrowthItemsRaw = append(GrowthItemsRaw, tempgrowth)
+	// }
 
 	//GROWTHITEMSSTORE
 	sort.Sort(GrowthItemsRaw)
@@ -205,3 +213,5 @@ func (gds GDSlice) Less(i, j int) bool {
 func (gds GDSlice) Swap(i, j int) {
 	gds[i], gds[j] = gds[j], gds[i]
 }
+
+// 5373d780-2e0f-447d-89e3-2f9c4fd6e388  2021-01-09T13:21:34+00:00  2M28S     gs://propmodel-271202_cloudbuild/source/1610198475.813473-3a0ab15b6b024d7c818df175788723f5.tgz  gcr.io/propmodel-271202/ogn (+1 more)  SUCCESS

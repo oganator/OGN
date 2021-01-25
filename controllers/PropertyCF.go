@@ -106,42 +106,6 @@ func (e *Entity) Disposal() {
 	e.COA[e.SalesDate.Dateint] = temp
 }
 
-// CIT - Also fees. 15%/21.7% starts in december of the first year, and assesses the tax liability of that year, then inserts the taxes payable into may of the next year. Does not assess capital gain (done in Disposal()). As more items are built out, they need to be added to taxable income, as the inclusion of BPuplift previously skewed the taxable income upwards
-func (e *Entity) CIT() {
-	startdate := Datetype{Month: 5, Year: e.StartDate.Year}
-	taxyear := e.StartDate.Year - 1
-	depr := Depreciation(e)
-	for date := startdate; date.Dateint <= e.EndDate.Dateint; date.Add(12) {
-		taxespayable := 0.0
-		taxableincome := e.COA[taxyear].TheoreticalRentalIncome + e.COA[taxyear].Vacancy + e.COA[taxyear].Capex + e.COA[taxyear].InterestExpense + depr + e.COA[taxyear].Fees
-		if date.Dateint == Dateadd(e.SalesDate, 5).Dateint {
-			taxableincome = taxableincome + e.COA[e.SalesDate.Dateint].AcqDispProperty + e.COA[Dateadd(e.StartDate, -1).Dateint].AcqDispProperty // capital gain
-		}
-		if taxableincome < 0.0 {
-
-		} else if taxableincome > 200000.0 {
-			taxespayable = 200000.0*.15 + (taxableincome-200000)*.217
-		} else {
-			taxespayable = taxableincome * .15
-		}
-		temp := FloatCOA{Tax: -taxespayable}
-		if date.Dateint == Dateadd(e.SalesDate, 5).Dateint {
-			temp.Add(e.COA[e.SalesDate.Dateint])
-			e.COA[e.SalesDate.Dateint] = temp
-			break
-		}
-		temp.Add(e.COA[date.Dateint])
-		e.COA[date.Dateint] = temp
-		taxyear++
-	}
-}
-
-// Depreciation -
-func Depreciation(e *Entity) float64 {
-	depr := (-e.Valuation.AcqPrice - (-e.Valuation.AcqPrice * e.Tax.MinValue) - (-e.Valuation.AcqPrice * e.Tax.LandValue)) / float64(e.Tax.UsablePeriod)
-	return depr
-}
-
 // SumNCF -
 func (e *Entity) SumNCF() {
 	cashbalance := e.COA[Dateadd(e.StartDate, -1).Dateint].NetCashFlow
@@ -158,14 +122,4 @@ func (e *Entity) SumNCF() {
 		e.COA[date.Dateint] = temp
 		cashbalance = 0
 	}
-}
-
-// Tax -
-type Tax struct {
-	MinValue     float64             // as a percent
-	LandValue    float64             // as a percent
-	UsablePeriod int                 // number of years
-	RETT         float64             // as a percent
-	CIT          map[float64]float64 //map[income]rate
-	VAT          float64             //
 }
