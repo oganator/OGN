@@ -18,16 +18,16 @@
 					<a class="nav-link" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('endncf')">Ending NCF</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" ng-click="getRequest('irr')">IRR</a>
+					<a class="nav-link" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('irr')" ng-show="strategy == 'Standard' ">IRR</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('em')">Equity Multiple</a>
+					<a class="nav-link" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('em')" ng-show="strategy == 'Standard' ">Equity Multiple</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('ytm')">YTM</a>
+					<a class="nav-link" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('ytm')" ng-show="strategy != 'Standard' ">YTM</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('duration')">Duration</a>
+					<a class="nav-link" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('duration')" ng-show="strategy != 'Standard' ">Duration</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" id="details-tab" data-toggle="tab" href="#details" role="tab" aria-controls="details" aria-selected="false" ng-click="getRequest('details')">Details</a>
@@ -35,7 +35,7 @@
 			</ul>
 		</div>
 		<div class="container-fluid shadow-lg rounded" style="width: 95%; overflow-x:scroll;">
-			<div id="cftable">[[template "MCDetails" .entity]]</div>
+			<div id="cftable">[[template "CFTable" .]]</div>
 			<div bind-html-compile = response></div>
 			</div>
 		</div>

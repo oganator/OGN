@@ -11,11 +11,11 @@
         </thead>
         <tbody>
             <tr>
-                <td>[[printf "%.2f" .data.Mean]]</td>
-                <td>[[printf "%.2f" .data.StDev]]</td>
-                <td>[[printf "%.2f" .data.Skew]]</td>
-                <td>[[printf "%.2f" .data.Kurtosis]]</td>
-                <td>[[printf "%.2f" .data.LRalpha]] + [[printf "%.2f" .data.LRbeta]]x</td>
+                <td>{{[[.data.Mean]] | number:2}}</td>
+                <td>{{[[.data.StDev]] | number:2}}</td>
+                <td>{{[[.data.Skew]] | number:2}}</td>
+                <td>{{[[.data.Kurtosis]] | number:2}}</td>
+                <td>{{[[.data.LRalpha]] | number:2}} + {{[[.data.LRbeta]] | number:2}}x</td>
             </tr>
         </tbody>
     </table>

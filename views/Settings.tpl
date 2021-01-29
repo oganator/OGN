@@ -28,41 +28,39 @@
                             <input type="text" class="form-control" id="rate" name="rate" Value="[[.entity.DebtInput.InterestRate]]">
                         </div>
                         <div class="form-group col-sm-1">
-                            <label for="discount">Discount Rate</label>
-                            <input type="text" class="form-control" id="discount" name="discount" Value="[[.entity.GLA.DiscountRate]]">
-                        </div>
-                        <div class="form-group col-sm-1">
-                            <label for="rate">Rent to Sell %</label>
-                            <input type="text" class="form-control" id="soldrent" name="soldrent" Value="[[.entity.GLA.PercentSoldRent]]">
+                            <label for="fees">Fees (bps)</label>
+                            <input type="text" class="form-control" id="fees" name="fees" Value="[[.entity.Fees.PercentOfGAV]]">
                         </div>
                         <div class="form-group col-sm-1">
                             <label for="rate">Strategy</label>
-                            <select type="text" class="form-control" id="strategy" name="strategy" placeholder="[[.entity.Strategy]]">
-                                <option>[[.entity.Strategy]]</option>
-                                <option>Pure Discount</option>
-                                <option>Amortized Coupon</option>
+                            <select type="text" class="form-control" id="strategy" name="strategy" placeholder="[[.entity.Strategy]]" ng-model="strategy">
+                                <option hidden>[[.entity.Strategy]]</option>
+                                <option>Standard</option>
                                 <option>Balloon</option>
+                                <option>Pure Discount</option>
                             </select>
                         </div>
-                        [[if eq .entity.Strategy "Balloon"]]
-                        <div class="form-group col-sm-1">
-                            <label for="balpercent">Balloon Percent</label>
-                            <input type="text" class="form-control" id="balpercent" name="balpercent" Value="[[.entity.BalloonPercent]]">
+                        <div class="form-group col-sm-1" ng-show="strategy != 'Standard' ">
+                            <label for="discount">Discount Rate</label>
+                            <input type="text" class="form-control" id="discount" name="discount" Value="[[.entity.GLA.DiscountRate]]">
                         </div>
-                        [[end]]
-                        <div class="form-group col-sm-1">
-                            <label for="fees">Fees (bps)</label>
-                            <input type="text" class="form-control" id="fees" name="fees" Value="[[.entity.Fees.PercentOfGAV]]">
+                        <div class="form-group col-sm-1" ng-show="strategy != 'Standard' ">
+                            <label for="rate">Rent to Sell %</label>
+                            <input type="text" class="form-control" id="soldrent" name="soldrent" Value="[[.entity.GLA.PercentSoldRent]]">
+                        </div>
+                        <div class="form-group col-sm-1" ng-show="strategy != 'Standard' ">
+                            <label for="balpercent">Balloon Percent</label>
+                            <input type="text" class="form-control" id="balpercent" name="balpercent" Value="[[.entity.BalloonPercent]]" >
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group col-sm-1">
                             <label for="erv">ERV Growth</label>
-                            <input type="text" class="form-control" id="erv" name="erv" Value="[[index .entity.GrowthInput "ERV"]]">
+                            <input type="text" class="form-control" id="erv" name="erv" Value='[[index .entity.GrowthInput "ERV"]]'>
                         </div>
                         <div class="form-group col-sm-1">
                             <label for="erv">CPI Growth</label>
-                            <input type="text" class="form-control" id="cpi" name="cpi" Value="[[index .entity.GrowthInput "CPI"]]">
+                            <input type="text" class="form-control" id="cpi" name="cpi" Value='[[index .entity.GrowthInput "CPI"]]'>
                         </div>
                         <div class="form-group col-sm-1">
                             <label for="yieldshift">Yield Shift (bps)</label>
@@ -137,13 +135,13 @@
                 <div class="form-group col-sm-1">
                     <input readonly type="text" class="form-control" id="irr" name="irr" Value="IRR: [[.entity.Metrics.IRR.NetLeveredAfterTax]]">
                 </div>
-                <div class="form-group col-sm-1 offset-sm-6">
+                <div class="form-group col-sm-1 offset-sm-6" ng-show="strategy != 'Standard' ">
                     <input readonly type="text" class="form-control" id="ytm" name="ytm" Value="YTM: [[.entity.Metrics.BondHolder.YTM]]">
                 </div>
-                <div class="form-group col-sm-1">
+                <div class="form-group col-sm-1" ng-show="strategy != 'Standard' ">
                     <input readonly type="text" class="form-control" id="dur" name="dur" Value="DUR: [[.entity.Metrics.BondHolder.Duration]]">
                 </div>
-                <div class="form-group col-sm-1">
+                <div class="form-group col-sm-1" ng-show="strategy != 'Standard' ">
                     <input readonly type="text" class="form-control" id="ytmdur" name="ytmdur" Value="YTM/DUR: ">
                 </div>
             </div>
@@ -332,4 +330,3 @@
     <br>
     <br>
 [[end]]
-

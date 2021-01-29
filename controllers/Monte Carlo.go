@@ -22,16 +22,6 @@ type MCSetup struct {
 	Hazard      float64
 }
 
-// MCResults -
-// type MCResults struct {
-// 	EndCash  float64
-// 	EndNCF   float64
-// 	IRR      float64
-// 	EM       float64
-// 	YTM      float64
-// 	Duration float64
-// }
-
 // MCResultSlice -
 type MCResultSlice struct {
 	EndCash  []float64
@@ -42,19 +32,8 @@ type MCResultSlice struct {
 	Duration []float64
 }
 
-// AMResults - used for MonteCarlo func
-// type AMResults struct {
-// 	NOI         *mat.Dense
-// 	MarketValue *mat.Dense
-// 	NCF         *mat.Dense
-// 	IRR         []float64
-// }
-
 // MCResults - used for final display. NOI, MarketValue and NCF have stats per year, IRR is for the hold period
 type MCResults struct {
-	// NOI         []MCStats
-	// MarketValue []MCStats
-	// NCF         []MCStats
 	EndCash  MCStats
 	EndNCF   MCStats
 	IRR      MCStats
@@ -79,27 +58,6 @@ type MCStats struct {
 type Hist struct {
 	Keys []float64
 	Vals []float64
-}
-
-// EntitySlice - used to implement sort.Interface
-type EntitySlice []*Entity
-
-// Len -
-func (ams EntitySlice) Len() int {
-	return len(ams)
-}
-
-// Less - return whether the element with index i should sort before the element with index j
-func (ams EntitySlice) Less(i, j int) bool {
-	if ams[i].Metrics.IRR.NetLeveredAfterTax < ams[j].Metrics.IRR.NetLeveredAfterTax {
-		return true
-	}
-	return false
-}
-
-// Swap -
-func (ams EntitySlice) Swap(i, j int) {
-	ams[i], ams[j] = ams[j], ams[i]
 }
 
 // MonteCarlo -

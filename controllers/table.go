@@ -40,7 +40,7 @@ func (e *Entity) MakeTable(coas BoolCOA) {
 	cashbalance := make(map[int]string)
 	bondincome := make(map[int]string)
 	bondexpense := make(map[int]string)
-	for date := Dateadd(e.StartDate, -1); date.Dateint <= e.EndDate.Dateint; date = Dateadd(date, 1) {
+	for date := Dateadd(e.StartDate, -1); date.Dateint <= e.SalesDate.Dateint; date = Dateadd(date, 1) {
 		if date.Dateint == e.StartDate.Dateint || date.Month == 1 || date == Dateadd(e.StartDate, -1) {
 			marketvalue[date.Year] = RenderFloat("#,###.", e.COA[date.Year].MarketValue)
 			totalerv[date.Year] = RenderFloat("#,###.", e.COA[date.Year].TotalERV)
@@ -472,18 +472,14 @@ func (e *Entity) CreateTableHeader(month, quarter, year bool) {
 		e.TableHeader.Monthly = ForecastMonthly
 	}
 	// Quarter
-	if quarter {
-		ForecastQuarterly := make([]Datetype, 0)
-		e.TableHeader.Quarterly = ForecastQuarterly
-	}
 	// Year
 	if year {
 		ForecastYearly := make([]Datetype, 0)
 		for ydate := Dateadd(e.StartDate, -1); ydate.Year <= e.EndDate.Year; ydate = Dateadd(ydate, 12) {
-			if ydate.Dateint <= e.SalesDate.Dateint {
+			if ydate.Year <= e.SalesDate.Year {
 				ydate.Bool = true
 			}
-			if ydate.Dateint >= Dateadd(e.StartDate, -1).Dateint {
+			if ydate.Year >= Dateadd(e.StartDate, -1).Year {
 				ForecastYearly = append(ForecastYearly, ydate)
 			}
 		}
