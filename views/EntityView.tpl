@@ -62,5 +62,57 @@
 			[[template "AddChildUnitModal" .entity.Name]]
 		</div>
 	[[end]]
+	<div class="row">
+		<div id="myDiv2"></div>
+	</div>
+<!--	<script>
+
+		Plotly.d3.json('https://raw.githubusercontent.com/plotly/datasets/master/3d-ribbon.json', function(figure){
+			var i
+			var data = [];
+			var length = figure.data.length;
+			for (i=0;i<length; i++){
+				data[i] = {
+					x: figure.data[i].x, 
+					y: figure.data[i].y, 
+					z: figure.data[i].z,
+					name: '',
+					colorscale: figure.data[i].colorscale,
+					type: 'surface',
+					showscale: false
+				}
+			}
+			Plotly.newPlot('myDiv', data, layout);
+		});
+		-->
+	<script>
+		var layout = {
+			title: 'Ribbon Plot',
+			showlegend: false,
+			autosize: false,
+			width: 2000,
+			height: 1000,
+			scene: {
+				xaxis: {title: 'Probability'},
+				yaxis: {title: 'Time'},
+				zaxis: {title: '$'}
+			}
+		};
+		var figure = [[.entity.MCResults.NCF]]
+		var i
+		var data = [];
+		var length = figure.length;
+		for (i=0;i<length; i++){
+			data[i] = {
+				x: figure[i].x, 
+				y: figure[i].y, 
+				z: figure[i].z,
+				name: '',
+				type: 'surface',
+				showscale: false
+			}
+		}
+		Plotly.newPlot('myDiv2', data, layout);
+	</script>
 	[[template "footer" .]]
 </body>

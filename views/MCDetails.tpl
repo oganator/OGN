@@ -5,10 +5,11 @@
 			<tr>
 				<th scope="col" data-sortable="true">View CF</th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn border border-white" style="background-color: #006A4D; color:white;" ng-click='sortMCDetails("irr")'>IRR</button></th>
+				<th scope="col" data-sortable="true"><button type="button" class="btn border border-white" style="background-color: #006A4D; color:white;" ng-click='sortMCDetails("em")'>Equity Multiple</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn border border-white" style="background-color: #006A4D; color:white;" ng-click='sortMCDetails("ytm")'>YTM</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn border border-white" style="background-color: #006A4D; color:white;" ng-click='sortMCDetails("duration")'>Duration</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn border border-white" style="background-color: #006A4D; color:white;" ng-click='sortMCDetails("void")'>Void</button></th>
-				<th scope="col" data-sortable="true"><button type="button" class="btn border border-white" style="background-color: #006A4D; color:white;" ng-click='sortMCDetails("extdur")'>Extension Duration</button></th>
+				<th scope="col" data-sortable="true"><button type="button" class="btn border border-white" style="background-color: #006A4D; color:white;" ng-click='sortMCDetails("extdur")'>EXT Duration</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn border border-white" style="background-color: #006A4D; color:white;" ng-click='sortMCDetails("hazard")'>Hazard Rate</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn border border-white" style="background-color: #006A4D; color:white;" ng-click='sortMCDetails("opex")'>OpEx %TRI</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn border border-white" style="background-color: #006A4D; color:white;" ng-click='sortMCDetails("cpi")'>CPI Growth</button></th>
@@ -23,6 +24,7 @@
 			<tr>
 				<td><button type="button" class="btn" style="background-color: #006A4D; color:white" href="#mccf" data-toggle="modal" data-target="#mccf" ng-click='viewCFIndex("[[$index]]")'>View CF</button></td>
 				<td>[[printf "%.2f" $value.Metrics.IRR.NetLeveredAfterTax]]</td>
+				<td>[[printf "%.2f" $value.Metrics.EM.NetLeveredAfterTax]]</td>
 				<td>[[printf "%.2f" $value.Metrics.BondHolder.YTM]]</td>
 				<td>[[printf "%.2f" $value.Metrics.BondHolder.Duration]]</td>
 				<td>[[$value.GLA.Void]]</td>

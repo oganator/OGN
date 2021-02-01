@@ -209,3 +209,27 @@ func (coa *FloatCOA) Add(x FloatCOA) {
 func (coa *FloatCOA) Multiply(x FloatCOA) {
 	*coa = MultiplyCOA(*coa, x)
 }
+
+// ReturnCOAArray -
+func ReturnCOAArray(coa IntFloatCOAMap, setup FloatCOA, start, end Datetype) (array []float64) {
+	duration := dateintdiff(end.Dateint, start.Dateint)
+	array = make([]float64, duration)
+	for i := 0; i < duration; i++ {
+		array[i] = SumCOADown(MultiplyCOA(coa[start.Dateint], setup))
+		start.Add(1)
+	}
+	return array
+}
+
+// CreateTupleArray - creates an array of tuples from a source array. both values of the tuple are the same. this is used for the ribbonplot
+func CreateTupleArray(slice []float64, xaxis bool) (tuplearray [][]float64) {
+	tuplearray = make([][]float64, len(slice))
+	for i, v := range slice {
+		v2 := v
+		if xaxis == true {
+			v2 = v - 1
+		}
+		tuplearray[i] = []float64{v2, v}
+	}
+	return tuplearray
+}

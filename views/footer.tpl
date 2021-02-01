@@ -9,6 +9,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-resource.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-route.min.js"></script>
 <script src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.12.1.min.js" data-require="ui-bootstrap@*" data-semver="0.12.1"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script src="static/js/app.js"></script>
 <script src="static/js/misc.js"></script>
 <script>

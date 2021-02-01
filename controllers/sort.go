@@ -17,6 +17,23 @@ func (a ByIRRr) Less(i, j int) bool {
 }
 func (a ByIRRr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
+// ByEM -
+type ByEM []*Entity
+
+func (a ByEM) Len() int { return len(a) }
+func (a ByEM) Less(i, j int) bool {
+	return a[i].Metrics.EM.NetLeveredAfterTax < a[j].Metrics.EM.NetLeveredAfterTax
+}
+func (a ByEM) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+type ByEMr []*Entity
+
+func (a ByEMr) Len() int { return len(a) }
+func (a ByEMr) Less(i, j int) bool {
+	return a[i].Metrics.EM.NetLeveredAfterTax > a[j].Metrics.EM.NetLeveredAfterTax
+}
+func (a ByEMr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
 // ByYTM -
 type ByYTM []*Entity
 

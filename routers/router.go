@@ -20,4 +20,5 @@ func init() {
 	beego.Router("/MCDuration", &controllers.MCDurationController{})
 	beego.Router("/MCDetails", &controllers.MCDetailsController{})
 	beego.Router("/MCIndex", &controllers.MCIndexController{})
+	beego.Router("/test", &controllers.TestController{})
 }
