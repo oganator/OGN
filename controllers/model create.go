@@ -126,7 +126,7 @@ func (e *Entity) CalculateModel(mc bool) {
 	e.PropertyCFCalc()
 	e.Disposal()
 	e.SumCOA()
-	// e.CIT()
+	e.CIT()
 	e.SumNCF()
 	e.SumCOA()
 	if mc == false {

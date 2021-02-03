@@ -3,7 +3,7 @@
 [[define "EntitySettings"]]
     <div class="container-fluid shadow-lg rounded" style="width: 95%">
         <br>
-        <form class="form-horizontal form-well" style="color: #006A4D;" role="form" method="post" action="/">
+        <form class="form-horizontal form-well" role="form" method="post" action="/">
                 <div class="tab-pane fade in show active" id="lease" role="tabpanel">
                     <div class="form-row">
                         <input hidden id="name" name="name" ng-model="entity" value="[[.entity.Name]]">
@@ -125,7 +125,7 @@
             <div class="form-row"> 
                 <div>
                     <div class="form-group col-md-4 d-flex align-items-end">
-                        <button type="submit" class="btn" style="background-color: #006A4D; color:white">Submit</button>
+                        <button type="submit" class="btn secondary-bg">Submit</button>
                     </div>
                 </div>
                 <div class="form-group col-sm-1">

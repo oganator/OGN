@@ -11,21 +11,21 @@
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     </head>
     <body>
-        <nav class="navbar navbar-expand-lg navbar-dark shadow-lg" style="background-color: #006A4D;">
-            <a class="navbar-brand" href="#">OGAN CAPITAL &nbsp &nbsp &nbsp</a>
-            <form class="form-horizontal form-well" style="color: #006A4D;" role="form" method="post" action="/ChangeEntity">
+        <nav class="main-secondary navbar navbar-expand-lg navbar-dark shadow-lg">
+            <a class="navbar-brand" style="color:white;">LaSalle Investment Management &nbsp &nbsp &nbsp</a>
+            <form class="form-horizontal form-well" role="form" method="post" action="/ChangeEntity">
                 <div class="tab-pane fade in show active" id="header" role="tabpanel">
                     <div class="form-row">
                         <div class="form-group col">
                             <select class="form-select" size="1" id="modelname" name="modelname" value="[[.entity.Name]]">
-                                <option selected>[[.entity.Name]]</option>
+                                <option selected hidden>[[.entity.Name]]</option>
                                 [[range $key,$value := .modelslist]]
                                 <option>[[$key]]</option>
                                 [[end]]
                             </select>
                         </div>
                         <div class="form-group col-md-1 d-flex align-items-end">
-                            <button type="submit" class="btn" style="background-color: white; color:#006A4D">Submit</button>
+                            <button type="submit" class="btn">Submit</button>
                         </div>
                     </div>
                 </div>

@@ -54,7 +54,8 @@
                 datasets: [{
                     label: '',
                     data: [[.data.Hist.Vals]],
-                    borderWidth: 1
+                    backgroundColor: "rgba(0,36,93,.5)", 
+                    borderWidth: 0
                 }]
             },
             options: {

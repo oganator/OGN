@@ -7,97 +7,6 @@ import (
 	beego "github.com/astaxie/beego"
 )
 
-// CFTableController -
-type CFTableController struct {
-	beego.Controller
-}
-
-// Get -
-func (c *CFTableController) Get() {
-	temp := make(map[interface{}]interface{})
-	temp["entity"] = Models[Key]
-	c.TplName = "CFTable.tpl"
-	c.Data = temp
-}
-
-// MCEndingCashController -
-type MCEndingCashController struct {
-	beego.Controller
-}
-
-// Get -
-func (c *MCEndingCashController) Get() {
-	temp := make(map[interface{}]interface{})
-	temp["data"] = Models[Key].MCResults.EndCash
-	c.TplName = "MCHist.tpl"
-	c.Data = temp
-}
-
-// MCEndingNCFController -
-type MCEndingNCFController struct {
-	beego.Controller
-}
-
-// Get -
-func (c *MCEndingNCFController) Get() {
-	temp := make(map[interface{}]interface{})
-	temp["data"] = Models[Key].MCResults.EndNCF
-	c.TplName = "MCHist.tpl"
-	c.Data = temp
-}
-
-// MCIRRController -
-type MCIRRController struct {
-	beego.Controller
-}
-
-// Get -
-func (c *MCIRRController) Get() {
-	temp := make(map[interface{}]interface{})
-	temp["data"] = Models[Key].MCResults.IRR
-	c.TplName = "MCHist.tpl"
-	c.Data = temp
-}
-
-// MCEMController -
-type MCEMController struct {
-	beego.Controller
-}
-
-// Get -
-func (c *MCEMController) Get() {
-	temp := make(map[interface{}]interface{})
-	temp["data"] = Models[Key].MCResults.EM
-	c.TplName = "MCHist.tpl"
-	c.Data = temp
-}
-
-// MCYTMController -
-type MCYTMController struct {
-	beego.Controller
-}
-
-// Get -
-func (c *MCYTMController) Get() {
-	temp := make(map[interface{}]interface{})
-	temp["data"] = Models[Key].MCResults.YTM
-	c.TplName = "MCHist.tpl"
-	c.Data = temp
-}
-
-// MCDurationController -
-type MCDurationController struct {
-	beego.Controller
-}
-
-// Get -
-func (c *MCDurationController) Get() {
-	temp := make(map[interface{}]interface{})
-	temp["data"] = Models[Key].MCResults.Duration
-	c.TplName = "MCHist.tpl"
-	c.Data = temp
-}
-
 // MCDetailsController -
 type MCDetailsController struct {
 	beego.Controller
@@ -182,6 +91,47 @@ func GetIntMCDetails(c *MCDetailsController, field string) (result int) {
 	temp := c.Data[field].(string)
 	result, _ = strconv.Atoi(temp)
 	return result
+}
+
+type MCTabsController struct {
+	beego.Controller
+}
+
+// Post -
+func (c *MCTabsController) Post() {
+	temp := make(map[interface{}]interface{})
+	c.Data["tab"] = c.GetString("tab")
+	tab := c.Data["tab"].(string)
+	switch tab {
+	case "cf":
+		temp["entity"] = Models[Key]
+		c.TplName = "CFTable.tpl"
+	case "endcash":
+		temp["data"] = Models[Key].MCResults.EndCash
+		c.TplName = "MCHist.tpl"
+	case "cashbalance":
+		temp["data"] = Models[Key].MCResults.CashBalance
+		c.TplName = "3dchart.tpl"
+	case "endncf":
+		temp["data"] = Models[Key].MCResults.EndNCF
+		c.TplName = "MCHist.tpl"
+	case "ncf":
+		temp["data"] = Models[Key].MCResults.NCF
+		c.TplName = "3dchart.tpl"
+	case "irr":
+		temp["data"] = Models[Key].MCResults.IRR
+		c.TplName = "MCHist.tpl"
+	case "em":
+		temp["data"] = Models[Key].MCResults.EM
+		c.TplName = "MCHist.tpl"
+	case "ytm":
+		temp["data"] = Models[Key].MCResults.YTM
+		c.TplName = "MCHist.tpl"
+	case "duration":
+		temp["data"] = Models[Key].MCResults.Duration
+		c.TplName = "MCHist.tpl"
+	}
+	c.Data = temp
 }
 
 type TestController struct {

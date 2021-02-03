@@ -16,7 +16,7 @@
 var ognApp = angular.module('ognApp', []);
 
 	// testController
-	ognApp.controller('testController', ['$scope', '$http', '$sce', function($scope, $http, $sce) {
+	ognApp.controller('assetViewController', ['$scope', '$http', '$sce', function($scope, $http, $sce) {
 		$scope.entity = [[.entity.Name]];
 		$scope.mcdetailspage = 1;
 		$scope.mcdetailsorder = "";
@@ -24,27 +24,33 @@ var ognApp = angular.module('ognApp', []);
 
 		// getRequest
 		$scope.getRequest = function(route) {
-			var url = ""
+			var url = "http://localhost:8080/MCTabs?tab="
 			if (route == 'cf'){
-				$scope.get("http://localhost:8080/CFTable")
+				$scope.post(url+"cf")
 			}
 			if (route == 'endcash'){
-				$scope.get("http://localhost:8080/MCEndingCash")
+				$scope.post(url+"endcash")
+			}
+			if (route == 'cashbalance'){
+				$scope.post(url+"cashbalance")
 			}
 			if (route == 'endncf'){
-				$scope.get("http://localhost:8080/MCEndingNCF")
+				$scope.post(url+"endncf")
+			}
+			if (route == 'ncf'){
+				$scope.post(url+"ncf")
 			}
 			if (route == 'irr'){
-				$scope.get("http://localhost:8080/MCIRR")
+				$scope.post(url+"irr")
 			}
 			if (route == 'em'){
-				$scope.get("http://localhost:8080/MCEM")
+				$scope.post(url+"em")
 			}
 			if (route == 'ytm'){
-				$scope.get("http://localhost:8080/MCYTM")
+				$scope.post(url+"ytm")
 			} 
 			if (route == 'duration'){
-				$scope.get("http://localhost:8080/MCDuration")
+				$scope.post(url+"duration")
 			} 
 			if (route == 'details'){
 				$scope.post("http://localhost:8080/MCDetails?name="+$scope.entity+"&page="+ $scope.mcdetailspage)
@@ -101,6 +107,8 @@ var ognApp = angular.module('ognApp', []);
 		}; // sortMCDetails
 
 	}]); // testController
+
+
 
 	//bindHtmlCompile directive 
 	ognApp.directive('bindHtmlCompile', ['$compile', function ($compile) {

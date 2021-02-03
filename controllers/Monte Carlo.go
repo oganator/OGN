@@ -167,10 +167,14 @@ type Ribbon struct {
 	X          [][]float64 `json:"x"`
 	Y          [][]float64 `json:"y"`
 	Z          [][]float64 `json:"z"`
-	Name       string
-	Colorscale [][]string
-	Plottype   string
-	Showscale  string
+	Name       string      `json:"name"`
+	Colorscale [][]string  `json:"colorscale"`
+	Plottype   string      `json:"type"`
+	Showscale  string      `json:"showscale"`
+}
+
+// RibbonData -
+type RibbonData struct {
 }
 
 // RibbonPlot -
@@ -194,20 +198,18 @@ func RibbonPlot(matrix [][]float64, duration int, bucketnum int, sims int) (ribb
 		}
 		keys = roundslice(2, 0, keys)
 		// create slice for x axis - used as the index in the ribbon
-		x := make([]float64, bucketnum)
-		for index := range x {
-			x[index] = float64((1 + i))
+		y := make([]float64, bucketnum)
+		for index := range y {
+			y[index] = float64((1 + i))
 		}
-		tempribbon := Ribbon{
-			Y:          CreateTupleArray(x, true),
-			X:          CreateTupleArray(vals, false),
-			Z:          CreateTupleArray(keys, false),
-			Name:       "OGANICA",
-			Colorscale: [][]string{},
-			Plottype:   "surface",
-			Showscale:  "false",
+		ribbon[i] = Ribbon{
+			X: CreateTupleArray(vals, false),
+			Y: CreateTupleArray(y, true),
+			Z: CreateTupleArray(keys, false),
+			// Colorscale: [][]string{},
+			Plottype:  "surface",
+			Showscale: "false",
 		}
-		ribbon[i] = tempribbon
 	}
 	return ribbon
 }

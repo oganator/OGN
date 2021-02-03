@@ -1,5 +1,5 @@
 [[define "CFTable"]]
-        <table class="table table-hover rounded tableFixHead ">
+        <table class="table table-hover rounded tableFixHead">
             <thead>
                 <tr>
                 <th scope="col"></th>
@@ -9,7 +9,7 @@
                     [[$year := .]]
                     [[range $months]] [[if .Bool]]
                         [[if eq .Year $year.Year]]
-                        <th scope="col" hidden name="[[.Year]]" style="background-color:white;color:#006A4D;">[[.MonthName]]</th> 
+                        <th scope="col" hidden name="[[.Year]]">[[.MonthName]]</th> 
                         [[end]] 
                     [[end]] [[end]]
                     <th scope="col"><button class="btn" onclick="chooseYear('[[.Year]]')">[[.Year]]</button></th>
@@ -20,12 +20,12 @@
                 [[range .entity.Table]]
                 [[$table := .]]
                     <tr>
-                        <th style="min-width: 250px; position: sticky; Left: 0px; background-color:white;color:#006A4D;" scope="row">[[.COA]]</th>
+                        <th style="min-width: 250px; position: sticky; Left: 0px;" scope="row">[[.COA]]</th>
                         [[range $years]] [[if .Bool]]
                             [[$year := .]]
                             [[range $months]] [[if .Bool]]
                                 [[if eq .Year $year.Year]]
-                                <td hidden name="[[.Year]]" style="background-color:#006A4D;color:white;">[[index $table.Value .Dateint]]</td>
+                                <td hidden name="[[.Year]]" class="secondary-bg">[[index $table.Value .Dateint]]</td>
                                 [[end]] 
                             [[end]] [[end]]
                             <td>[[index $table.Value $year.Year]]</td>

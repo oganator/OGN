@@ -23,7 +23,7 @@
                             <form id="query_form" class="form-horizontal form-well" role="form" action="/ViewUnit" method="post">
                                 <input type="text" hidden class="form-control" id="parent" name="parent" value="[[$name]]">
                                 <div>
-                                    <button type="submit" class="btn" id="name" name="name" style="background-color: #006A4D; color:#FFFFFF;" Value="[[.Name]]">[[.Name]]</button>
+                                    <button type="submit" class="btn" id="name" name="name"  Value="[[.Name]]">[[.Name]]</button>
                                 </div>
                             </form>
                         </div>
