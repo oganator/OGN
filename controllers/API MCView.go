@@ -73,8 +73,13 @@ func (c *MCDetailsController) Post() {
 		sort.Sort(ByEndCash(Models[tempkey].MCSlice))
 	case "endncf-r":
 		sort.Sort(ByEndCashr(Models[tempkey].MCSlice))
+	case "prob":
+		sort.Sort(ByProb(Models[tempkey].MCSlice))
+	case "prob-r":
+		sort.Sort(ByProbr(Models[tempkey].MCSlice))
 	}
 	temp["MCSlice"] = Models[tempkey].MCSlice[startindex:endindex]
+	temp["Strategy"] = Models[tempkey].Strategy
 	c.TplName = "MCDetails.tpl"
 	c.Data = temp
 }

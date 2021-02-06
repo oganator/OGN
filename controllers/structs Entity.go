@@ -27,7 +27,7 @@ type Entity struct {
 	MCResultSlice  MCResultSlice      `json:"MCResultSlice,omitempty"`   //
 	MCResults      MCResults          `json:"MCResults,omitempty"`       //
 	Tax            Tax                `json:"Tax,omitempty"`             //
-	COA            IntFloatCOAMap     `json:"COA,omitempty"`             // Contains monthly values, as well as yearly values (rolling or calendar) up to the sales date\
+	COA            IntFloatCOAMap     `json:"COA,omitempty"`             // Contains monthly values, as well as yearly values (rolling or calendar) up to the sales date
 	Valuation      Valuation          `json:"Valuation,omitempty"`       //
 	TableHeader    HeaderType         `json:"TableHeader,omitempty"`     // Years, Months...etc
 	Table          []TableJSON        `json:"Table,omitempty"`           //
@@ -49,7 +49,10 @@ type Unit struct {
 	Parent                *Entity        `json:"-"`                               //
 	Probability           float64        `json:"Probability,omitempty"`           //
 	PercentSoldRent       float64        `json:"PercentSoldRent,omitempty"`       //
+	DiscountRate          float64        `json:"DiscountRate,omitempty"`          //
+	BondProceeds          float64        `json:"BondProceeds,omitempty"`          //
 	BondIncome            float64        `json:"BondIncome,omitempty"`            //
+	BondIndex             Indexation     `json:"BondIndex,omitempty"`             //
 	BondExpense           float64        `json:"BondExpense,omitempty"`           //
 	Default               Default        `json:"Default,omitempty"`               //
 	RentRevisionERV       float64        `json:"RentRevisionERV,omitempty"`       //
@@ -59,9 +62,9 @@ type Unit struct {
 	RentIncentivesPercent float64        `json:"RentIncentivesPercent,omitempty"` //
 	Void                  int            `json:"Void,omitempty"`                  //
 	FitOutCosts           CostInput      `json:"FitOutCosts,omitempty"`           // input for costs when the lease expires
-	DiscountRate          float64        `json:"DiscountRate,omitempty"`          //
 	ERVArea               float64        `json:"ERVArea,omitempty"`               //
 	ERVAmount             float64        `json:"ERVAmount,omitempty"`             //
+	COA                   IntFloatCOAMap `json:"COA,omitempty"`                   // Contains monthly values, as well as yearly values (rolling or calendar) up to the sales date\
 }
 
 // ChildEntities -

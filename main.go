@@ -2,13 +2,15 @@ package main
 
 import (
 	_ "OGN/routers"
+	"math/rand"
+	"time"
 
 	beego "github.com/astaxie/beego"
 	"github.com/astaxie/beego/plugins/cors"
 )
 
 func main() {
-	// rand.Seed(time.Now().UTC().UnixNano())
+	rand.Seed(time.Now().UTC().UnixNano())
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins: true,
 		// AllowOrigins:     []string{"*"},

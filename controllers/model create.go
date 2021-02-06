@@ -159,13 +159,20 @@ func (e *Entity) CalculateModel(mc bool) {
 			LoanProceeds:            false,
 			InterestExpense:         true,
 			LoanBalance:             false,
-			Debt:                    true,
+			Debt:                    false,
 			Tax:                     true,
 			Fees:                    true,
 			NetCashFlow:             true,
 			CashBalance:             true,
 			BondIncome:              true,
 			BondExpense:             true,
+		}
+		switch e.Strategy {
+		case "Standard":
+			coas.BPUplift = false
+			coas.Debt = true
+			coas.BondIncome = false
+			coas.BondExpense = false
 		}
 		e.MakeTable(coas)
 	}

@@ -1,65 +1,43 @@
-[[define "rentschedule"]]
-    <div class="container-fluid shadow-lg rounded" style="width: 95%">
-        <table class="table table-hover tableFixHead rounded">
-            <thead>
-                <tr>
-                    <th scope="col"></th>
-                    [[range .]]
-                    <th scope="col">Extension [[.EXTNumber]]
-                    [[end]]
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <th scope="row">Start Date</th>
-                    [[range .]]
-                    <td>[[.StartDate.Month]]/[[.StartDate.Year]]</td>
-                    [[end]]
-                </tr>
-                <tr>
-                    <th scope="row">End Date Vacancy</th>
-                    [[range .]]
-                    <td>[[.VacancyEnd.Month]]/[[.VacancyEnd.Year]]</td>
-                    [[end]]
-                </tr>
-                <tr>
-                    <th scope="row">Default Date</th>
-                    [[range .]]
-                    <td>[[.DefaultDate.Month]]/[[.DefaultDate.Year]]</td>
-                    [[end]]
-                </tr>					
-                <tr>
-                    <th scope="row">Lease End Date</th>
-                    [[range .]]
-                    <td>[[.EndDate.Month]]/[[.EndDate.Year]]</td>
-                    [[end]]
-                </tr>
-                <tr>
-                    <th scope="row">Renewal Rent</th>
-                    [[range .]]
-                    <td>[[printf "%.0f" .RenewRent]]</td>
-                    [[end]]
-                </tr>
-                <tr>
-                    <th scope="row">Rotation Rent</th>
-                    [[range .]]
-                    <td>[[printf "%.0f" .RotateRent]]</td>
-                    [[end]]
-                </tr>
-                <tr>
-                    <th scope="row">Ending Contract Rent</th>
-                    [[range .]]
-                    <td>[[printf "%.0f" .EndContractRent]]</td>
-                    [[end]]
-                </tr>
-                <tr>
-                    <th scope="row">Base Rent</th>
-                    [[range .]]
-                    <td>[[printf "%.0f" .CFRent]]</td>
-                    [[end]]
-                </tr>                
-            </tbody>
-        </table>
-    </div>
+[[define "RentSchedule"]]
+<div class="container-fluid">
+    <table class="table table-hover tableFixHead rounded">
+        <thead>
+            <tr>
+                <th scope="col">EXT Number</th>
+                <th scope="col">Start Date</th>
+                <th scope="col">Vacancy End</th>
+                <th scope="col">Rent Incentives End</th>
+                <th scope="col">Default Date</th>
+                <th scope="col">End Date</th>
+                <th scope="col">Original End Date</th>
+                <th scope="col">Renew Rent</th>
+                <th scope="col">Rotate Rent</th>
+                <th scope="col">Passing Rent</th>
+                <th scope="col">Ending Contract Rent</th>
+                <th scope="col">Rent Revision ERV</th>
+                <th scope="col">Probability</th>
+            </tr>
+        </thead>
+        <tbody>
+        [[range .]]
+            <tr>
+                <td style="border-color:006A4D;">[[.EXTNumber]]</td>
+                <td style="border-color:006A4D;">[[.StartDate.MonthName]] [[.StartDate.Year]]</td>
+                <td style="border-color:006A4D;">[[.VacancyEnd.MonthName]] [[.VacancyEnd.Year]]</td>
+                <td style="border-color:006A4D;">[[.RentIncentivesEnd.MonthName]] [[.RentIncentivesEnd.Year]]</td>
+                <td style="border-color:006A4D;">[[.DefaultDate.MonthName]] [[.DefaultDate.Year]]</td>
+                <td style="border-color:006A4D;">[[.EndDate.MonthName]] [[.EndDate.Year]]</td>
+                <td style="border-color:006A4D;">[[.OriginalEndDate.MonthName]] [[.OriginalEndDate.Year]]</td>
+                <td style="border-color:006A4D;">{{[[.RenewRent]] *12 | number:0}}</td>
+                <td style="border-color:006A4D;">{{[[.RotateRent]] *12 | number:0}}</td>
+                <td style="border-color:006A4D;">{{[[.PassingRent]] *12 | number:0}}</td>
+                <td style="border-color:006A4D;">{{[[.EndContractRent]] *12 | number:0}}</td>
+                <td style="border-color:006A4D;">{{[[.RentRevisionERV]] *100 | number:2}}%</td>
+                <td style="border-color:006A4D;">{{[[.Probability]] *100 | number:2}}%</td>
+            </tr>
+        [[end]]
+        </tbody>
+    </table>
+</div>
 [[end]]
-
+[[template "RentSchedule" .data]]

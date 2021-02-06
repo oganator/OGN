@@ -5,15 +5,19 @@
                 <th scope="col"></th>
                 [[$months := .entity.TableHeader.Monthly]]
                 [[$years := .entity.TableHeader.Yearly]]
-                [[range $years]] [[if .Bool]]
-                    [[$year := .]]
-                    [[range $months]] [[if .Bool]]
-                        [[if eq .Year $year.Year]]
-                        <th scope="col" hidden name="[[.Year]]">[[.MonthName]]</th> 
-                        [[end]] 
-                    [[end]] [[end]]
-                    <th scope="col"><button class="btn" onclick="chooseYear('[[.Year]]')">[[.Year]]</button></th>
-                [[end]] [[end]]
+                [[range $years]] 
+                    [[if .Bool]]
+                        [[$year := .]]
+                        [[range $months]] 
+                            [[if .Bool]]
+                                [[if eq .Year $year.Year]]
+                                    <th scope="col" hidden name="[[.Year]]">[[.MonthName]]</th> 
+                                [[end]] 
+                            [[end]] 
+                        [[end]]
+                        <th scope="col"><button class="btn" onclick="chooseYear('[[.Year]]')">[[.Year]]</button></th>
+                    [[end]] 
+                [[end]]
                 </tr>
             </thead>
             <tbody>
@@ -21,15 +25,19 @@
                 [[$table := .]]
                     <tr>
                         <th style="min-width: 250px; position: sticky; Left: 0px;" scope="row">[[.COA]]</th>
-                        [[range $years]] [[if .Bool]]
-                            [[$year := .]]
-                            [[range $months]] [[if .Bool]]
-                                [[if eq .Year $year.Year]]
-                                <td hidden name="[[.Year]]" class="secondary-bg">[[index $table.Value .Dateint]]</td>
-                                [[end]] 
-                            [[end]] [[end]]
-                            <td>[[index $table.Value $year.Year]]</td>
-                        [[end]] [[end]]
+                        [[range $years]] 
+                            [[if .Bool]]
+                                [[$year := .]]
+                                [[range $months]] 
+                                    [[if .Bool]]
+                                        [[if eq .Year $year.Year]]
+                                            <td hidden name="[[.Year]]" class="second-bg">[[index $table.Value .Dateint]]</td>
+                                        [[end]] 
+                                    [[end]] 
+                                [[end]]
+                                <td>[[index $table.Value $year.Year]]</td>
+                            [[end]]
+                        [[end]]
                     </tr>
                 [[end]]
             </tbody>

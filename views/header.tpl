@@ -11,7 +11,7 @@
         <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     </head>
     <body>
-        <nav class="main-secondary navbar navbar-expand-lg navbar-dark shadow-lg">
+        <nav class="first-second navbar navbar-expand-lg navbar-dark shadow-lg">
             <a class="navbar-brand" style="color:white;">LaSalle Investment Management &nbsp &nbsp &nbsp</a>
             <form class="form-horizontal form-well" role="form" method="post" action="/ChangeEntity">
                 <div class="tab-pane fade in show active" id="header" role="tabpanel">

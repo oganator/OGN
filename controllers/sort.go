@@ -220,3 +220,20 @@ func (a ByEndNCFr) Less(i, j int) bool {
 	return a[i].COA[a[i].SalesDate.Dateint].NetCashFlow > a[j].COA[a[j].SalesDate.Dateint].NetCashFlow
 }
 func (a ByEndNCFr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+// ByProb -
+type ByProb []*Entity
+
+func (a ByProb) Len() int { return len(a) }
+func (a ByProb) Less(i, j int) bool {
+	return a[i].GLA.Probability < a[j].GLA.Probability
+}
+func (a ByProb) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+type ByProbr []*Entity
+
+func (a ByProbr) Len() int { return len(a) }
+func (a ByProbr) Less(i, j int) bool {
+	return a[i].GLA.Probability > a[j].GLA.Probability
+}
+func (a ByProbr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }

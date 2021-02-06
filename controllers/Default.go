@@ -7,7 +7,7 @@ import (
 // RandomDefault -
 func (u *Unit) RandomDefault(date Datetype, endrent float64) {
 	randomdefault := rand.Float64()
-	if randomdefault <= u.Default.Hazard/12 {
+	if randomdefault <= u.Default.Hazard {
 		u.RentSchedule.DefaultDate = date
 		u.RentSchedule.EndDate = Dateadd(date, -1)
 		u.RentSchedule.Probability = 0.0

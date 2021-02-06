@@ -19,6 +19,7 @@ var ognApp = angular.module('ognApp', []);
 	ognApp.controller('assetViewController', ['$scope', '$http', '$sce', function($scope, $http, $sce) {
 		$scope.entity = [[.entity.Name]];
 		$scope.mcdetailspage = 1;
+		$scope.mcdetailspagestotal = [[.entity.MCSetup.Sims]]/10;
 		$scope.mcdetailsorder = "";
 		$scope.strategy = [[.entity.Strategy]];
 
@@ -26,34 +27,35 @@ var ognApp = angular.module('ognApp', []);
 		$scope.getRequest = function(route) {
 			var url = "http://localhost:8080/MCTabs?tab="
 			if (route == 'cf'){
-				$scope.post(url+"cf")
+				$scope.post(url+"cf");
 			}
 			if (route == 'endcash'){
-				$scope.post(url+"endcash")
+				$scope.post(url+"endcash");
 			}
 			if (route == 'cashbalance'){
-				$scope.post(url+"cashbalance")
+				$scope.post(url+"cashbalance");
 			}
 			if (route == 'endncf'){
-				$scope.post(url+"endncf")
+				$scope.post(url+"endncf");
 			}
 			if (route == 'ncf'){
-				$scope.post(url+"ncf")
+				$scope.post(url+"ncf");
 			}
 			if (route == 'irr'){
-				$scope.post(url+"irr")
+				$scope.post(url+"irr");
 			}
 			if (route == 'em'){
-				$scope.post(url+"em")
+				$scope.post(url+"em");
 			}
 			if (route == 'ytm'){
-				$scope.post(url+"ytm")
+				$scope.post(url+"ytm");
 			} 
 			if (route == 'duration'){
-				$scope.post(url+"duration")
+				$scope.post(url+"duration");
 			} 
 			if (route == 'details'){
-				$scope.post("http://localhost:8080/MCDetails?name="+$scope.entity+"&page="+ $scope.mcdetailspage)
+				$scope.post("http://localhost:8080/MCDetails?name="+$scope.entity+"&page=1");
+				$scope.mcdetailspage = 1;
 			}
 			var cftable = angular.element( document.querySelector( '#cftable' ) );
 			cftable.remove();
@@ -86,7 +88,7 @@ var ognApp = angular.module('ognApp', []);
 		// viewCFIndex
 		$scope.viewCFIndex = function(index){
 			$scope.data = {};
-			var body = "?name="+$scope.entity+"&index="+index
+			var body = "?name="+$scope.entity+"&index="+index*$scope.mcdetailspage;
 			$http.post("http://localhost:8080/MCIndex"+body).then(
 				function successCallback(response) {
 					$scope.data = $sce.trustAsHtml(response.data);
@@ -102,13 +104,56 @@ var ognApp = angular.module('ognApp', []);
 			if ($scope.mcdetailsorder == order){
 				order = order+"-r";
 			}
-			$scope.mcdetailsorder = order
-			$scope.post("http://localhost:8080/MCDetails?name="+$scope.entity+"&page="+ $scope.mcdetailspage+"&order="+order)
+			$scope.mcdetailsorder = order;
+			$scope.post("http://localhost:8080/MCDetails?name="+$scope.entity+"&page=1"+"&order="+order);
+			$scope.mcdetailspage = 1;
 		}; // sortMCDetails
 
+		// nextMCDetails
+		$scope.nextMCDetails = function(direction){
+			if (direction === '+'){
+			$scope.mcdetailspage++;
+			} else if (direction === '-'){
+				$scope.mcdetailspage--;
+			}
+			$scope.post("http://localhost:8080/MCDetails?name="+$scope.entity+"&page="+$scope.mcdetailspage);
+		}; //nextMCDetails
+
+		// getRentSchedule
+		$scope.getRentSchedule = function(unit){
+			$http.post("http://localhost:8080/ViewRentSchedule?unit="+unit+"&name="+$scope.entity).then(
+				function successCallback(response) {
+					$scope.rentschedule = $sce.trustAsHtml(response.data);
+				},
+				function errorCallback(response) {
+					console.log("POST-ing of data failed");
+				}
+			);
+		}; //getRentSchedule
+
+		// getRentSchedule
+		$scope.getUnitCF = function(unit){
+			$http.post("http://localhost:8080/ViewUnitCF?unit="+unit+"&name="+$scope.entity).then(
+				function successCallback(response) {
+					$scope.unitcf = $sce.trustAsHtml(response.data);
+				},
+				function errorCallback(response) {
+					console.log("POST-ing of data failed");
+				}
+			);
+		}; //getRentSchedule
+
+		// hideNext
+		$scope.hideNext = function(){
+			return $scope.mcdetailspage == $scope.mcdetailspagestotal;
+		} //hideNext
+
+		// hidePrevious
+		$scope.hidePrevious = function(){
+			return $scope.mcdetailspage == 1;
+		} //hidePrevious
+
 	}]); // testController
-
-
 
 	//bindHtmlCompile directive 
 	ognApp.directive('bindHtmlCompile', ['$compile', function ($compile) {

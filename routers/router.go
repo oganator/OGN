@@ -9,7 +9,8 @@ import (
 func init() {
 	beego.Router("/", &controllers.ViewEntityController{})
 	beego.Router("/ChangeEntity", &controllers.ChangeEntityController{})
-	beego.Router("/", &controllers.ViewUnitController{})
+	beego.Router("/ViewRentSchedule", &controllers.ViewRentScheduleController{})
+	beego.Router("/ViewUnitCF", &controllers.ViewUnitCFController{})
 	// MONTECARLO
 	beego.Router("/MCTabs", &controllers.MCTabsController{})
 	beego.Router("/MCDetails", &controllers.MCDetailsController{})

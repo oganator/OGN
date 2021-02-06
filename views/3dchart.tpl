@@ -4,10 +4,10 @@
 </div>
 <script>
 	var layout = {
-		showlegend: false,
+		showlegend: true,
 		autosize: false,
-		width: 2000,
-		height: 1400,
+		width: 2200,
+		height: 1200,
 		scene: {
 			xaxis: {title: 'Probability'},
 			yaxis: {title: 'Time'},

@@ -2,17 +2,18 @@
 
 :root {
     --text-color: #00245D;
-    --main-bg-color: #00245D;
-    --secondary-bg-color: #25517D;
+    --first-bg-color: #00245D;
+    --second-bg-color: #25517D;
     --third-bg-color: #46B3D1;
-    --fourth-bg-color: #A18D68;
+    --fourth-bg-color: #CFCABD;
+    --fifth-bg-color: #A18D68;
     --background-color:#393b40;
 }
 
-.main-secondary {
-    background-color: var(--secondary-bg-color);
-    background-image: linear-gradient(to top, var(--secondary-bg-color) 0%, var(--main-bg-color) 100%);
-    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=var(--main-bg-color),endColorstr=var(--secondary-bg-color));
+.first-second {
+    background-color: var(--second-bg-color);
+    background-image: linear-gradient(to top, var(--second-bg-color) 0%, var(--first-bg-color) 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=var(--first-bg-color),endColorstr=var(--second-bg-color));
     border-bottom: 1px solid #333333;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
     min-height: 65px;
@@ -20,14 +21,14 @@
     z-index: 4;
 }
 
-.main-bg {
+.first-bg {
     color: white;
-    background-color: var(--main-bg-color);
+    background-color: var(--first-bg-color);
 }
 
-.secondary-bg {
+.second-bg {
     color: white;
-    background-color: var(--secondary-bg-color);
+    background-color: var(--second-bg-color);
 }
 
 .fourth-bg {
@@ -46,17 +47,17 @@
     position: sticky;
     top: 0;
     color: white;
-    background-color: var(--secondary-bg-color);
-    background-image: linear-gradient(to top, var(--secondary-bg-color) 0%, var(--main-bg-color) 100%);
-    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=var(--main-bg-color),endColorstr=var(--secondary-bg-color));
+    background-color: var(--second-bg-color);
+    background-image: linear-gradient(to top, var(--second-bg-color) 0%, var(--first-bg-color) 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=var(--first-bg-color),endColorstr=var(--second-bg-color));
     min-height: 65px;
     position: relative;
     z-index: 4;
 }
 
 .tableFixHead tbody tr:hover td, .tableFixHead tbody tr:hover th {
-    background-color: var(--quarternary-bg-color);
-    color: var(--main-bg-color);
+    background-color: var(--fourth-bg-color);
+    color: var(--first-bg-color);
   }
 
 table {
@@ -65,7 +66,7 @@ table {
 }
 
 thead {
-    border-color: var(--main-bg-color);
+    border-color: var(--first-bg-color);
 }
 
 th,
@@ -75,7 +76,7 @@ td {
 
 th,
 tr {
-    color: var(--main-bg-color);
+    color: var(--first-bg-color);
 }
 /*///////////////////////////////////////////////*/
 
@@ -86,26 +87,26 @@ tr {
     border-left: 0mm;
     border-right: 0mm;
     border-radius: 0mm;
-    color: var(--main-bg-color);    
+    color: var(--second-bg-color);    
 }
 
-.form-label{
-    color: var(--third-bg-color);
+label{
+    color: var(--second-bg-color);
 }
 
 .form-control:focus {
     border-bottom-color:var(--third-bg-color) !important;
     box-shadow: 0 4px 2px -2px var(--third-bg-color) !important;
-    color: var(--secondary-bg-color);
+    color: var(--third-bg-color);
 }
 
  ::-moz-selection {
-    background: var(--secondary-bg-color);
+    background: var(--second-bg-color);
     color: white;
 }
 
  ::selection {
-    background: var(--secondary-bg-color);
+    background: var(--second-bg-color);
     color: white;
 }
 
@@ -114,7 +115,7 @@ tr {
 }
 
 .btn {
-    background-color: var(--secondary-bg-color);
+    background-color: var(--second-bg-color);
     border-color: white;
     color: white;
 }
@@ -126,6 +127,5 @@ tr {
 
 .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
     color: #fff;
-    background-color: var(--secondary-bg-color);
+    background-color: var(--second-bg-color);
 }
-

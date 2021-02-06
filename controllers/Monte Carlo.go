@@ -85,6 +85,7 @@ func (e *Entity) MonteCarlo() {
 			tempentitydata.OpExpercent = NormalSample(e.OpEx.PercentOfTRI, e.MCSetup.OpEx)
 			tempentitydata.YieldShift = NormalSample(e.Valuation.YieldShift, e.MCSetup.YieldShift)
 			tempentitydata.GLA.Void = int(NormalSample(float64(e.GLA.Void), float64(e.MCSetup.Void)))
+			tempentitydata.GLA.Probability = NormalSample(e.GLA.Probability, e.MCSetup.Probability)
 			tempentitydata.GLA.Default.Hazard = LogNormalSample(float64(e.GLA.Default.Hazard), float64(e.MCSetup.Hazard))
 			//
 			temp.UpdateEntity(true, tempentitydata)
@@ -111,9 +112,9 @@ func (e *Entity) MonteCarlo() {
 	}
 	wg.Wait()
 	e.MCResults.EndCash = MCStatsCalc(e.MCResultSlice.EndCash, e.MCSetup.Sims)
-	e.MCResults.CashBalance = RibbonPlot(e.MCResultSlice.CashBalance, duration-2, 25, e.MCSetup.Sims)
+	e.MCResults.CashBalance = RibbonPlot(e.MCResultSlice.CashBalance, duration-2, 50, e.MCSetup.Sims)
 	e.MCResults.EndNCF = MCStatsCalc(e.MCResultSlice.EndNCF, e.MCSetup.Sims)
-	e.MCResults.NCF = RibbonPlot(e.MCResultSlice.NCF, duration-2, 25, e.MCSetup.Sims)
+	e.MCResults.NCF = RibbonPlot(e.MCResultSlice.NCF, duration-2, 50, e.MCSetup.Sims)
 	switch e.Strategy {
 	case "Standard":
 		e.MCResults.IRR = MCStatsCalc(e.MCResultSlice.IRR, e.MCSetup.Sims)
@@ -227,6 +228,19 @@ func BetaSample(mu, stdev float64) float64 {
 		Beta:  beta,
 	}
 	return x.Rand()
+}
+
+func AlphaCheck(mu, sigma float64) (alphaZero float64) {
+	var alpha = ((1-mu)/math.Pow(sigma, 2) - 1/mu) * math.Pow(mu, 2)
+	alphaZero = sigma
+	if alpha <= 0 {
+		mtwo := math.Pow(mu, 2)
+		mthree := math.Pow(mu, 3)
+		x := (mtwo - mthree)
+		alphaZero = math.Pow(x/mu, .5) - .00001
+		return alphaZero
+	}
+	return alphaZero
 }
 
 // BinomialSample - Skew must be between 0 and 1. a value of .5 indicates no Skew, <.5 is positive Skew and >.5 is negative Skew.

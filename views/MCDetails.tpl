@@ -6,9 +6,12 @@
 				<th scope="col" data-sortable="true">View CF</th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("irr")'>IRR</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("em")'>Equity Multiple</button></th>
+				[[if (eq .Strategy "Balloon")]]
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("ytm")'>YTM</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("duration")'>Duration</button></th>
+				[[end]]
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("void")'>Void</button></th>
+				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("prob")'>Probability</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("extdur")'>EXT Duration</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("hazard")'>Hazard Rate</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("opex")'>OpEx %TRI</button></th>
@@ -25,9 +28,12 @@
 				<td><button type="button" class="btn" href="#mccf" data-toggle="modal" data-target="#mccf" ng-click='viewCFIndex("[[$index]]")'>View CF</button></td>
 				<td>[[printf "%.2f" $value.Metrics.IRR.NetLeveredAfterTax]]</td>
 				<td>[[printf "%.2f" $value.Metrics.EM.NetLeveredAfterTax]]</td>
+				[[if (eq .Strategy "Balloon")]]
 				<td>[[printf "%.2f" $value.Metrics.BondHolder.YTM]]</td>
 				<td>[[printf "%.2f" $value.Metrics.BondHolder.Duration]]</td>
+				[[end]]
 				<td>[[$value.GLA.Void]]</td>
+				<td>{{[[$value.GLA.Probability]] *100 | number:2}}</td>
 				<td>[[$value.GLA.EXTDuration]]</td>
 				<td>{{[[$value.GLA.Default.Hazard]] *100 | number:2}}</td>
 				<td>{{[[$value.OpEx.PercentOfTRI]] *100 | number:2}}</td>
@@ -42,11 +48,13 @@
 		</tbody>
 	</table>
 	<div class="d-flex flex-row-reverse">
-		<button type="button" class="btn col-sm-1 align-items-end">Next Page</button>
+		<button type="button" class="btn col-sm-1 align-items-end" ng-click="nextMCDetails('+')" ng-hide="hideNext()">Next Page</button>
+		<button type="button" class="btn col-sm-1 align-items-end" ng-click="nextMCDetails('-')" ng-hide="hidePrevious()">Previous Page</button>
+		page {{mcdetailspage}} of {{mcdetailspagestotal}} &nbsp 
 	</div>
 	<br>
 	<div class="modal" id="mccf" tabindex="-1" role="dialog" aria-labelledby="mccf" aria-hidden="true">
-		<div class="modal-content container-fluid shadow-lg rounded" style="width: 95%; overflow-x:scroll;">
+		<div class="modal-content container-fluid" style="width: 95%; overflow-x:scroll;">
 			<div ng-bind-html = data></div>
 		</div>
 	</div>

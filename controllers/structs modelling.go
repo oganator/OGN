@@ -15,6 +15,7 @@ type RentSchedule struct {
 	EndContractRent   float64    `json:"EndContractRent,omitempty"`    //
 	RentRevisionERV   float64    `json:"RentRevisionERV,omitempty"`    //
 	Probability       float64    `json:"Probability,omitempty"`        //
+	ProbabilitySim    float64    `json:"ProbabilitySim,omitempty"`     //
 	RenewIndex        Indexation `json:"RenewIndex,omitempty"`         //
 	RotateIndex       Indexation `json:"RotateIndex,omitempty"`        //
 	ParentUnit        *Unit      `json:"-"`                            //

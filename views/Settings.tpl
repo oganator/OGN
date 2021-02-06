@@ -20,14 +20,6 @@
                             <input type="text" class="form-control" id="exityield" name="exityield" value="[[.entity.Valuation.ExitYield]]">
                         </div>
                         <div class="form-group col-sm-1">
-                            <label for="ltv">LTV</label>
-                            <input type="text" class="form-control" id="ltv" name="ltv" Value="[[.entity.DebtInput.LTV]]">
-                        </div>
-                        <div class="form-group col-sm-1">
-                            <label for="rate">Loan Rate</label>
-                            <input type="text" class="form-control" id="rate" name="rate" Value="[[.entity.DebtInput.InterestRate]]">
-                        </div>
-                        <div class="form-group col-sm-1">
                             <label for="fees">Fees (bps)</label>
                             <input type="text" class="form-control" id="fees" name="fees" Value="[[.entity.Fees.PercentOfGAV]]">
                         </div>
@@ -39,6 +31,14 @@
                                 <option>Balloon</option>
                                 <option>Pure Discount</option>
                             </select>
+                        </div>
+                        <div class="form-group col-sm-1" ng-show="strategy == 'Standard' ">
+                            <label for="ltv">LTV</label>
+                            <input type="text" class="form-control" id="ltv" name="ltv" Value="[[.entity.DebtInput.LTV]]">
+                        </div>
+                        <div class="form-group col-sm-1" ng-show="strategy == 'Standard' ">
+                            <label for="rate">Loan Rate</label>
+                            <input type="text" class="form-control" id="rate" name="rate" Value="[[.entity.DebtInput.InterestRate]]">
                         </div>
                         <div class="form-group col-sm-1" ng-show="strategy != 'Standard' ">
                             <label for="discount">Discount Rate</label>
