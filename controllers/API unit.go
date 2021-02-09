@@ -29,8 +29,13 @@ func GetIntRentSchedule(c *ViewRentScheduleController, field string) (result int
 func (c *ViewRentScheduleController) Post() {
 	temp := make(map[interface{}]interface{})
 	key := ModelsList[GetStringRentSchedule(c, "name")]
+	indexstring := GetStringRentSchedule(c, "index")
+	index, _ := strconv.Atoi(indexstring)
 	unit := GetIntRentSchedule(c, "unit")
 	temp["data"] = Models[key].ChildUnits[unit].RSStore
+	if indexstring != "" {
+		temp["data"] = Models[key].MCSlice[index].ChildUnits[unit].RSStore
+	}
 	c.TplName = "RentSchedule.tpl"
 	c.Data = temp
 }
@@ -86,5 +91,36 @@ func (c *ViewUnitCFController) Post() {
 	})
 	temp["entity"] = &tempentity
 	c.TplName = "CFTable.tpl"
+	c.Data = temp
+}
+
+////////////////////////////////////////////////////////////////////////
+
+// ViewUnitTableController -
+type ViewUnitTableController struct {
+	beego.Controller
+}
+
+// GetStringUnitTable -
+func GetStringUnitTable(c *ViewUnitTableController, field string) string {
+	c.Data[field] = c.GetString(field)
+	return c.Data[field].(string)
+}
+
+// GetIntUnitTable -
+func GetIntUnitTable(c *ViewUnitTableController, field string) (result int) {
+	c.Data[field] = c.GetString(field)
+	temp := c.Data[field].(string)
+	result, _ = strconv.Atoi(temp)
+	return result
+}
+
+// Post -
+func (c *ViewUnitTableController) Post() {
+	temp := make(map[interface{}]interface{})
+	key := ModelsList[GetStringUnitTable(c, "name")]
+	index := GetIntUnitTable(c, "index")
+	temp["entity"] = Models[key].MCSlice[index]
+	c.TplName = "UnitTable.tpl"
 	c.Data = temp
 }

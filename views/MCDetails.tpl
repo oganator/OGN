@@ -55,7 +55,8 @@
 	<br>
 	<div class="modal" id="mccf" tabindex="-1" role="dialog" aria-labelledby="mccf" aria-hidden="true">
 		<div class="modal-content container-fluid" style="width: 95%; overflow-x:scroll;">
-			<div ng-bind-html = data></div>
+			<div bind-html-compile = data></div>
+			<div bind-html-compile = unittable></div>
 		</div>
 	</div>
 </div>

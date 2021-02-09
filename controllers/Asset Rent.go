@@ -51,7 +51,7 @@ func (e *Entity) AssetRentCalc(mc bool) {
 				switch mc {
 				case true:
 					if date.Dateint <= uu.RentSchedule.VacancyEnd.Dateint {
-						vacancy = -uu.ERVAmount * uu.ERVArea * uu.RentSchedule.ProbabilitySim / 12 * ee.Growth["ERV"][date.Dateint]
+						vacancy = -uu.ERVAmount * uu.ERVArea * ee.Growth["ERV"][date.Dateint] / 12 * uu.RentSchedule.ProbabilitySim
 						void = 0.0
 					}
 				case false:
@@ -133,7 +133,7 @@ func (u *Unit) InitialRentScheduleCalc() {
 		RentIncentivesEnd: Dateadd(u.LeaseStartDate, u.RentIncentivesMonths),
 		DefaultDate:       Datetype{},
 		EndDate:           Dateadd(u.LeaseExpiryDate, 0),
-		OriginalEndDate:   Datetype{},
+		OriginalEndDate:   Dateadd(u.LeaseExpiryDate, 0),
 		RenewRent:         u.PassingRent / 12,
 		RotateRent:        0,
 		PassingRent:       u.PassingRent / 12,
@@ -152,6 +152,7 @@ func (u *Unit) InitialRentScheduleCalc() {
 
 // RentScheduleCalc -
 func (u *Unit) RentScheduleCalc(date Datetype, mc bool) {
+	u.RSStore[len(u.RSStore)-1].EndContractRent = u.RentSchedule.EndContractRent
 	renew := (u.Parent.Growth["ERV"][date.Dateint]*u.ERVAmount*u.ERVArea-u.RentSchedule.EndContractRent*12)*u.RentSchedule.RentRevisionERV + u.RentSchedule.EndContractRent*12
 	rotate := u.Parent.Growth["ERV"][date.Dateint] * u.ERVAmount * u.ERVArea
 	indexyear := date.Year
@@ -162,9 +163,10 @@ func (u *Unit) RentScheduleCalc(date Datetype, mc bool) {
 	indexdate.Add(0)
 	duration := u.EXTDuration + int(u.RentSchedule.Probability*float64(u.Void))
 	prob := u.RentSchedule.Probability
+	sample := rand.Float64()
 	if mc == true {
 		prob = 1.0
-		if rand.Float64() < u.Probability {
+		if sample < u.Probability {
 			prob = 0.0
 		}
 	}
@@ -188,6 +190,8 @@ func (u *Unit) RentScheduleCalc(date Datetype, mc bool) {
 		ParentUnit:        u,
 	}
 	u.RentSchedule = temp
+	temp.RenewRent = temp.RenewRent / prob
+	temp.RotateRent = temp.RotateRent / (1 - prob)
 	u.RSStore = append(u.RSStore, temp)
 }
 

@@ -11,6 +11,7 @@ func init() {
 	beego.Router("/ChangeEntity", &controllers.ChangeEntityController{})
 	beego.Router("/ViewRentSchedule", &controllers.ViewRentScheduleController{})
 	beego.Router("/ViewUnitCF", &controllers.ViewUnitCFController{})
+	beego.Router("/ViewUnitTable", &controllers.ViewUnitTableController{})
 	// MONTECARLO
 	beego.Router("/MCTabs", &controllers.MCTabsController{})
 	beego.Router("/MCDetails", &controllers.MCDetailsController{})

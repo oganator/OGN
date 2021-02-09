@@ -87,6 +87,7 @@ var ognApp = angular.module('ognApp', []);
 
 		// viewCFIndex
 		$scope.viewCFIndex = function(index){
+			$scope.getUnitTable(index);
 			$scope.data = {};
 			var body = "?name="+$scope.entity+"&index="+index*$scope.mcdetailspage;
 			$http.post("http://localhost:8080/MCIndex"+body).then(
@@ -120,8 +121,8 @@ var ognApp = angular.module('ognApp', []);
 		}; //nextMCDetails
 
 		// getRentSchedule
-		$scope.getRentSchedule = function(unit){
-			$http.post("http://localhost:8080/ViewRentSchedule?unit="+unit+"&name="+$scope.entity).then(
+		$scope.getRentSchedule = function(unit, index){
+			$http.post("http://localhost:8080/ViewRentSchedule?unit="+unit+"&name="+$scope.entity+"&index="+index).then(
 				function successCallback(response) {
 					$scope.rentschedule = $sce.trustAsHtml(response.data);
 				},
@@ -131,7 +132,7 @@ var ognApp = angular.module('ognApp', []);
 			);
 		}; //getRentSchedule
 
-		// getRentSchedule
+		// getUnitCF
 		$scope.getUnitCF = function(unit){
 			$http.post("http://localhost:8080/ViewUnitCF?unit="+unit+"&name="+$scope.entity).then(
 				function successCallback(response) {
@@ -141,7 +142,19 @@ var ognApp = angular.module('ognApp', []);
 					console.log("POST-ing of data failed");
 				}
 			);
-		}; //getRentSchedule
+		}; //getUnitCF
+
+		// getUnitTable
+		$scope.getUnitTable = function(index){
+			$http.post("http://localhost:8080/ViewUnitTable?name="+$scope.entity+"&index="+index).then(
+				function successCallback(response) {
+					$scope.unittable = $sce.trustAsHtml(response.data);
+				},
+				function errorCallback(response) {
+					console.log("POST-ing of data failed");
+				}
+			);
+		}; //getUnitTable
 
 		// hideNext
 		$scope.hideNext = function(){

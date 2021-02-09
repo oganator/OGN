@@ -5,6 +5,7 @@ type RentSchedule struct {
 	EXTNumber         int        `json:"EXTNumber,omitempty"`          //
 	StartDate         Datetype   `json:"StartDate,omitempty"`          //
 	VacancyEnd        Datetype   `json:"VacancyEnd,omitempty"`         //
+	VacancyAmount     float64    `json:"VacancyAmount,omitempty"`      //
 	RentIncentivesEnd Datetype   `json:"RenewIncentivesEnd,omitempty"` //
 	DefaultDate       Datetype   `json:"DefaultDate"`                  //
 	EndDate           Datetype   `json:"EndDate,omitempty"`            //
@@ -27,7 +28,7 @@ type Indexation struct {
 	StartDate   Datetype `json:"StartDate,omitempty"`
 	EndDate     Datetype `json:"EndDate,omitempty"`
 	Amount      float64  `json:"Amount,omitempty"`
-	Final       float64  `json:Final,omitempty"`
+	Final       float64  `json:"Final,omitempty"`
 }
 
 // IndexDetails -

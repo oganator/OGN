@@ -74,7 +74,7 @@ func (c *ViewEntityController) Post() {
 		ERV:         GetFloat(c, "ervsigma") / 100,
 		CPI:         GetFloat(c, "cpisigma") / 100,
 		YieldShift:  GetFloat(c, "yieldshiftsigma"),
-		Void:        GetInt(c, "voidsigma"),
+		Void:        GetFloat(c, "voidsigma"),
 		Probability: GetFloat(c, "probabilitysigma") / 100,
 		OpEx:        GetFloat(c, "opexsigma") / 100,
 		Hazard:      GetFloat(c, "hazardsigma") / 100,

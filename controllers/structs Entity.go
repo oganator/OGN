@@ -21,6 +21,7 @@ type Entity struct {
 	Fees           CostInput          `json:"Fees,omitempty"`            //
 	Capex          map[int]CostInput  `json:"Capex,omitempty"`           // yearly input for costs.
 	GLA            Unit               `json:"GLA,omitempty"`             //
+	MC             bool               `json:"MC,omitempty"`              //
 	MCSetup        MCSetup            `json:"MCSetup,omitempty"`         //
 	MCSlice        []*Entity          `json:"MCSlice,omitempty"`         //
 	Mutex          sync.Mutex         `json:"MCMutex,omitempty"`         //

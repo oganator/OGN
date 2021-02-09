@@ -42,7 +42,7 @@
 		</div>
 		<div class="container-fluid shadow-lg rounded" style="width: 95%; overflow-x:scroll;">
 			<div id="cftable">[[template "CFTable" .]]</div>
-			<div bind-html-compile = response></div>
+			<div bind-html-compile = response></div>			
 			</div>
 		</div>
 		<br>

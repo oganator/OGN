@@ -16,7 +16,7 @@ type MCSetup struct {
 	ERV         float64
 	CPI         float64
 	YieldShift  float64
-	Void        int
+	Void        float64
 	Probability float64
 	OpEx        float64
 	Hazard      float64
@@ -84,10 +84,11 @@ func (e *Entity) MonteCarlo() {
 			tempentitydata.CPIGrowth = NormalSample(e.GrowthInput["CPI"], e.MCSetup.CPI)
 			tempentitydata.OpExpercent = NormalSample(e.OpEx.PercentOfTRI, e.MCSetup.OpEx)
 			tempentitydata.YieldShift = NormalSample(e.Valuation.YieldShift, e.MCSetup.YieldShift)
-			tempentitydata.GLA.Void = int(NormalSample(float64(e.GLA.Void), float64(e.MCSetup.Void)))
+			tempentitydata.GLA.Void = int(NormalSample(float64(e.GLA.Void), e.MCSetup.Void))
 			tempentitydata.GLA.Probability = NormalSample(e.GLA.Probability, e.MCSetup.Probability)
 			tempentitydata.GLA.Default.Hazard = LogNormalSample(float64(e.GLA.Default.Hazard), float64(e.MCSetup.Hazard))
 			//
+			temp.MC = true
 			temp.UpdateEntity(true, tempentitydata)
 			temp.MCResults.EndCash.Mean = temp.COA[temp.SalesDate.Dateint].CashBalance
 			temp.MCResults.EndNCF.Mean = temp.COA[temp.SalesDate.Dateint].NetCashFlow
