@@ -175,10 +175,6 @@ type Ribbon struct {
 	Showscale  string      `json:"showscale"`
 }
 
-// RibbonData -
-type RibbonData struct {
-}
-
 // RibbonPlot -
 func RibbonPlot(matrix [][]float64, duration int, bucketnum int, sims int) (ribbon []Ribbon) {
 	ribbon = make([]Ribbon, duration)

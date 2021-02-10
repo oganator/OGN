@@ -51,11 +51,11 @@ func CreateEntity(v EntityData) (e Entity) {
 func (e *Entity) UpdateEntity(mc bool, v *EntityData) {
 	startdate := Dateadd(Datetype{Month: v.StartMonth, Year: v.StartYear}, 0)
 	salesdate := Dateadd(startdate, v.HoldPeriod*12-1)
-	enddate := Dateadd(salesdate, 60)
+	enddate := Dateadd(salesdate, 132)
 	growthinput := map[string]float64{}
 	growthinput["CPI"] = v.CPIGrowth
 	growthinput["ERV"] = v.ERVGrowth
-	temp := Entity{
+	*e = Entity{
 		MasterID:      v.MasterID,
 		Name:          v.Name,
 		ChildEntities: map[int]Entity{},
@@ -107,8 +107,7 @@ func (e *Entity) UpdateEntity(mc bool, v *EntityData) {
 		Strategy:       v.Strategy,
 		BalloonPercent: v.BalloonPercent,
 	}
-	temp.CalculateModel(mc)
-	(*e) = temp
+	e.CalculateModel(mc)
 }
 
 // CalculateModel - mc == MonteCarlo; if true then table is not made

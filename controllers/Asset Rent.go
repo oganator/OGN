@@ -12,7 +12,7 @@ func (e *Entity) AssetRentCalc(mc bool) {
 	wg := sync.WaitGroup{}
 	for _, u := range e.ChildUnits {
 		wg.Add(1)
-		go func(uu *Unit, ee *Entity, mc bool) {
+		go func(uu *Unit, ee *Entity, mcmc bool) {
 			defer wg.Done()
 			uu.InitialRentScheduleCalc()
 			uu.COA = map[int]FloatCOA{}
@@ -27,12 +27,13 @@ func (e *Entity) AssetRentCalc(mc bool) {
 			for date := ee.StartDate; date.Dateint <= ee.EndDate.Dateint; date.Add(1) {
 				renewrent := uu.RentSchedule.RenewRent
 				rotaterent := uu.RentSchedule.RotateRent
-				if date.Dateint <= ee.SalesDate.Dateint && date.Dateint > uu.RentSchedule.VacancyEnd.Dateint && mc == true {
-					uu.RandomDefault(date, ee.COA[date.Dateint].PassingRent+uu.RentSchedule.PassingRent)
+				isdefault := false
+				if date.Dateint <= ee.SalesDate.Dateint && date.Dateint > uu.RentSchedule.VacancyEnd.Dateint && mcmc == true {
+					isdefault = uu.RandomDefault(date, ee.COA[date.Dateint].PassingRent+uu.RentSchedule.PassingRent)
 				}
-				if date.Dateint == Dateadd(uu.RentSchedule.EndDate, 1).Dateint {
+				if date.Dateint == Dateadd(uu.RentSchedule.EndDate, 1).Dateint && isdefault == false {
 					uu.RentSchedule.EndContractRent = renewrent*uu.RentSchedule.RenewIndex.Amount + rotaterent*uu.RentSchedule.RotateIndex.Amount
-					uu.RentScheduleCalc(date, mc)
+					uu.RentScheduleCalc(date, mcmc)
 				}
 				if date.Dateint == uu.RentSchedule.RenewIndex.EndDate.Dateint {
 					uu.RentSchedule.RenewIndex.IndexationCalc(ee, date)
@@ -48,13 +49,18 @@ func (e *Entity) AssetRentCalc(mc bool) {
 				rentfree := 0.0
 				vacancy := 0.0
 				void := 1.0
-				switch mc {
-				case true:
+				switch {
+				case mcmc == true && uu.RSStore[len(uu.RSStore)-1].DefaultDate.Year > 1:
+					if date.Dateint <= uu.RentSchedule.VacancyEnd.Dateint {
+						vacancy = -uu.ERVAmount * uu.ERVArea * ee.Growth["ERV"][date.Dateint] / 12
+						void = 0.0
+					}
+				case mcmc == true:
 					if date.Dateint <= uu.RentSchedule.VacancyEnd.Dateint {
 						vacancy = -uu.ERVAmount * uu.ERVArea * ee.Growth["ERV"][date.Dateint] / 12 * uu.RentSchedule.ProbabilitySim
 						void = 0.0
 					}
-				case false:
+				case mcmc == false:
 					if date.Dateint <= uu.RentSchedule.VacancyEnd.Dateint {
 						vacancy = -uu.ERVAmount * uu.ERVArea * (1 - uu.RentSchedule.Probability) / 12 * ee.Growth["ERV"][date.Dateint]
 						void = 0.0
@@ -193,6 +199,36 @@ func (u *Unit) RentScheduleCalc(date Datetype, mc bool) {
 	temp.RenewRent = temp.RenewRent / prob
 	temp.RotateRent = temp.RotateRent / (1 - prob)
 	u.RSStore = append(u.RSStore, temp)
+}
+
+// RentScheduleDefaultCalc -
+func (u *Unit) RentScheduleDefaultCalc(date Datetype) {
+	u.RSStore = append(u.RSStore, u.RentSchedule)
+	rotate := u.Parent.Growth["ERV"][date.Dateint] * u.ERVAmount * u.ERVArea
+	indexyear := date.Year
+	indexdate := Datetype{
+		Month: u.LeaseStartDate.Month,
+		Year:  indexyear,
+	}
+	indexdate.Add(0)
+	duration := u.EXTDuration
+	temp := RentSchedule{
+		EXTNumber:         u.RentSchedule.EXTNumber + 1,
+		StartDate:         date,
+		VacancyEnd:        Dateadd(date, u.Void),
+		RentIncentivesEnd: Dateadd(Dateadd(u.RentSchedule.EndDate, 1), u.RentIncentivesMonths),
+		DefaultDate:       Datetype{},
+		EndDate:           Dateadd(u.RentSchedule.EndDate, duration),
+		OriginalEndDate:   Dateadd(u.RentSchedule.EndDate, duration),
+		RotateRent:        rotate / 12,
+		PassingRent:       rotate / 12,
+		EndContractRent:   0,
+		RentRevisionERV:   u.RentSchedule.RentRevisionERV,
+		Probability:       u.RentSchedule.Probability,
+		RotateIndex:       Indexation{IndexNumber: 0, StartDate: Dateadd(indexdate, u.Void), EndDate: Dateadd(indexdate, 12+u.Void), Amount: 1},
+		ParentUnit:        u,
+	}
+	u.RentSchedule = temp
 }
 
 // IndexationCalcOld - Calculates the next index. Date is startdate

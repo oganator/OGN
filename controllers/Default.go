@@ -5,10 +5,11 @@ import (
 )
 
 // RandomDefault -
-func (u *Unit) RandomDefault(date Datetype, endrent float64) {
+func (u *Unit) RandomDefault(date Datetype, endrent float64) (isdefault bool) {
 	randomdefault := rand.Float64()
 	if randomdefault < u.Default.Hazard {
-		u.RentSchedule.DefaultDate = date
+		isdefault = true
+		u.RentSchedule.DefaultDate = Dateadd(date, 0)
 		u.RentSchedule.EndDate = Dateadd(date, 0)
 		u.RentSchedule.Probability = 0.0
 		u.RentSchedule.ProbabilitySim = 0.0
@@ -19,5 +20,8 @@ func (u *Unit) RandomDefault(date Datetype, endrent float64) {
 			u.Parent.SalesDate.Add(u.Void)
 			u.Parent.EndDate.Add(u.Void)
 		}
+		u.RentScheduleDefaultCalc(date)
+		return isdefault
 	}
+	return isdefault
 }
