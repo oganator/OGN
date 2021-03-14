@@ -36,14 +36,16 @@ type MCResultSlice struct {
 
 // MCResults - used for final display. NOI, MarketValue and NCF have stats per year, IRR is for the hold period
 type MCResults struct {
-	EndCash     MCStats
-	CashBalance []Ribbon
-	EndNCF      MCStats
-	NCF         []Ribbon
-	IRR         MCStats
-	EM          MCStats
-	YTM         MCStats
-	Duration    MCStats
+	EndCash        MCStats
+	CashBalance    []Ribbon
+	CashBalanceVaR VaRPercentile
+	EndNCF         MCStats
+	NCF            []Ribbon
+	NCFVaR         VaRPercentile
+	IRR            MCStats
+	EM             MCStats
+	YTM            MCStats
+	Duration       MCStats
 }
 
 // MCStats -
@@ -113,9 +115,9 @@ func (e *Entity) MonteCarlo() {
 	}
 	wg.Wait()
 	e.MCResults.EndCash = MCStatsCalc(e.MCResultSlice.EndCash, e.MCSetup.Sims)
-	e.MCResults.CashBalance = RibbonPlot(e.MCResultSlice.CashBalance, duration-2, 50, e.MCSetup.Sims)
+	e.MCResults.CashBalance, e.MCResults.CashBalanceVaR = RibbonPlot(e.MCResultSlice.CashBalance, duration-2, 100, e.MCSetup.Sims)
 	e.MCResults.EndNCF = MCStatsCalc(e.MCResultSlice.EndNCF, e.MCSetup.Sims)
-	e.MCResults.NCF = RibbonPlot(e.MCResultSlice.NCF, duration-2, 50, e.MCSetup.Sims)
+	e.MCResults.NCF, e.MCResults.NCFVaR = RibbonPlot(e.MCResultSlice.NCF, duration-2, 100, e.MCSetup.Sims)
 	switch e.Strategy {
 	case "Standard":
 		e.MCResults.IRR = MCStatsCalc(e.MCResultSlice.IRR, e.MCSetup.Sims)
@@ -153,7 +155,7 @@ func MCStatsCalc(slice []float64, sims int) (stats MCStats) {
 	raw, _ := plotter.NewHist(histslice, 100)
 	stats.Hist.Vals = make([]float64, 100)
 	stats.Hist.Keys = make([]float64, 100)
-	for i := 0; i <= 99; i++ {
+	for i := 1; i <= 100; i++ {
 		if i >= len(raw.Bins) {
 			break
 		}
@@ -175,9 +177,46 @@ type Ribbon struct {
 	Showscale  string      `json:"showscale"`
 }
 
+// VaRPercentile -
+type VaRPercentile struct {
+	One        XYFloatSlice
+	Five       XYFloatSlice
+	Ten        XYFloatSlice
+	TwentyFive XYFloatSlice
+	Fifty      XYFloatSlice
+}
+
+// XYFloatSlice -
+type XYFloatSlice struct {
+	X []float64
+	Y []float64
+}
+
 // RibbonPlot -
-func RibbonPlot(matrix [][]float64, duration int, bucketnum int, sims int) (ribbon []Ribbon) {
-	ribbon = make([]Ribbon, duration)
+func RibbonPlot(matrix [][]float64, duration int, bucketnum int, sims int) (ribbonslice []Ribbon, varpslice VaRPercentile) {
+	ribbonslice = make([]Ribbon, duration)
+	varpslice = VaRPercentile{
+		One: XYFloatSlice{
+			X: make([]float64, duration),
+			Y: make([]float64, duration),
+		},
+		Five: XYFloatSlice{
+			X: make([]float64, duration),
+			Y: make([]float64, duration),
+		},
+		Ten: XYFloatSlice{
+			X: make([]float64, duration),
+			Y: make([]float64, duration),
+		},
+		TwentyFive: XYFloatSlice{
+			X: make([]float64, duration),
+			Y: make([]float64, duration),
+		},
+		Fifty: XYFloatSlice{
+			X: make([]float64, duration),
+			Y: make([]float64, duration),
+		},
+	}
 	for i, v := range matrix {
 		sort.Float64s(v)
 		histslice := make(plotter.Values, duration)
@@ -200,16 +239,30 @@ func RibbonPlot(matrix [][]float64, duration int, bucketnum int, sims int) (ribb
 		for index := range y {
 			y[index] = float64((1 + i))
 		}
-		ribbon[i] = Ribbon{
-			X: CreateTupleArray(vals, false),
-			Y: CreateTupleArray(y, true),
-			Z: CreateTupleArray(keys, false),
-			// Colorscale: [][]string{},
+		ribbonslice[i] = Ribbon{
+			X:         CreateTupleArray(vals, false),
+			Y:         CreateTupleArray(y, true),
+			Z:         CreateTupleArray(keys, false),
 			Plottype:  "surface",
 			Showscale: "false",
 		}
+		varpslice.One.X[i] = y[0]
+		one := int(float64(sims) * .01)
+		varpslice.One.Y[i] = v[one-1]
+		varpslice.Five.X[i] = y[4]
+		five := int(float64(sims) * .05)
+		varpslice.Five.Y[i] = v[five-1]
+		varpslice.Ten.X[i] = y[9]
+		ten := int(float64(sims) * .1)
+		varpslice.Ten.Y[i] = v[ten-1]
+		varpslice.TwentyFive.X[i] = y[24]
+		twentyfive := int(float64(sims) * .25)
+		varpslice.TwentyFive.Y[i] = v[twentyfive-1]
+		varpslice.Fifty.X[i] = y[49]
+		fifty := int(float64(sims) * .5)
+		varpslice.Fifty.Y[i] = v[fifty-1]
 	}
-	return ribbon
+	return ribbonslice, varpslice
 }
 
 // BetaSample - give mu and stdev, alpha and beta are calculated, and then used to randomly sample the beta distribution
