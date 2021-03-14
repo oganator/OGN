@@ -12,7 +12,7 @@ type Datetype struct {
 	Quarter   int    `json:"Quarter,omitempty"`
 	Year      int    `json:"Year,omitempty"`
 	MonthName string `json:"MonthName,omitempty"`
-	Bool      bool   `json:"Bool, omitempty"`
+	Bool      bool   `json:"Bool,omitempty"`
 }
 
 // Dateadd -

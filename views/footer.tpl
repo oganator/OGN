@@ -82,8 +82,7 @@ var ognApp = angular.module('ognApp', []);
 				function errorCallback(response) {
 					console.log("POST-ing of data failed");
 				}
-			); 
-		}; // post
+			); 		}; // post
 
 		// viewCFIndex
 		$scope.viewCFIndex = function(index){
@@ -122,7 +121,11 @@ var ognApp = angular.module('ognApp', []);
 
 		// getRentSchedule
 		$scope.getRentSchedule = function(unit, index){
-			$http.post("http://localhost:8080/ViewRentSchedule?unit="+unit+"&name="+$scope.entity+"&index="+index).then(
+			var url = "http://localhost:8080/ViewRentSchedule?unit="+unit+"&name="+$scope.entity+"&index="+index
+			if (typeof index == 'undefined'){
+				url = "http://localhost:8080/ViewRentSchedule?unit="+unit+"&name="+$scope.entity
+			}
+			$http.post(url).then(
 				function successCallback(response) {
 					$scope.rentschedule = $sce.trustAsHtml(response.data);
 				},

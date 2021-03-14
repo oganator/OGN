@@ -5,9 +5,9 @@
 <script>
 	var layout = {
 		showlegend: false,
-		autosize: false,
+		autosize: true,
 		width: 2200,
-		height: 1600,
+		height: 1500,
 		scene: {
 			xaxis: {title: 'Probability'},
 			yaxis: {title: 'Time'},

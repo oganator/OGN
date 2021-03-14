@@ -31,7 +31,7 @@
                         <button href="#unitcf" class="btn btn-default btn-rounded my-3" data-toggle="modal" data-target="#unitcf" ng-click="getUnitCF('[[.MasterID]]')">Cash Flow</button>
                     </td>
                     <td>
-                        <button href="#rentschedule" class="btn btn-default btn-rounded my-3" data-toggle="modal" data-target="#rentschedule" ng-click="getRentSchedule('[[.MasterID]]')[[if .Parent.MC]][[.Parent.MasterID]][[end]]">Rent Schedule</button>
+                        <button href="#rentschedule" class="btn btn-default btn-rounded my-3" data-toggle="modal" data-target="#rentschedule" ng-click="getRentSchedule('[[.MasterID]]'[[if .Parent.MC]],[[.Parent.MasterID]][[end]])">Rent Schedule [[if .Parent.MC]][[.Parent.MasterID]][[end]]</button>
                     </td>
                 </tr>
                 [[end]]

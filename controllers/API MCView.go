@@ -113,12 +113,14 @@ func (c *MCTabsController) Post() {
 		c.TplName = "CFTable.tpl"
 	case "endcash":
 		temp["data"] = Models[Key].MCResults.EndCash
+		temp["varp"] = Models[Key].MCResults.CashBalanceVaR
 		c.TplName = "MCHist.tpl"
 	case "cashbalance":
 		temp["data"] = Models[Key].MCResults.CashBalance
 		c.TplName = "3dchart.tpl"
 	case "endncf":
 		temp["data"] = Models[Key].MCResults.EndNCF
+		temp["varp"] = Models[Key].MCResults.NCFVaR
 		c.TplName = "MCHist.tpl"
 	case "ncf":
 		temp["data"] = Models[Key].MCResults.NCF

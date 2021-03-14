@@ -1,4 +1,3 @@
-
     <table class="table tableFixHead rounded">
         <thead>
             <tr>
@@ -19,8 +18,15 @@
             </tr>
         </tbody>
     </table>
-    <div class="container-fluid" style="width: 50%;">
-        <canvas id="myChart" class="chart chart-bar"></canvas>
+    <div class="row">
+        <div class="container-fluid" style="width: 45%;">
+            <canvas id="myChart" class="chart chart-bar"></canvas>
+        </div>
+        [[if .varp]]
+            <div class="container-fluid" style="width: 45%;">
+                [[template "VaRGraph" .]]
+            </div>  
+        [[end]]
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
     <script>
