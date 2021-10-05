@@ -13,8 +13,8 @@ import (
 // MCSetup -
 type MCSetup struct {
 	Sims        int
-	ERV         float64
-	CPI         float64
+	ERV         HModel
+	CPI         HModel
 	YieldShift  float64
 	Void        float64
 	Probability float64
@@ -24,14 +24,16 @@ type MCSetup struct {
 
 // MCResultSlice -
 type MCResultSlice struct {
-	EndCash     []float64
-	CashBalance [][]float64
-	EndNCF      []float64
-	NCF         [][]float64
-	IRR         []float64
-	EM          []float64
-	YTM         []float64
-	Duration    []float64
+	EndCash        []float64
+	CashBalance    [][]float64
+	EndNCF         []float64
+	NCF            [][]float64
+	EndMarketValue []float64
+	MarketValue    [][]float64
+	IRR            []float64
+	EM             []float64
+	YTM            []float64
+	Duration       []float64
 }
 
 // MCResults - used for final display. NOI, MarketValue and NCF have stats per year, IRR is for the hold period
@@ -42,6 +44,9 @@ type MCResults struct {
 	EndNCF         MCStats
 	NCF            []Ribbon
 	NCFVaR         VaRPercentile
+	EndMarketValue MCStats
+	MarketValue    []Ribbon
+	MarketValueVaR VaRPercentile
 	IRR            MCStats
 	EM             MCStats
 	YTM            MCStats
@@ -70,10 +75,22 @@ type Hist struct {
 func (e *Entity) MonteCarlo() {
 	e.MCSlice = make([]*Entity, e.MCSetup.Sims)
 	duration := dateintdiff(e.SalesDate.Dateint, e.StartDate.Dateint)
-	e.MCResultSlice = MCResultSlice{EndCash: make([]float64, e.MCSetup.Sims), CashBalance: make([][]float64, duration-2), EndNCF: make([]float64, e.MCSetup.Sims), NCF: make([][]float64, duration-2), IRR: make([]float64, e.MCSetup.Sims), EM: make([]float64, e.MCSetup.Sims), YTM: make([]float64, e.MCSetup.Sims), Duration: make([]float64, e.MCSetup.Sims)}
+	e.MCResultSlice = MCResultSlice{
+		EndCash:        make([]float64, e.MCSetup.Sims),
+		CashBalance:    make([][]float64, duration-2),
+		EndNCF:         make([]float64, e.MCSetup.Sims),
+		NCF:            make([][]float64, duration-2),
+		EndMarketValue: make([]float64, e.MCSetup.Sims),
+		MarketValue:    make([][]float64, duration-2),
+		IRR:            make([]float64, e.MCSetup.Sims),
+		EM:             make([]float64, e.MCSetup.Sims),
+		YTM:            make([]float64, e.MCSetup.Sims),
+		Duration:       make([]float64, e.MCSetup.Sims),
+	}
 	for i := 0; i < duration-2; i++ {
 		e.MCResultSlice.CashBalance[i] = make([]float64, e.MCSetup.Sims)
 		e.MCResultSlice.NCF[i] = make([]float64, e.MCSetup.Sims)
+		e.MCResultSlice.MarketValue[i] = make([]float64, e.MCSetup.Sims)
 	}
 	wg := sync.WaitGroup{}
 	for i := 1; i <= e.MCSetup.Sims; i++ {
@@ -82,8 +99,16 @@ func (e *Entity) MonteCarlo() {
 			defer wg.Done()
 			temp := *e
 			tempentitydata := EntityStore[e.MasterID]
-			tempentitydata.ERVGrowth = NormalSample(e.GrowthInput["ERV"], e.MCSetup.ERV)
-			tempentitydata.CPIGrowth = NormalSample(e.GrowthInput["CPI"], e.MCSetup.CPI)
+			tempentitydata.ERVGrowth.ShortTermRate = NormalSample(e.GrowthInput["ERV"].ShortTermRate, e.MCSetup.ERV.ShortTermRate)
+			tempentitydata.ERVGrowth.ShortTermPeriod = int(NormalSample(float64(e.GrowthInput["ERV"].ShortTermPeriod), float64(e.MCSetup.ERV.ShortTermPeriod)))
+			tempentitydata.ERVGrowth.TransitionPeriod = int(NormalSample(float64(e.GrowthInput["ERV"].TransitionPeriod), float64(e.MCSetup.ERV.TransitionPeriod)))
+			tempentitydata.ERVGrowth.LongTermRate = NormalSample(e.GrowthInput["ERV"].LongTermRate, e.MCSetup.ERV.LongTermRate)
+
+			tempentitydata.CPIGrowth.ShortTermRate = NormalSample(e.GrowthInput["CPI"].ShortTermRate, e.MCSetup.CPI.ShortTermRate)
+			tempentitydata.CPIGrowth.ShortTermPeriod = int(NormalSample(float64(e.GrowthInput["CPI"].ShortTermPeriod), float64(e.MCSetup.CPI.ShortTermPeriod)))
+			tempentitydata.CPIGrowth.TransitionPeriod = int(NormalSample(float64(e.GrowthInput["CPI"].TransitionPeriod), float64(e.MCSetup.CPI.TransitionPeriod)))
+			tempentitydata.CPIGrowth.LongTermRate = NormalSample(e.GrowthInput["CPI"].LongTermRate, e.MCSetup.CPI.LongTermRate)
+
 			tempentitydata.OpExpercent = NormalSample(e.OpEx.PercentOfTRI, e.MCSetup.OpEx)
 			tempentitydata.YieldShift = NormalSample(e.Valuation.YieldShift, e.MCSetup.YieldShift)
 			tempentitydata.GLA.Void = int(NormalSample(float64(e.GLA.Void), e.MCSetup.Void))
@@ -94,18 +119,21 @@ func (e *Entity) MonteCarlo() {
 			temp.UpdateEntity(true, tempentitydata)
 			temp.MCResults.EndCash.Mean = temp.COA[temp.SalesDate.Dateint].CashBalance
 			temp.MCResults.EndNCF.Mean = temp.COA[temp.SalesDate.Dateint].NetCashFlow
+			temp.MCResults.EndMarketValue.Mean = temp.COA[temp.SalesDate.Dateint].MarketValue
 			date := Dateadd(temp.StartDate, 1)
 			// mutex lock
 			e.Mutex.Lock()
 			e.MCSlice[index-1] = &temp
-			e.MCResultSlice.EndCash[index-1] = temp.COA[temp.SalesDate.Dateint].CashBalance
 			// assign results for every month
 			for ii := 0; ii < duration-2; ii++ {
 				e.MCResultSlice.CashBalance[ii][index-1] = temp.COA[date.Dateint].CashBalance
 				e.MCResultSlice.NCF[ii][index-1] = temp.COA[date.Dateint].NetCashFlow
+				e.MCResultSlice.MarketValue[ii][index-1] = temp.COA[date.Dateint].MarketValue
 				date.Add(1)
 			}
+			e.MCResultSlice.EndCash[index-1] = temp.COA[temp.SalesDate.Dateint].CashBalance
 			e.MCResultSlice.EndNCF[index-1] = temp.COA[temp.SalesDate.Dateint].NetCashFlow
+			e.MCResultSlice.EndMarketValue[index-1] = temp.COA[temp.SalesDate.Dateint].MarketValue
 			e.MCResultSlice.IRR[index-1] = temp.Metrics.IRR.NetLeveredAfterTax
 			e.MCResultSlice.EM[index-1] = temp.Metrics.EM.NetLeveredAfterTax
 			e.MCResultSlice.YTM[index-1] = temp.Metrics.BondHolder.YTM
@@ -116,8 +144,13 @@ func (e *Entity) MonteCarlo() {
 	wg.Wait()
 	e.MCResults.EndCash = MCStatsCalc(e.MCResultSlice.EndCash, e.MCSetup.Sims)
 	e.MCResults.CashBalance, e.MCResults.CashBalanceVaR = RibbonPlot(e.MCResultSlice.CashBalance, duration-2, 100, e.MCSetup.Sims)
+
 	e.MCResults.EndNCF = MCStatsCalc(e.MCResultSlice.EndNCF, e.MCSetup.Sims)
 	e.MCResults.NCF, e.MCResults.NCFVaR = RibbonPlot(e.MCResultSlice.NCF, duration-2, 100, e.MCSetup.Sims)
+
+	e.MCResults.EndMarketValue = MCStatsCalc(e.MCResultSlice.EndMarketValue, e.MCSetup.Sims)
+	e.MCResults.MarketValue, e.MCResults.MarketValueVaR = RibbonPlot(e.MCResultSlice.MarketValue, duration-2, 100, e.MCSetup.Sims)
+
 	switch e.Strategy {
 	case "Standard":
 		e.MCResults.IRR = MCStatsCalc(e.MCResultSlice.IRR, e.MCSetup.Sims)

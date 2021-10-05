@@ -13,7 +13,7 @@ func PopulateModels() {
 func CreateEntity(v EntityData) (e Entity) {
 	startdate := Dateadd(Datetype{Month: v.StartMonth, Year: v.StartYear}, 0)
 	salesdate := Dateadd(Datetype{Month: v.SalesMonth, Year: v.SalesYear}, 0)
-	growth := map[string]float64{}
+	growth := map[string]HModel{}
 	growth["CPI"] = v.CPIGrowth
 	growth["ERV"] = v.ERVGrowth
 	e = Entity{
@@ -52,7 +52,7 @@ func (e *Entity) UpdateEntity(mc bool, v *EntityData) {
 	startdate := Dateadd(Datetype{Month: v.StartMonth, Year: v.StartYear}, 0)
 	salesdate := Dateadd(startdate, v.HoldPeriod*12-1)
 	enddate := Dateadd(salesdate, 132)
-	growthinput := map[string]float64{}
+	growthinput := map[string]HModel{}
 	growthinput["CPI"] = v.CPIGrowth
 	growthinput["ERV"] = v.ERVGrowth
 	*e = Entity{
@@ -116,11 +116,12 @@ func (e *Entity) CalculateModel(mc bool) {
 	e.SalesDate.Add(0)
 	e.EndDate.Add(0)
 	e.Growth = make(map[string]map[int]float64)
-	e.GrowthCalc()
+	e.GrowthCalc(mc)
 	e.PopulateUnits()
 	// e.CalculateUnits()
 	e.AssetRentCalc(mc)
-	e.ValuationCalc()
+	e.DirectCapCalc()
+	// e.DCFCalc()
 	e.Acquisition()
 	e.PropertyCFCalc()
 	e.Disposal()

@@ -30,8 +30,8 @@ func (e *Entity) CIT() {
 		}
 		if taxableincome < 0.0 {
 			taxespayable = CarryBack(taxableincome, e, date)
-		} else if taxableincome > 200000.0 {
-			taxespayable = 200000.0*.15 + (taxableincome-200000)*.217
+		} else if taxableincome > 395000.0 {
+			taxespayable = 395000.0*.15 + (taxableincome-395000)*.217
 		} else {
 			taxespayable = taxableincome * .15
 		}

@@ -38,6 +38,12 @@ var ognApp = angular.module('ognApp', []);
 			if (route == 'endncf'){
 				$scope.post(url+"endncf");
 			}
+			if (route == 'endmarketvalue'){
+				$scope.post(url+"endmarketvalue");
+			}
+			if (route == 'marketvalue'){
+				$scope.post(url+"marketvalue");
+			}
 			if (route == 'ncf'){
 				$scope.post(url+"ncf");
 			}
@@ -55,6 +61,7 @@ var ognApp = angular.module('ognApp', []);
 			} 
 			if (route == 'details'){
 				$scope.post("http://localhost:8080/MCDetails?name="+$scope.entity+"&page=1");
+				//$scope.post("http://localhost:8080/MCDetails?name=Markerkant 13 9&page=1");
 				$scope.mcdetailspage = 1;
 			}
 			var cftable = angular.element( document.querySelector( '#cftable' ) );

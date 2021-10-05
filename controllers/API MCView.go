@@ -73,6 +73,10 @@ func (c *MCDetailsController) Post() {
 		sort.Sort(ByEndCash(Models[tempkey].MCSlice))
 	case "endncf-r":
 		sort.Sort(ByEndCashr(Models[tempkey].MCSlice))
+	case "endmarketvalue":
+		sort.Sort(ByEndMarketValue(Models[tempkey].MCSlice))
+	case "endmarketvalue-r":
+		sort.Sort(ByEndMarketValuer(Models[tempkey].MCSlice))
 	case "prob":
 		sort.Sort(ByProb(Models[tempkey].MCSlice))
 	case "prob-r":
@@ -124,6 +128,13 @@ func (c *MCTabsController) Post() {
 		c.TplName = "MCHist.tpl"
 	case "ncf":
 		temp["data"] = Models[Key].MCResults.NCF
+		c.TplName = "3dchart.tpl"
+	case "endmarketvalue":
+		temp["data"] = Models[Key].MCResults.EndMarketValue
+		temp["varp"] = Models[Key].MCResults.MarketValueVaR
+		c.TplName = "MCHist.tpl"
+	case "marketvalue":
+		temp["data"] = Models[Key].MCResults.MarketValue
 		c.TplName = "3dchart.tpl"
 	case "irr":
 		temp["data"] = Models[Key].MCResults.IRR

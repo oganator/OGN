@@ -141,7 +141,7 @@ type ByCPI []*Entity
 
 func (a ByCPI) Len() int { return len(a) }
 func (a ByCPI) Less(i, j int) bool {
-	return a[i].GrowthInput["CPI"] < a[j].GrowthInput["CPI"]
+	return a[i].GrowthInput["CPI"].ShortTermRate < a[j].GrowthInput["CPI"].ShortTermRate
 }
 func (a ByCPI) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
@@ -149,7 +149,7 @@ type ByCPIr []*Entity
 
 func (a ByCPIr) Len() int { return len(a) }
 func (a ByCPIr) Less(i, j int) bool {
-	return a[i].GrowthInput["CPI"] > a[j].GrowthInput["CPI"]
+	return a[i].GrowthInput["CPI"].ShortTermRate > a[j].GrowthInput["CPI"].ShortTermRate
 }
 func (a ByCPIr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
@@ -158,7 +158,7 @@ type ByERV []*Entity
 
 func (a ByERV) Len() int { return len(a) }
 func (a ByERV) Less(i, j int) bool {
-	return a[i].GrowthInput["ERV"] < a[j].GrowthInput["ERV"]
+	return a[i].GrowthInput["ERV"].ShortTermRate < a[j].GrowthInput["ERV"].ShortTermRate
 }
 func (a ByERV) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
@@ -166,7 +166,7 @@ type ByERVr []*Entity
 
 func (a ByERVr) Len() int { return len(a) }
 func (a ByERVr) Less(i, j int) bool {
-	return a[i].GrowthInput["ERV"] > a[j].GrowthInput["ERV"]
+	return a[i].GrowthInput["ERV"].ShortTermRate > a[j].GrowthInput["ERV"].ShortTermRate
 }
 func (a ByERVr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
@@ -220,6 +220,23 @@ func (a ByEndNCFr) Less(i, j int) bool {
 	return a[i].COA[a[i].SalesDate.Dateint].NetCashFlow > a[j].COA[a[j].SalesDate.Dateint].NetCashFlow
 }
 func (a ByEndNCFr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+// ByEndMarketValue -
+type ByEndMarketValue []*Entity
+
+func (a ByEndMarketValue) Len() int { return len(a) }
+func (a ByEndMarketValue) Less(i, j int) bool {
+	return a[i].COA[a[i].SalesDate.Dateint].MarketValue < a[j].COA[a[j].SalesDate.Dateint].MarketValue
+}
+func (a ByEndMarketValue) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+type ByEndMarketValuer []*Entity
+
+func (a ByEndMarketValuer) Len() int { return len(a) }
+func (a ByEndMarketValuer) Less(i, j int) bool {
+	return a[i].COA[a[i].SalesDate.Dateint].MarketValue > a[j].COA[a[j].SalesDate.Dateint].MarketValue
+}
+func (a ByEndMarketValuer) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 // ByProb -
 type ByProb []*Entity

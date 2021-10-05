@@ -19,8 +19,8 @@ type EntityData struct {
 	SalesYear           int
 	EndMonth            int
 	EndYear             int
-	CPIGrowth           float64
-	ERVGrowth           float64
+	CPIGrowth           HModel
+	ERVGrowth           HModel
 	EntryYield          float64
 	YieldShift          float64
 	ExitYield           float64
@@ -100,27 +100,33 @@ func ReadXLSX() {
 		tempentity.SalesYear, _ = strconv.Atoi(row[7])
 		tempentity.EndMonth, _ = strconv.Atoi(row[8])
 		tempentity.EndYear, _ = strconv.Atoi(row[9])
-		tempentity.CPIGrowth, _ = strconv.ParseFloat(row[10], 64)
-		tempentity.ERVGrowth, _ = strconv.ParseFloat(row[11], 64)
-		tempentity.EntryYield, _ = strconv.ParseFloat(row[12], 64)
-		tempentity.YieldShift, _ = strconv.ParseFloat(row[13], 64)
-		tempentity.ExitYield, _ = strconv.ParseFloat(row[14], 64)
-		tempentity.HoldPeriod, _ = strconv.Atoi(row[15])
-		tempentity.RETT, _ = strconv.ParseFloat(row[16], 64)
-		tempentity.VAT, _ = strconv.ParseFloat(row[17], 64)
-		tempentity.WOZpercent, _ = strconv.ParseFloat(row[18], 64)
-		tempentity.DeprPeriod, _ = strconv.Atoi(row[19])
-		tempentity.Landvalue, _ = strconv.ParseFloat(row[20], 64)
-		tempentity.CarryBackYrs, _ = strconv.Atoi(row[24])
-		tempentity.CarryForwardYrs, _ = strconv.Atoi(row[25])
-		tempentity.LTV, _ = strconv.ParseFloat(row[21], 64)
-		tempentity.LoanRate, _ = strconv.ParseFloat(row[22], 64)
-		tempentity.OpExpercent, _ = strconv.ParseFloat(row[23], 64)
-		tempentity.percentIncometosell, _ = strconv.ParseFloat(row[24], 64)
-		tempentity.YearsIncometosell, _ = strconv.Atoi(row[25])
-		tempentity.DiscountRate, _ = strconv.ParseFloat(row[26], 64)
-		tempentity.Strategy = row[27]
-		tempentity.Fees, _ = strconv.ParseFloat(row[28], 64)
+		tempentity.CPIGrowth.ShortTermRate, _ = strconv.ParseFloat(row[10], 64)
+		tempentity.CPIGrowth.ShortTermPeriod, _ = strconv.Atoi(row[11])
+		tempentity.CPIGrowth.TransitionPeriod, _ = strconv.Atoi(row[12])
+		tempentity.CPIGrowth.LongTermRate, _ = strconv.ParseFloat(row[13], 64)
+		tempentity.ERVGrowth.ShortTermRate, _ = strconv.ParseFloat(row[14], 64)
+		tempentity.ERVGrowth.ShortTermPeriod, _ = strconv.Atoi(row[15])
+		tempentity.ERVGrowth.TransitionPeriod, _ = strconv.Atoi(row[16])
+		tempentity.ERVGrowth.LongTermRate, _ = strconv.ParseFloat(row[17], 64)
+		tempentity.EntryYield, _ = strconv.ParseFloat(row[18], 64)
+		tempentity.YieldShift, _ = strconv.ParseFloat(row[19], 64)
+		tempentity.ExitYield, _ = strconv.ParseFloat(row[20], 64)
+		tempentity.HoldPeriod, _ = strconv.Atoi(row[21])
+		tempentity.RETT, _ = strconv.ParseFloat(row[22], 64)
+		tempentity.VAT, _ = strconv.ParseFloat(row[23], 64)
+		tempentity.WOZpercent, _ = strconv.ParseFloat(row[24], 64)
+		tempentity.DeprPeriod, _ = strconv.Atoi(row[25])
+		tempentity.Landvalue, _ = strconv.ParseFloat(row[26], 64)
+		tempentity.CarryBackYrs, _ = strconv.Atoi(row[30])
+		tempentity.CarryForwardYrs, _ = strconv.Atoi(row[31])
+		tempentity.LTV, _ = strconv.ParseFloat(row[27], 64)
+		tempentity.LoanRate, _ = strconv.ParseFloat(row[28], 64)
+		tempentity.OpExpercent, _ = strconv.ParseFloat(row[29], 64)
+		tempentity.percentIncometosell, _ = strconv.ParseFloat(row[32], 64)
+		// tempentity.YearsIncometosell, _ = strconv.Atoi(row[0])
+		tempentity.DiscountRate, _ = strconv.ParseFloat(row[35], 64)
+		tempentity.Strategy = row[33]
+		tempentity.Fees, _ = strconv.ParseFloat(row[34], 64)
 		EntityStore[tempentity.MasterID] = &tempentity
 	}
 	// UNITS

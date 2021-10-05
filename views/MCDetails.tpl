@@ -1,4 +1,5 @@
 [[define "MCDetails"]]
+
 <div>
 	<table class="table table-hover tableFixHead rounded">
 		<thead>
@@ -15,11 +16,12 @@
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("extdur")'>EXT Duration</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("hazard")'>Hazard Rate</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("opex")'>OpEx %TRI</button></th>
-				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("cpi")'>CPI Growth</button></th>
-				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("erv")'>ERV Growth</button></th>
+				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("cpi")'>CPI Short Rate</button></th>
+				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("erv")'>ERV Short Rate</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("yieldshift")'>Yield Shift</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("endcash")'>Ending Cash</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("endncf")'>Ending NCF</button></th>
+				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("endmarketvalue")'>Ending Market Value</button></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -38,11 +40,12 @@
 				<td>{{[[$value.GLA.Default.Hazard]] *100 | number:2}}</td>
 				<td>{{[[$value.OpEx.PercentOfTRI]] *100 | number:2}}</td>
 				[[range $value.GrowthInput]]
-				<td>{{[[.]] *100 | number:2}}</td>
+				<td>{{[[.ShortTermRate]] *100 | number:2}}</td>
 				[[end]]
 				<td>[[printf "%.2f" $value.Valuation.YieldShift]]</td>
 				<td>{{[[$value.MCResults.EndCash.Mean]] | number:0}}</td>
 				<td>{{[[$value.MCResults.EndNCF.Mean]] | number:0}}</td>
+				<td>{{[[$value.MCResults.EndMarketValue.Mean]] | number:0}}</td>
 			</tr>
 			[[end]]
 		</tbody>

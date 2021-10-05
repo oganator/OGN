@@ -16,6 +16,8 @@
                 <th scope="col">Ending Contract Rent</th>
                 <th scope="col">Rent Revision ERV</th>
                 <th scope="col">Probability</th>
+                <th scope="col">Renew Index</th>
+                <th scope="col">Rotate Index</th>
             </tr>
         </thead>
         <tbody>
@@ -34,6 +36,9 @@
                 <td style="border-color:006A4D;">{{[[.EndContractRent]] *12 | number:0}}</td>
                 <td style="border-color:006A4D;">{{[[.RentRevisionERV]] *100 | number:2}}%</td>
                 <td style="border-color:006A4D;">{{[[.Probability]] *100 | number:2}}%</td>
+                [[range .RenewIndex]]
+                <td style="border-color:006A4D;">{{[[.Final]]| number:2}}%</td>
+                [[end]]
             </tr>
         [[end]]
         </tbody>

@@ -27,9 +27,11 @@ func (e *Entity) PropertyCFCalc() {
 // Acquisition -
 func (e *Entity) Acquisition() {
 	soldrent := 0.0
+	e.Mutex.Lock()
 	acq := e.COA[Dateadd(e.StartDate, -1).Dateint].MarketValue
+	e.Mutex.Unlock()
 	e.Valuation.AcqPrice = acq
-	rett := acq * -.07
+	rett := acq * -e.Tax.RETT
 	switch e.Strategy {
 	case "Pure Discount":
 		soldrent = SumCOALines(FloatCOA{BondIncome: 1.0}, e.COA, e.StartDate, e.SalesDate)

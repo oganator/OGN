@@ -24,11 +24,12 @@ type RentSchedule struct {
 
 // Indexation -
 type Indexation struct {
-	IndexNumber int      `json:"IndexNumber,omitempty"`
-	StartDate   Datetype `json:"StartDate,omitempty"`
-	EndDate     Datetype `json:"EndDate,omitempty"`
-	Amount      float64  `json:"Amount,omitempty"`
-	Final       float64  `json:"Final,omitempty"`
+	IndexNumber  int           `json:"IndexNumber,omitempty"`
+	StartDate    Datetype      `json:"StartDate,omitempty"`
+	EndDate      Datetype      `json:"EndDate,omitempty"`
+	Amount       float64       `json:"Amount,omitempty"`
+	Final        float64       `json:"Final,omitempty"`
+	RentSchedule *RentSchedule `json:"Unit,omitempty"`
 }
 
 // IndexDetails -

@@ -30,7 +30,7 @@ func IRR(cf *IntFloatCOAMap, start Datetype, end Datetype, setup FloatCOA) float
 // IRRCalc -
 func IRRCalc(values []float64) float64 {
 	const irrMaxInterations = 20
-	const irrAccuracy = 1e-7
+	const irrAccuracy = 1e-9
 	const irrInitialGuess = 0
 	x0 := float64(irrInitialGuess)
 	var x1 float64

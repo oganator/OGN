@@ -7,7 +7,7 @@
 	</div>
 	[[if .entity.Table]]
 		<div class="container-fluid" style="width: 95%;">
-			<ul class="nav nav-pills" id="myTab">
+			<ul class="nav nav-pills" id="CFtabletabs">
 				<li class="nav-item">
 					<a class="nav-link active" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="true" ng-click="getRequest('cf')">Cash Flow</a>
 				</li>
@@ -22,6 +22,12 @@
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('ncf')">Net Cash Flow</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('endmarketvalue')">End Market Value</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('marketvalue')">Market Value</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('irr')" ng-show="strategy == 'Standard' ">IRR</a>
