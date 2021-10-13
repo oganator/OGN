@@ -9,6 +9,9 @@
                         <a class="nav-link waves-light active" data-toggle="tab" href="#settings" role="tab">Settings</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link waves-light" data-toggle="tab" href="#leasing" role="tab">Leasing</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link waves-light" data-toggle="tab" href="#ervcpi" role="tab">ERV/CPI Growth</a>
                     </li>
                     <li class="nav-item">
@@ -23,10 +26,14 @@
                 <div class="tab-pane fade in show active" id="settings" role="tabpanel">
                     [[template "EntitySettingsDefault" .]]
                 </div>
+                <div class="tab-pane fade" id="leasing" role="tabpanel">
+                    [[template "EntitySettingsLeasing" .]]
+                </div>
                 <div class="tab-pane fade" id="ervcpi" role="tabpanel">
                     [[template "EntitySettingsERVCPI" .]]
                 </div>
                 <div class="tab-pane fade" id="val" role="tabpanel">
+                    [[template "EntitySettingsValuation" .]]
                 </div>
                 <div class="tab-pane fade" id="tax" role="tabpanel">
                     [[template "EntitySettingsTax" .]]
@@ -61,17 +68,6 @@
     <br>
     <script>
         window.onload = ytmDur()
-        function convertPercent(){
-            document.getElementById('entryyield').value = document.getElementById('entryyield').value*100;
-            document.getElementById('exityield').value = document.getElementById('exityield').value*100;
-            document.getElementById('discount').value = document.getElementById('discount').value*100;
-            document.getElementById('soldrent').value = document.getElementById('soldrent').value*100;
-            document.getElementById('erv').value = document.getElementById('erv').value*100;
-            document.getElementById('cpi').value = document.getElementById('cpi').value*100;
-            document.getElementById('opex').value = document.getElementById('opex').value*100;
-            document.getElementById('balpercent').value = document.getElementById('balpercent').value*100;
-            ytmDur();
-        }
         function ytmDur(){
             temp = Math.round([[.entity.Metrics.BondHolder.YTM]] / [[.entity.Metrics.BondHolder.Duration]]*1000)/1000
             document.getElementById('ytmdur').value = document.getElementById('ytmdur').value.concat(temp);
@@ -85,14 +81,6 @@
         <div class="form-group col-sm-1">
             <label for="holdperiod">Hold Period</label>
             <input type="text" class="form-control" id="holdperiod" name="holdperiod" value="[[.entity.HoldPeriod]]">
-        </div>
-        <div class="form-group col-sm-1">
-            <label for="entryyield">Entry Yield</label>
-            <input type="text" class="form-control" id="entryyield" name="entryyield" value="[[.entity.Valuation.EntryYield]]">
-        </div>
-        <div class="form-group col-sm-1">
-            <label for="exityield">Exit Yield</label>
-            <input type="text" class="form-control" id="exityield" name="exityield" value="[[.entity.Valuation.ExitYield]]">
         </div>
         <div class="form-group col-sm-1">
             <label for="fees">Fees (bps)</label>
@@ -129,57 +117,15 @@
         </div>
     </div>
     <div class="form-row">
-        
-        <div class="form-group col-sm-1">
-            <label for="yieldshift">Yield Shift (bps)</label>
-            <input type="text" class="form-control" id="yieldshift" name="yieldshift" value="[[.entity.Valuation.YieldShift]]">
-        </div>
-        <div class="form-group col-sm-1">
-            <label for="void">Void</label>
-            <input type="text" class="form-control" id="void" name="void" Value="[[.entity.GLA.Void]]">
-        </div>
-        <div class="form-group col-sm-1">
-            <label for="duration">Extension Duration</label>
-            <input type="text" class="form-control" id="duration" name="duration" Value="[[.entity.GLA.EXTDuration]]">
-        </div>
-        <div class="form-group col-sm-1">
-            <label for="rentrevision">Rent Revision ERV</label>
-            <input type="text" class="form-control" id="rentrevision" name="rentrevision" Value="[[.entity.GLA.RentRevisionERV]]">
-        </div>
-        <div class="form-group col-sm-1">
-            <label for="probability">Probability</label>
-            <input type="text" class="form-control" id="probability" name="probability" Value="[[.entity.GLA.Probability]]">
-        </div>
+
         <div class="form-group col-sm-1">
             <label for="opex">Operating Expenses</label>
             <input type="text" class="form-control" id="opex" name="opex" Value="[[.entity.OpEx.PercentOfTRI]]">
         </div>
-        <div class="form-group col-sm-1">
-            <label for="hazard">Hazard Rate</label>
-            <input type="text" class="form-control" id="hazard" name="hazard" Value="[[.entity.GLA.Default.Hazard]]">
-        </div>
     </div>
     <div class="form-row">
         <div class="form-group col-sm-1">
-            <input type="text" class="form-control" id="yieldshiftsigma" name="yieldshiftsigma" value="[[.entity.MCSetup.YieldShift]]">
-        </div>
-        <div class="form-group col-sm-1">
-            <input type="text" class="form-control" id="voidsigma" name="voidsigma" Value="[[.entity.MCSetup.Void]]">
-        </div>
-        <div class="form-group col-sm-1">
-            <input type="text" class="form-control" id="" name="" Value="">
-        </div>
-        <div class="form-group col-sm-1">
-            <input type="text" class="form-control" id="" name="" Value="">
-        </div>
-        <div class="form-group col-sm-1">
-            <input type="text" class="form-control" id="probabilitysigma" name="probabilitysigma" Value="[[.entity.MCSetup.Probability]]">
-        </div>
-        <div class="form-group col-sm-1">
             <input type="text" class="form-control" id="opexsigma" name="opexsigma" Value="[[.entity.MCSetup.OpEx]]">
-        </div>
-        <div class="form-group col-sm-1">
-            <input type="text" class="form-control" id="hazardsigma" name="hazardsigma" Value="[[.entity.MCSetup.Hazard]]">
         </div>
     </div>
 [[end]]
@@ -292,6 +238,95 @@
                 <label for="carryforwardyrs">Carry Forward Years</label>
                 <input type="text" class="form-control" id="carryforwardyrs" name="carryforwardyrs" Value='[[.entity.Tax.CarryForwardYrs]]'>
             </div>
+        </div>
+    </div>
+[[end]]
+
+[[define "EntitySettingsLeasing"]]
+    <div class="form-column">
+        <div class="form-row">
+            <div class="form-group col-sm-1">
+                <label for="void">Void</label>
+                <input type="text" class="form-control" id="void" name="void" Value="[[.entity.GLA.Void]]">
+            </div>
+            <div class="form-group col-sm-1">
+                <label for="duration">Extension Duration</label>
+                <input type="text" class="form-control" id="duration" name="duration" Value="[[.entity.GLA.EXTDuration]]">
+            </div>
+            <div class="form-group col-sm-1">
+                <label for="rentrevision">Rent Revision ERV</label>
+                <input type="text" class="form-control" id="rentrevision" name="rentrevision" Value="[[.entity.GLA.RentRevisionERV]]">
+            </div>
+            <div class="form-group col-sm-1">
+                <label for="probability">Probability</label>
+                <input type="text" class="form-control" id="probability" name="probability" Value="[[.entity.GLA.Probability]]">
+            </div>
+            <div class="form-group col-sm-1">
+                <label for="incentivemonths">Incentive Months</label>
+                <input type="text" class="form-control" id="incentivemonths" name="incentivemonths" Value="[[.entity.GLA.RentIncentives.Duration]]">
+            </div>
+            <div class="form-group col-sm-1">
+                <label for="incentivepercent">Incentive Percent</label>
+                <input type="text" class="form-control" id="incentivepercent" name="incentivepercent" Value="[[.entity.GLA.RentIncentives.PercentOfContractRent]]">
+            </div>            
+            <div class="form-group col-sm-1">
+                <label for="hazard">Hazard Rate</label>
+                <input type="text" class="form-control" id="hazard" name="hazard" Value="[[.entity.GLA.Default.Hazard]]">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-sm-1">
+                <input type="text" class="form-control" id="voidsigma" name="voidsigma" Value="[[.entity.MCSetup.Void]]">
+            </div>
+            <div class="form-group col-sm-1">
+                <input type="text" class="form-control" id="" name="" Value="">
+            </div>
+            <div class="form-group col-sm-1">
+                <input type="text" class="form-control" id="" name="" Value="">
+            </div>
+            <div class="form-group col-sm-1">
+                <input type="text" class="form-control" id="probabilitysigma" name="probabilitysigma" Value="[[.entity.MCSetup.Probability]]">
+            </div>
+            <div class="form-group col-sm-1">
+                <input type="text" class="form-control" id="" name="" Value="">
+            </div>
+            <div class="form-group col-sm-1">
+                <input type="text" class="form-control" id="" name="" Value="">
+            </div>
+            <div class="form-group col-sm-1">
+                <input type="text" class="form-control" id="" name="" Value="">
+            </div>
+        </div>
+    </div>
+[[end]]
+
+
+[[define "EntitySettingsValuation"]]
+    <div class="form-column">
+        <div class="form-row">
+            <div class="form-group col-sm-1">
+                <label for="entryyield">Entry Yield</label>
+                <input type="text" class="form-control" id="entryyield" name="entryyield" value="[[.entity.Valuation.EntryYield]]">
+            </div>
+            <div class="form-group col-sm-1">
+                <label for="exityield">Exit Yield</label>
+                <input type="text" class="form-control" id="exityield" name="exityield" value="[[.entity.Valuation.ExitYield]]">
+            </div>
+            <div class="form-group col-sm-1">
+                <label for="yieldshift">Yield Shift (bps)</label>
+                <input type="text" class="form-control" id="yieldshift" name="yieldshift" value="[[.entity.Valuation.YieldShift]]">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-sm-1">
+                <input type="text" class="form-control" id="" name="" Value="">
+            </div>
+            <div class="form-group col-sm-1">
+                <input type="text" class="form-control" id="" name="" Value="">
+            </div>
+            <div class="form-group col-sm-1">
+                <input type="text" class="form-control" id="yieldshiftsigma" name="yieldshiftsigma" value="[[.entity.MCSetup.YieldShift]]">
+            </div>    
         </div>
     </div>
 [[end]]
