@@ -38,34 +38,34 @@ type Entity struct {
 
 // Unit -
 type Unit struct {
-	MasterID              int
-	Name                  string         `json:"Name,omitempty"`                  //
-	LeaseStartDate        Datetype       `json:"LeaseStartDate,omitempty"`        //
-	LeaseExpiryDate       Datetype       `json:"LeaseExpiryDate,omitempty"`       //
-	UnitStatus            string         `json:"UnitStatus,omitempty"`            // vacant or occupied
-	Tenant                string         `json:"Tenant,omitempty"`                //
-	PassingRent           float64        `json:"PassingRent,omitempty"`           //
-	RentSchedule          RentSchedule   `json:"RentSchedule,omitempty"`          // created by Unit.RentScheduleCalc()
-	RSStore               []RentSchedule `json:"RSStore,omitempty"`               // only used for reference
-	Parent                *Entity        `json:"-"`                               //
-	Probability           float64        `json:"Probability,omitempty"`           //
-	PercentSoldRent       float64        `json:"PercentSoldRent,omitempty"`       //
-	DiscountRate          float64        `json:"DiscountRate,omitempty"`          //
-	BondProceeds          float64        `json:"BondProceeds,omitempty"`          //
-	BondIncome            float64        `json:"BondIncome,omitempty"`            //
-	BondIndex             Indexation     `json:"BondIndex,omitempty"`             //
-	BondExpense           float64        `json:"BondExpense,omitempty"`           //
-	Default               Default        `json:"Default,omitempty"`               //
-	RentRevisionERV       float64        `json:"RentRevisionERV,omitempty"`       //
-	EXTDuration           int            `json:"EXTDuration,omitempty"`           //
-	IndexDetails          IndexDetails   `json:"IndexDetails,omitempty"`          //
-	RentIncentivesMonths  int            `json:"RentIncentivesMonths,omitempty"`  //
-	RentIncentivesPercent float64        `json:"RentIncentivesPercent,omitempty"` //
-	Void                  int            `json:"Void,omitempty"`                  //
-	FitOutCosts           CostInput      `json:"FitOutCosts,omitempty"`           // input for costs when the lease expires
-	ERVArea               float64        `json:"ERVArea,omitempty"`               //
-	ERVAmount             float64        `json:"ERVAmount,omitempty"`             //
-	COA                   IntFloatCOAMap `json:"COA,omitempty"`                   // Contains monthly values, as well as yearly values (rolling or calendar) up to the sales date\
+	MasterID           int
+	Name               string         `json:"Name,omitempty"`            //
+	LeaseStartDate     Datetype       `json:"LeaseStartDate,omitempty"`  //
+	LeaseExpiryDate    Datetype       `json:"LeaseExpiryDate,omitempty"` //
+	UnitStatus         string         `json:"UnitStatus,omitempty"`      // vacant or occupied
+	Tenant             string         `json:"Tenant,omitempty"`          //
+	PassingRent        float64        `json:"PassingRent,omitempty"`     //
+	RentSchedule       RentSchedule   `json:"RentSchedule,omitempty"`    // created by Unit.RentScheduleCalc()
+	RSStore            []RentSchedule `json:"RSStore,omitempty"`         // only used for reference
+	Parent             *Entity        `json:"-"`                         //
+	Probability        float64        `json:"Probability,omitempty"`     //
+	PercentSoldRent    float64        `json:"PercentSoldRent,omitempty"` //
+	DiscountRate       float64        `json:"DiscountRate,omitempty"`    //
+	BondProceeds       float64        `json:"BondProceeds,omitempty"`    //
+	BondIncome         float64        `json:"BondIncome,omitempty"`      //
+	BondIndex          Indexation     `json:"BondIndex,omitempty"`       //
+	BondExpense        float64        `json:"BondExpense,omitempty"`     //
+	Default            Default        `json:"Default,omitempty"`         //
+	RentRevisionERV    float64        `json:"RentRevisionERV,omitempty"` //
+	EXTDuration        int            `json:"EXTDuration,omitempty"`     //
+	IndexDetails       IndexDetails   `json:"IndexDetails,omitempty"`    //
+	RentIncentives     CostInput      `json:"RentIncentives,omitempty"`  //
+	Void               int            `json:"Void,omitempty"`            //
+	FitOutCosts        CostInput      `json:"FitOutCosts,omitempty"`     // input for costs when the lease expires
+	LeasingCommissions CostInput      `json:"LeasingCommissions,omitempty"`
+	ERVArea            float64        `json:"ERVArea,omitempty"`   //
+	ERVAmount          float64        `json:"ERVAmount,omitempty"` //
+	COA                IntFloatCOAMap `json:"COA,omitempty"`       // Contains monthly values, as well as yearly values (rolling or calendar) up to the sales date\
 }
 
 // ChildEntities -

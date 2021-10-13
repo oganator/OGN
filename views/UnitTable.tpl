@@ -3,9 +3,9 @@
         <table class="table table-hover tableFixHead rounded">
             <thead>
                 <tr>
+                    <th scope="col">Unit Name</th>
                     <th scope="col">Tenant</th>
                     <th scope="col">Status</th>
-                    <th scope="col">% Sold Rent</th>
                     <th scope="col">Lease End</th>
                     <th scope="col">ERV Area</th>
                     <th scope="col">ERV Amount</th>
@@ -19,10 +19,10 @@
                 [[$name := .Name]]
                 [[range .ChildUnits]]
                 <tr>
+                    <td style="border-color:006A4D;">[[.Name]]</td>
                     <td style="border-color:006A4D;">[[.Tenant]]</td>
                     <td style="border-color:006A4D;">[[.UnitStatus]]</td>
-                    <td style="border-color:006A4D;">[[.PercentSoldRent]]</td>
-                    <td style="border-color:006A4D;">[[.LeaseExpiryDate.Year]]/[[.LeaseExpiryDate.Month]]</td>
+                    <td style="border-color:006A4D;">[[.LeaseExpiryDate.MonthName]] [[.LeaseExpiryDate.Year]]</td>
                     <td style="border-color:006A4D;">{{[[printf "%.0f" .ERVArea]] | number:0}}</td>
                     <td style="border-color:006A4D;">{{[[printf "%.0f" .ERVAmount]] | number:0}}</td>
                     <td style="border-color:006A4D;">{{[[printf "%.0f" .PassingRent]] | number:0}}</td>

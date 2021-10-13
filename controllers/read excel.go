@@ -1,12 +1,13 @@
 package controllers
 
 import (
-	"sort"
+	"fmt"
 	"strconv"
 
-	"github.com/360EntSecGroup-Skylar/excelize"
-	// "github.com/360EntSecGroup-Skylar/excelize"
+	xl "github.com/xuri/excelize/v2"
 )
+
+var XLSX, _ = xl.OpenFile("./models/Data.xlsx")
 
 // EntityData -
 type EntityData struct {
@@ -20,9 +21,12 @@ type EntityData struct {
 	EndMonth            int
 	EndYear             int
 	CPIGrowth           HModel
+	CPISigma            HModel
 	ERVGrowth           HModel
+	ERVSigma            HModel
 	EntryYield          float64
 	YieldShift          float64
+	YieldShiftSigma     float64
 	ExitYield           float64
 	HoldPeriod          int
 	RETT                float64
@@ -42,33 +46,35 @@ type EntityData struct {
 	Strategy            string
 	BalloonPercent      float64
 	GLA                 Unit
+	VoidSigma           float64
+	ProbabilitySigma    float64
+	OpExSigma           float64
+	Hazard              float64
 }
 
 // UnitData -
 type UnitData struct {
-	MasterID          int
-	Name              string
-	ParentMasterID    int
-	LeaseStartMonth   int
-	LeaseStartYear    int
-	LeaseEndMonth     int
-	LeaseEndYear      int
-	UnitStatus        string
-	Tenant            string
-	PassingRent       float64
-	Probability       float64
-	RentRevisionERV   float64
-	EXTDuration       int
-	IndexFreq         int
-	IndexType         string
-	IndexStartMonth   int
-	IncentivesMonths  int
-	IncentivesPercent float64
-	Void              int
-	DiscountRate      float64
-	ERVArea           float64
-	ERVAmount         float64
-	PercentSoldRent   float64
+	MasterID        int
+	Name            string
+	ParentMasterID  int
+	LeaseStartMonth int
+	LeaseStartYear  int
+	LeaseEndMonth   int
+	LeaseEndYear    int
+	UnitStatus      string
+	Tenant          string
+	PassingRent     float64
+	Probability     float64
+	RentRevisionERV float64
+	EXTDuration     int
+	IndexFreq       int
+	IndexType       string
+	IndexStartMonth int
+	Void            int
+	DiscountRate    float64
+	ERVArea         float64
+	ERVAmount       float64
+	PercentSoldRent float64
 }
 
 // GrowthData -
@@ -78,14 +84,83 @@ type GrowthData struct {
 	Amount         float64
 }
 
+// WriteXLSX -
+func WriteXLSXEntities(e *Entity) {
+	row, _ := XLSX.SearchSheet("Entities", e.Name)
+	rows := row[0]
+	rows = rows[1:]
+	XLSX.SetCellValue("Entities", "K"+fmt.Sprint(rows), e.GrowthInput["CPI"].ShortTermRate*100)
+	XLSX.SetCellValue("Entities", "L"+fmt.Sprint(rows), e.GrowthInput["CPI"].ShortTermPeriod)
+	XLSX.SetCellValue("Entities", "M"+fmt.Sprint(rows), e.GrowthInput["CPI"].TransitionPeriod)
+	XLSX.SetCellValue("Entities", "N"+fmt.Sprint(rows), e.GrowthInput["CPI"].LongTermRate*100)
+	XLSX.SetCellValue("Entities", "O"+fmt.Sprint(rows), e.GrowthInput["ERV"].ShortTermRate*100)
+	XLSX.SetCellValue("Entities", "P"+fmt.Sprint(rows), e.GrowthInput["ERV"].ShortTermPeriod)
+	XLSX.SetCellValue("Entities", "Q"+fmt.Sprint(rows), e.GrowthInput["ERV"].TransitionPeriod)
+	XLSX.SetCellValue("Entities", "R"+fmt.Sprint(rows), e.GrowthInput["ERV"].LongTermRate*100)
+	XLSX.SetCellValue("Entities", "S"+fmt.Sprint(rows), e.Valuation.EntryYield*100)
+	XLSX.SetCellValue("Entities", "T"+fmt.Sprint(rows), e.Valuation.YieldShift)
+	XLSX.SetCellValue("Entities", "V"+fmt.Sprint(rows), e.HoldPeriod)
+	XLSX.SetCellValue("Entities", "W"+fmt.Sprint(rows), e.Tax.RETT*100)
+	XLSX.SetCellValue("Entities", "X"+fmt.Sprint(rows), e.Tax.VAT*100)
+	XLSX.SetCellValue("Entities", "Y"+fmt.Sprint(rows), e.Tax.MinValue*100)
+	XLSX.SetCellValue("Entities", "AA"+fmt.Sprint(rows), e.Tax.LandValue*100)
+	XLSX.SetCellValue("Entities", "AB"+fmt.Sprint(rows), e.DebtInput.LTV*100)
+	XLSX.SetCellValue("Entities", "AC"+fmt.Sprint(rows), e.DebtInput.InterestRate*100)
+	XLSX.SetCellValue("Entities", "AD"+fmt.Sprint(rows), e.OpEx.PercentOfTRI*100)
+	XLSX.SetCellValue("Entities", "AE"+fmt.Sprint(rows), e.Tax.CarryBackYrs)
+	XLSX.SetCellValue("Entities", "AF"+fmt.Sprint(rows), e.Tax.CarryForwardYrs)
+	XLSX.SetCellValue("Entities", "AG"+fmt.Sprint(rows), e.GLA.PercentSoldRent*100)
+	XLSX.SetCellValue("Entities", "AH"+fmt.Sprint(rows), e.Strategy)
+	XLSX.SetCellValue("Entities", "AI"+fmt.Sprint(rows), e.Fees.Amount*100)
+	XLSX.SetCellValue("Entities", "AJ"+fmt.Sprint(rows), e.GLA.DiscountRate*100)
+	XLSX.SetCellValue("Entities", "AK"+fmt.Sprint(rows), e.GLA.Void)
+	XLSX.SetCellValue("Entities", "AL"+fmt.Sprint(rows), e.GLA.EXTDuration)
+	XLSX.SetCellValue("Entities", "AM"+fmt.Sprint(rows), e.GLA.RentRevisionERV*100)
+	XLSX.SetCellValue("Entities", "AN"+fmt.Sprint(rows), e.GLA.Probability*100)
+	XLSX.SetCellValue("Entities", "AO"+fmt.Sprint(rows), e.BalloonPercent*100)
+	XLSX.SetCellValue("Entities", "AP"+fmt.Sprint(rows), e.MCSetup.YieldShift)
+	XLSX.SetCellValue("Entities", "AQ"+fmt.Sprint(rows), e.MCSetup.Void)
+	XLSX.SetCellValue("Entities", "AR"+fmt.Sprint(rows), e.MCSetup.Probability*100)
+	XLSX.SetCellValue("Entities", "AS"+fmt.Sprint(rows), e.MCSetup.OpEx*100)
+	XLSX.SetCellValue("Entities", "AT"+fmt.Sprint(rows), e.MCSetup.CPI.ShortTermRate*100)
+	XLSX.SetCellValue("Entities", "AU"+fmt.Sprint(rows), e.MCSetup.CPI.ShortTermPeriod)
+	XLSX.SetCellValue("Entities", "AV"+fmt.Sprint(rows), e.MCSetup.CPI.TransitionPeriod)
+	XLSX.SetCellValue("Entities", "AW"+fmt.Sprint(rows), e.MCSetup.CPI.LongTermRate*100)
+	XLSX.SetCellValue("Entities", "AX"+fmt.Sprint(rows), e.MCSetup.ERV.ShortTermRate*100)
+	XLSX.SetCellValue("Entities", "AY"+fmt.Sprint(rows), e.MCSetup.ERV.ShortTermPeriod)
+	XLSX.SetCellValue("Entities", "AZ"+fmt.Sprint(rows), e.MCSetup.ERV.TransitionPeriod)
+	XLSX.SetCellValue("Entities", "BA"+fmt.Sprint(rows), e.MCSetup.ERV.LongTermRate*100)
+	XLSX.SetCellValue("Entities", "BB"+fmt.Sprint(rows), e.MCSetup.Hazard*100)
+	XLSX.SetCellValue("Entities", "BC"+fmt.Sprint(rows), e.GLA.RentIncentives.Duration)
+	XLSX.SetCellValue("Entities", "BD"+fmt.Sprint(rows), e.GLA.RentIncentives.PercentOfContractRent*100)
+	XLSX.Save()
+}
+
+// WriteXLSXUnits -
+func (u *UnitData) WriteXLSXUnits() {
+	if u.MasterID == 0 {
+		u.MasterID = len(UnitStore)
+	}
+	row := u.MasterID + 2
+	XLSX.SetCellValue("Units", "B"+fmt.Sprint(row), u.MasterID)
+	XLSX.SetCellValue("Units", "C"+fmt.Sprint(row), u.Name)
+	XLSX.SetCellValue("Units", "D"+fmt.Sprint(row), u.ParentMasterID)
+	XLSX.SetCellValue("Units", "E"+fmt.Sprint(row), u.LeaseStartMonth)
+	XLSX.SetCellValue("Units", "F"+fmt.Sprint(row), u.LeaseStartYear)
+	XLSX.SetCellValue("Units", "G"+fmt.Sprint(row), u.LeaseEndMonth)
+	XLSX.SetCellValue("Units", "H"+fmt.Sprint(row), u.LeaseEndYear)
+	XLSX.SetCellValue("Units", "I"+fmt.Sprint(row), u.UnitStatus)
+	XLSX.SetCellValue("Units", "J"+fmt.Sprint(row), u.Tenant)
+	XLSX.SetCellValue("Units", "K"+fmt.Sprint(row), u.PassingRent)
+	XLSX.SetCellValue("Units", "V"+fmt.Sprint(row), u.ERVArea)
+	XLSX.SetCellValue("Units", "W"+fmt.Sprint(row), u.ERVAmount)
+	XLSX.Save()
+}
+
 // ReadXLSX - Reads Data.xlsx and populates data stores (Entity, Unit and GrowthItems)
 func ReadXLSX() {
-	xlsx, _ := excelize.OpenFile("./models/Data.xlsx")
-
-	// entityfile, _ := os.Open("./models/Entities.csv")
 	// ENTITIES
-	entities := xlsx.GetRows("Entities")
-	// entities, _ := csv.NewReader(entityfile).ReadAll()
+	entities, _ := XLSX.GetRows("Entities")
 	for i, row := range entities {
 		if i < 2 {
 			continue
@@ -123,14 +198,34 @@ func ReadXLSX() {
 		tempentity.LoanRate, _ = strconv.ParseFloat(row[28], 64)
 		tempentity.OpExpercent, _ = strconv.ParseFloat(row[29], 64)
 		tempentity.percentIncometosell, _ = strconv.ParseFloat(row[32], 64)
-		// tempentity.YearsIncometosell, _ = strconv.Atoi(row[0])
 		tempentity.DiscountRate, _ = strconv.ParseFloat(row[35], 64)
 		tempentity.Strategy = row[33]
 		tempentity.Fees, _ = strconv.ParseFloat(row[34], 64)
+		tempentity.GLA.DiscountRate, _ = strconv.ParseFloat(row[35], 64)
+		tempentity.GLA.Void, _ = strconv.Atoi(row[36])
+		tempentity.GLA.EXTDuration, _ = strconv.Atoi(row[37])
+		tempentity.GLA.RentRevisionERV, _ = strconv.ParseFloat(row[38], 64)
+		tempentity.GLA.Probability, _ = strconv.ParseFloat(row[39], 64)
+		tempentity.BalloonPercent, _ = strconv.ParseFloat(row[40], 64)
+		tempentity.YieldShiftSigma, _ = strconv.ParseFloat(row[41], 64)
+		tempentity.VoidSigma, _ = strconv.ParseFloat(row[42], 64)
+		tempentity.ProbabilitySigma, _ = strconv.ParseFloat(row[43], 64)
+		tempentity.OpExSigma, _ = strconv.ParseFloat(row[44], 64)
+		tempentity.CPISigma.ShortTermRate, _ = strconv.ParseFloat(row[45], 64)
+		tempentity.CPISigma.ShortTermPeriod, _ = strconv.Atoi(row[46])
+		tempentity.CPISigma.TransitionPeriod, _ = strconv.Atoi(row[47])
+		tempentity.CPISigma.LongTermRate, _ = strconv.ParseFloat(row[48], 64)
+		tempentity.ERVSigma.ShortTermRate, _ = strconv.ParseFloat(row[49], 64)
+		tempentity.ERVSigma.ShortTermPeriod, _ = strconv.Atoi(row[50])
+		tempentity.ERVSigma.TransitionPeriod, _ = strconv.Atoi(row[51])
+		tempentity.ERVSigma.LongTermRate, _ = strconv.ParseFloat(row[52], 64)
+		tempentity.Hazard, _ = strconv.ParseFloat(row[53], 64)
+		tempentity.GLA.RentIncentives.Duration, _ = strconv.Atoi(row[54])
+		tempentity.GLA.RentIncentives.PercentOfContractRent, _ = strconv.ParseFloat(row[55], 64)
 		EntityStore[tempentity.MasterID] = &tempentity
 	}
 	// UNITS
-	units := xlsx.GetRows("Units")
+	units, _ := XLSX.GetRows("Units")
 	// unitfile, _ := os.Open("./models/Units.csv")
 	// units, _ := csv.NewReader(unitfile).ReadAll()
 	for i, row := range units {
@@ -154,13 +249,11 @@ func ReadXLSX() {
 		tempunit.IndexFreq, _ = strconv.Atoi(row[14])
 		tempunit.IndexType = row[15]
 		tempunit.IndexStartMonth, _ = strconv.Atoi(row[16])
-		tempunit.IncentivesMonths, _ = strconv.Atoi(row[17])
-		tempunit.IncentivesPercent, _ = strconv.ParseFloat(row[18], 64)
 		tempunit.Void, _ = strconv.Atoi(row[19])
 		tempunit.DiscountRate, _ = strconv.ParseFloat(row[20], 64)
 		tempunit.ERVArea, _ = strconv.ParseFloat(row[21], 64)
 		tempunit.ERVAmount, _ = strconv.ParseFloat(row[22], 64)
-		tempunit.PercentSoldRent, _ = strconv.ParseFloat(row[23], 64)
+		// tempunit.PercentSoldRent, _ = strconv.ParseFloat(row[23], 64)
 		UnitStore[tempunit.MasterID] = tempunit
 	}
 
@@ -178,15 +271,24 @@ func ReadXLSX() {
 	// }
 
 	//GROWTHITEMSSTORE
-	sort.Sort(GrowthItemsRaw)
-	for _, v := range EntityStore {
-		GrowthItemsStore[v.MasterID] = make(map[string]float64)
-		for _, vv := range GrowthItemsRaw {
-			if vv.EntityMasterID == v.MasterID {
-				GrowthItemsStore[v.MasterID][vv.Item] = vv.Amount
-			}
-		}
-	}
+	// sort.Sort(GrowthItemsRaw)
+	// for _, v := range EntityStore {
+	// 	GrowthItemsStore[v.MasterID] = make(map[string]float64)
+	// 	for _, vv := range GrowthItemsRaw {
+	// 		if vv.EntityMasterID == v.MasterID {
+	// 			GrowthItemsStore[v.MasterID][vv.Item] = vv.Amount
+	// 		}
+	// 	}
+	// }
+	// for _, v := range units {
+	// 	fmt.Println(v)
+	// }
+
+	// for i, v := range UnitStore {
+	// 	fmt.Println(i, v)
+	// }
+	// fmt.Println(UnitStore[0])
+	// fmt.Println(UnitStore[2])
 }
 
 // Associations -
@@ -199,25 +301,23 @@ func Associations() {
 	}
 }
 
-// GDSlice -
-type GDSlice []GrowthData
+// // GDSlice -
+// type GDSlice []GrowthData
 
-// Len -
-func (gds GDSlice) Len() int {
-	return len(gds)
-}
+// // Len -
+// func (gds GDSlice) Len() int {
+// 	return len(gds)
+// }
 
-// Less - return whether the element with index i should sort before the element with index j
-func (gds GDSlice) Less(i, j int) bool {
-	if gds[i].EntityMasterID < gds[j].EntityMasterID {
-		return true
-	}
-	return false
-}
+// // Less - return whether the element with index i should sort before the element with index j
+// func (gds GDSlice) Less(i, j int) bool {
+// 	if gds[i].EntityMasterID < gds[j].EntityMasterID {
+// 		return true
+// 	}
+// 	return false
+// }
 
-// Swap -
-func (gds GDSlice) Swap(i, j int) {
-	gds[i], gds[j] = gds[j], gds[i]
-}
-
-// 5373d780-2e0f-447d-89e3-2f9c4fd6e388  2021-01-09T13:21:34+00:00  2M28S     gs://propmodel-271202_cloudbuild/source/1610198475.813473-3a0ab15b6b024d7c818df175788723f5.tgz  gcr.io/propmodel-271202/ogn (+1 more)  SUCCESS
+// // Swap -
+// func (gds GDSlice) Swap(i, j int) {
+// 	gds[i], gds[j] = gds[j], gds[i]
+// }

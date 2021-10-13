@@ -18,6 +18,35 @@
             </tr>
         </tbody>
     </table>
+    <table class="table tableFixHead rounded">
+        <thead>
+            <tr>
+                <th scope="col" style="width: 12.5%">P1</th>
+                <th scope="col" style="width: 12.5%">P5</th>
+                <th scope="col" style="width: 12.5%">P10</th>
+                <th scope="col" style="width: 12.5%">P25</th>
+                <th scope="col" style="width: 12.5%">P50</th>
+                <th scope="col" style="width: 12.5%">P75</th>
+                <th scope="col" style="width: 12.5%">P90</th>
+                <th scope="col" style="width: 12.5%">P95</th>
+                <th scope="col" style="width: 12.5%">P99</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{[[.data.P1]] | number:2}}</td>
+                <td>{{[[.data.P5]] | number:2}}</td>
+                <td>{{[[.data.P10]] | number:2}}</td>
+                <td>{{[[.data.P25]] | number:2}}</td>
+                <td>{{[[.data.P50]] | number:2}}</td>
+                <td>{{[[.data.P75]] | number:2}}</td>
+                <td>{{[[.data.P90]] | number:2}}</td>
+                <td>{{[[.data.P95]] | number:2}}</td>
+                <td>{{[[.data.P99]] | number:2}}</td>
+            </tr>
+        </tbody>
+    </table>
+
     <div class="row">
         <div class="container-fluid" style="width: 45%;">
             <canvas id="myChart" class="chart chart-bar"></canvas>

@@ -93,8 +93,8 @@ var ognApp = angular.module('ognApp', []);
 
 		// viewCFIndex
 		$scope.viewCFIndex = function(index){
-			$scope.getUnitTable(index);
-			$scope.data = {};
+			//$scope.getUnitTable(index);
+			$scope.data = '';
 			var body = "?name="+$scope.entity+"&index="+index*$scope.mcdetailspage;
 			$http.post("http://localhost:8080/MCIndex"+body).then(
 				function successCallback(response) {

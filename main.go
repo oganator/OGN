@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "OGN/routers"
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -19,5 +20,9 @@ func main() {
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
-	beego.Run()
+	end := time.Date(2021, 11, 15, 0, 0, 0, 0, time.UTC)
+	fmt.Println("This Trial ends: ", end)
+	if time.Now().Before(end) {
+		beego.Run()
+	}
 }

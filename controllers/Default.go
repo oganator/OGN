@@ -21,6 +21,8 @@ func (u *Unit) RandomDefault(date Datetype, endrent float64) (isdefault bool) {
 			u.Parent.EndDate.Add(u.Void)
 		}
 		u.RentScheduleDefaultCalc(date)
+		u.Default.NumberOfDefaults++
+		u.Parent.GLA.Default.NumberOfDefaults++
 		return isdefault
 	}
 	return isdefault

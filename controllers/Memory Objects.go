@@ -6,8 +6,8 @@ var EntityStore = map[int]*EntityData{}
 // UnitStore -
 var UnitStore = map[int]UnitData{}
 
-// GrowthItemsRaw -
-var GrowthItemsRaw = GDSlice{}
+// // GrowthItemsRaw -
+// var GrowthItemsRaw = GDSlice{}
 
 //GrowthItemsStore -
 var GrowthItemsStore = make(map[int]map[string]float64)

@@ -60,6 +60,15 @@ type MCStats struct {
 	StDev    float64
 	Skew     float64
 	Kurtosis float64
+	P1       float64
+	P5       float64
+	P10      float64
+	P25      float64
+	P50      float64
+	P75      float64
+	P90      float64
+	P95      float64
+	P99      float64
 	LRalpha  float64
 	LRbeta   float64
 	Hist     Hist
@@ -158,6 +167,8 @@ func (e *Entity) MonteCarlo() {
 	case "Balloon", "Pure Discount":
 		e.MCResults.YTM = MCStatsCalc(e.MCResultSlice.YTM, e.MCSetup.Sims)
 		e.MCResults.Duration = MCStatsCalc(e.MCResultSlice.Duration, e.MCSetup.Sims)
+		e.MCResults.IRR = MCStatsCalc(e.MCResultSlice.IRR, e.MCSetup.Sims)
+		e.MCResults.EM = MCStatsCalc(e.MCResultSlice.EM, e.MCSetup.Sims)
 	}
 }
 
@@ -180,8 +191,18 @@ func MCStatsCalc(slice []float64, sims int) (stats MCStats) {
 		StDev:    stdev,
 		Skew:     stat.Skew(slice, nil),
 		Kurtosis: stat.ExKurtosis(slice, nil),
+		P1:       slice[int(float64(sims)*.01)],
+		P5:       slice[int(float64(sims)*.05)],
+		P10:      slice[int(float64(sims)*.10)],
+		P25:      slice[int(float64(sims)*.25)],
+		P50:      slice[int(float64(sims)*.50)],
+		P75:      slice[int(float64(sims)*.75)],
+		P90:      slice[int(float64(sims)*.90)],
+		P95:      slice[int(float64(sims)*.95)],
+		P99:      slice[int(float64(sims)*.99)],
 		LRalpha:  lra,
 		LRbeta:   lrb,
+		Hist:     Hist{},
 	}
 	histslice := make(plotter.Values, sims)
 	histslice = slice

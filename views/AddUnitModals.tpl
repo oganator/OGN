@@ -8,14 +8,12 @@
                     <div class="modal-c-tabs">
                         <!-- Nav tabs -->
                         <ul class="nav nav-tabs md-tabs tabs-2 light-blue darken-3" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" data-toggle="tab" href="#panel7" role="tab"><i class="fas fa-user mr-1"></i>
-                            General</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#panelerv" role="tab"><i class="fas fa-user-plus mr-1"></i>
-                            ERV</a>
-                        </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#panel7" role="tab"><i class="fas fa-user mr-1"></i>General</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#panelerv" role="tab"><i class="fas fa-user-plus mr-1"></i>ERV</a>
+                            </li>
                         </ul>
                         <!-- Tab panels -->
                         <div class="tab-content">
@@ -53,7 +51,7 @@
                                         </div>&nbsp &nbsp &nbsp &nbsp &nbsp   
                                         <div class="form-group">
                                             <div class="form-group">
-                                                <label for="rent">Passing Rent</label>
+                                                <label for="rent">Annual Passing Rent</label>
                                                 <input type="text" class="form-control" id="rent" name="rent">
                                             </div>
                                         </div>
@@ -90,7 +88,8 @@
                             </div>
                             <!--ERV tab-->
                             <div class="tab-pane fade" id="panelerv" role="tabpanel">
-                                <div class="modal-body">
+                                <div class="modal-body">All values are annual
+                                <br>
                                     <div class="form-row">			
                                         <div class="form-group">
                                             <div class="form-group">
@@ -104,12 +103,6 @@
                                                 <input type="text" class="form-control" id="area" name="area">
                                             </div>
                                         </div>
-                                        <div class="form-group">
-                                            <div class="form-group">
-                                                <label for="type">Type</label>
-                                                <input type="text" class="form-control" id="type" name="type">
-                                            </div>
-                                        </div>								
                                     </div>
                                 </div>
                             </div>

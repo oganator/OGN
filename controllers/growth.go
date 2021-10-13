@@ -9,6 +9,7 @@ type HModel struct {
 	ShortTermPeriod  int     `json:"ShortTermPeriod,omitempty"`
 	TransitionPeriod int     `json:"TransitionPeriod,omitempty"`
 	LongTermRate     float64 `json:"LongTermRate,omitempty"`
+	EndingIndex      float64 `json:"EndingIndex,omitempty"`
 }
 
 // GrowthCalc -
@@ -23,7 +24,7 @@ func (e *Entity) GrowthCalc(mc bool) {
 		longTermStartDate := Dateadd(e.StartDate, v.ShortTermPeriod+v.TransitionPeriod)
 		marginaltransitionrate := (v.LongTermRate - v.ShortTermRate) / float64(v.TransitionPeriod)
 		transitionrate := v.ShortTermRate
-		for date := Dateadd(prevdate, 1); date.Dateint <= e.EndDate.Dateint; date.Add(1) {
+		for date := Dateadd(prevdate, 1); date.Dateint <= Dateadd(e.EndDate, 120).Dateint; date.Add(1) {
 			switch {
 			case date.Dateint <= shortTermEndDate.Dateint:
 				e.Growth[i][date.Dateint] = math.Pow(1.0+v.ShortTermRate, tw) * e.Growth[i][prevdate.Dateint]

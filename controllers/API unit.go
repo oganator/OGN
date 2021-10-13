@@ -124,3 +124,63 @@ func (c *ViewUnitTableController) Post() {
 	c.TplName = "UnitTable.tpl"
 	c.Data = temp
 }
+
+//////////////////////////////////////////////////////////////////////
+
+// AddChildUnitController -
+type AddChildUnitController struct {
+	beego.Controller
+}
+
+// GetStringAddChildUnit -
+func GetStringAddChildUnit(c *AddChildUnitController, field string) string {
+	c.Data[field] = c.GetString(field)
+	return c.Data[field].(string)
+}
+
+// GetIntAddChildUnit -
+func GetIntAddChildUnit(c *AddChildUnitController, field string) (result int) {
+	c.Data[field] = c.GetString(field)
+	temp := c.Data[field].(string)
+	result, _ = strconv.Atoi(temp)
+	return result
+}
+
+// GetFloat -
+func GetFloatAddChildUnit(c *AddChildUnitController, field string) (result float64) {
+	c.Data[field] = c.GetString(field)
+	temp := c.Data[field].(string)
+	result, _ = strconv.ParseFloat(temp, 64)
+	return result
+}
+
+// Post -
+func (c *AddChildUnitController) Post() {
+	temp := make(map[interface{}]interface{})
+	unit := UnitData{}
+	parentmasterid := ModelsList[GetStringAddChildUnit(c, "parent")]
+	unit.ParentMasterID = parentmasterid
+	unit.Name = GetStringAddChildUnit(c, "unitname")
+	unit.Tenant = GetStringAddChildUnit(c, "tenant")
+	if unit.Tenant == "" {
+		unit.UnitStatus = "Vacant"
+	} else {
+		unit.UnitStatus = "Occupied"
+	}
+	unit.PassingRent = GetFloatAddChildUnit(c, "rent")
+	unit.LeaseStartMonth = GetIntAddChildUnit(c, "startmonth")
+	unit.LeaseStartYear = GetIntAddChildUnit(c, "startyear")
+	unit.LeaseEndMonth = GetIntAddChildUnit(c, "expirymonth")
+	unit.LeaseEndYear = GetIntAddChildUnit(c, "expiryyear")
+	unit.ERVAmount = GetFloatAddChildUnit(c, "amount")
+	unit.ERVArea = GetFloatAddChildUnit(c, "area")
+	UnitStore[unit.MasterID] = unit
+	unit.WriteXLSXUnits()
+	Associations()
+	Models[parentmasterid].CalculateModel(false)
+	//
+	c.TplName = "EntityView.tpl"
+	temp["entity"] = Models[parentmasterid]
+	temp["modelslist"] = ModelsList
+	c.Data = temp
+}

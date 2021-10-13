@@ -14,10 +14,18 @@
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("void")'>Void</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("prob")'>Probability</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("extdur")'>EXT Duration</button></th>
-				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("hazard")'>Hazard Rate</button></th>
+				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("hazard")'>Number of Defaults</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("opex")'>OpEx %TRI</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("cpi")'>CPI Short Rate</button></th>
+				<th scope="col" data-sortable="true">CPI Short Term</th>
+				<th scope="col" data-sortable="true">CPI Transition</th>
+				<th scope="col" data-sortable="true">CPI Long Term</th>
+				<th scope="col" data-sortable="true">CPI Ending Index</th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("erv")'>ERV Short Rate</button></th>
+				<th scope="col" data-sortable="true">ERV Short Term</th>
+				<th scope="col" data-sortable="true">ERV Transition</th>
+				<th scope="col" data-sortable="true">ERV Long Term</th>
+				<th scope="col" data-sortable="true">ERV Ending Index</th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("yieldshift")'>Yield Shift</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("endcash")'>Ending Cash</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("endncf")'>Ending NCF</button></th>
@@ -37,10 +45,14 @@
 				<td>[[$value.GLA.Void]]</td>
 				<td>{{[[$value.GLA.Probability]] *100 | number:2}}</td>
 				<td>[[$value.GLA.EXTDuration]]</td>
-				<td>{{[[$value.GLA.Default.Hazard]] *100 | number:2}}</td>
+				<td>{{[[$value.GLA.Default.NumberOfDefaults]] | number:0}}</td>
 				<td>{{[[$value.OpEx.PercentOfTRI]] *100 | number:2}}</td>
 				[[range $value.GrowthInput]]
 				<td>{{[[.ShortTermRate]] *100 | number:2}}</td>
+				<td>{{[[.ShortTermPeriod]] | number:0}}</td>
+				<td>{{[[.TransitionPeriod]]| number:0}}</td>
+				<td>{{[[.LongTermRate]] *100 | number:2}}</td>
+				<td>{{[[.EndingIndex]] | number:4}}</td>
 				[[end]]
 				<td>[[printf "%.2f" $value.Valuation.YieldShift]]</td>
 				<td>{{[[$value.MCResults.EndCash.Mean]] | number:0}}</td>

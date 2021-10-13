@@ -72,6 +72,8 @@ func (c *ViewEntityController) Post() {
 	EntityStore[Key].GLA.EXTDuration = GetInt(c, "duration")
 	EntityStore[Key].GLA.RentRevisionERV = GetFloat(c, "rentrevision") / 100
 	EntityStore[Key].GLA.Probability = GetFloat(c, "probability") / 100
+	EntityStore[Key].GLA.RentIncentives.Duration = GetInt(c, "incentivemonths")
+	EntityStore[Key].GLA.RentIncentives.PercentOfContractRent = GetFloat(c, "incentivepercent") / 100
 	EntityStore[Key].OpExpercent = GetFloat(c, "opex") / 100
 	EntityStore[Key].Fees = GetFloat(c, "fees")
 	EntityStore[Key].GLA.Default.Hazard = GetFloat(c, "hazard") / 100
@@ -103,15 +105,18 @@ func (c *ViewEntityController) Post() {
 	EntityStore[Key].VAT = GetFloat(c, "vat") / 100
 	EntityStore[Key].CarryBackYrs = GetInt(c, "carrybackyrs")
 	EntityStore[Key].CarryForwardYrs = GetInt(c, "carryforwardyrs")
+	//
 	temp := make(map[interface{}]interface{})
 	Models[Key].UpdateEntity(false, EntityStore[Models[Key].MasterID])
 	Models[Key].MCSetup = mcsetup
+	go WriteXLSXEntities(Models[Key])
 	Models[Key].MonteCarlo()
 	Models[Key].MultiplyInputs()
 	temp["entity"] = Models[Key]
 	temp["modelslist"] = ModelsList
 	c.TplName = "EntityView.tpl"
 	c.Data = temp
+
 }
 
 // MultiplyInputs -
@@ -121,6 +126,7 @@ func (e *Entity) MultiplyInputs() {
 	e.GLA.DiscountRate = math.Round(e.GLA.DiscountRate*100000) / 1000
 	e.GLA.PercentSoldRent = math.Round(e.GLA.PercentSoldRent*100000) / 1000
 	e.BalloonPercent = math.Round(e.BalloonPercent*100000) / 1000
+	e.GLA.RentIncentives.PercentOfContractRent = math.Round(e.GLA.RentIncentives.PercentOfContractRent*100000) / 1000
 	temperv := HModel{}
 	temperv.ShortTermRate = math.Round(e.GrowthInput["ERV"].ShortTermRate*100000) / 1000
 	temperv.ShortTermPeriod = int(math.Round(float64(e.GrowthInput["ERV"].ShortTermPeriod)))
@@ -139,25 +145,21 @@ func (e *Entity) MultiplyInputs() {
 	e.DebtInput.LTV = math.Round(e.DebtInput.LTV*100000) / 1000
 	e.DebtInput.InterestRate = math.Round(e.DebtInput.InterestRate*100000) / 1000
 	e.GLA.Default.Hazard = math.Round(e.GLA.Default.Hazard*100000) / 1000
-
 	tempervmc := HModel{}
 	tempervmc.ShortTermRate = math.Round(e.MCSetup.ERV.ShortTermRate*100000) / 1000
 	tempervmc.ShortTermPeriod = int(math.Round(float64(e.MCSetup.ERV.ShortTermPeriod)))
 	tempervmc.TransitionPeriod = int(math.Round(float64(e.MCSetup.ERV.TransitionPeriod)))
 	tempervmc.LongTermRate = math.Round(e.MCSetup.ERV.LongTermRate*100000) / 1000
 	e.MCSetup.ERV = tempervmc
-
 	tempcpimc := HModel{}
 	tempcpimc.ShortTermRate = math.Round(e.MCSetup.CPI.ShortTermRate*100000) / 1000
 	tempcpimc.ShortTermPeriod = int(math.Round(float64(e.MCSetup.CPI.ShortTermPeriod)))
 	tempcpimc.TransitionPeriod = int(math.Round(float64(e.MCSetup.CPI.TransitionPeriod)))
 	tempcpimc.LongTermRate = math.Round(e.MCSetup.CPI.LongTermRate*100000) / 1000
 	e.MCSetup.CPI = tempcpimc
-
 	e.MCSetup.Probability = math.Round(e.MCSetup.Probability*100000) / 1000
 	e.MCSetup.OpEx = math.Round(e.MCSetup.OpEx*100000) / 1000
 	e.MCSetup.Hazard = math.Round(e.MCSetup.Hazard*100000) / 1000
-
 	// TAX
 	e.Tax.RETT = math.Round(e.Tax.RETT*100000) / 1000
 	e.Tax.LandValue = math.Round(e.Tax.LandValue*100000) / 1000

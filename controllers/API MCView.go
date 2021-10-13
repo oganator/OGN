@@ -70,9 +70,9 @@ func (c *MCDetailsController) Post() {
 	case "endcash-r":
 		sort.Sort(ByEndCashr(Models[tempkey].MCSlice))
 	case "endncf":
-		sort.Sort(ByEndCash(Models[tempkey].MCSlice))
+		sort.Sort(ByEndNCF(Models[tempkey].MCSlice))
 	case "endncf-r":
-		sort.Sort(ByEndCashr(Models[tempkey].MCSlice))
+		sort.Sort(ByEndNCFr(Models[tempkey].MCSlice))
 	case "endmarketvalue":
 		sort.Sort(ByEndMarketValue(Models[tempkey].MCSlice))
 	case "endmarketvalue-r":

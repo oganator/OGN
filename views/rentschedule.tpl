@@ -6,7 +6,8 @@
                 <th scope="col">EXT Number</th>
                 <th scope="col">Start Date</th>
                 <th scope="col">Vacancy End</th>
-                <th scope="col">Rent Incentives End</th>
+                <th scope="col">Renewal Rent Incentives End</th>
+                <th scope="col">Rotation Rent Incentives End</th>
                 <th scope="col">Default Date</th>
                 <th scope="col">End Date</th>
                 <th scope="col">Original End Date</th>
@@ -16,8 +17,6 @@
                 <th scope="col">Ending Contract Rent</th>
                 <th scope="col">Rent Revision ERV</th>
                 <th scope="col">Probability</th>
-                <th scope="col">Renew Index</th>
-                <th scope="col">Rotate Index</th>
             </tr>
         </thead>
         <tbody>
@@ -26,7 +25,8 @@
                 <td style="border-color:006A4D;">[[.EXTNumber]]</td>
                 <td style="border-color:006A4D;">[[.StartDate.MonthName]] [[.StartDate.Year]]</td>
                 <td style="border-color:006A4D;">[[.VacancyEnd.MonthName]] [[.VacancyEnd.Year]]</td>
-                <td style="border-color:006A4D;">[[.RentIncentivesEnd.MonthName]] [[.RentIncentivesEnd.Year]]</td>
+                <td style="border-color:006A4D;">[[.RentIncentivesEndRenew.MonthName]] [[.RentIncentivesEndRenew.Year]]</td>
+                <td style="border-color:006A4D;">[[.RentIncentivesEndRotate.MonthName]] [[.RentIncentivesEndRotate.Year]]</td>
                 <td style="border-color:006A4D;">[[.DefaultDate.MonthName]] [[.DefaultDate.Year]]</td>
                 <td style="border-color:006A4D;">[[.EndDate.MonthName]] [[.EndDate.Year]]</td>
                 <td style="border-color:006A4D;">[[.OriginalEndDate.MonthName]] [[.OriginalEndDate.Year]]</td>
@@ -36,9 +36,6 @@
                 <td style="border-color:006A4D;">{{[[.EndContractRent]] *12 | number:0}}</td>
                 <td style="border-color:006A4D;">{{[[.RentRevisionERV]] *100 | number:2}}%</td>
                 <td style="border-color:006A4D;">{{[[.Probability]] *100 | number:2}}%</td>
-                [[range .RenewIndex]]
-                <td style="border-color:006A4D;">{{[[.Final]]| number:2}}%</td>
-                [[end]]
             </tr>
         [[end]]
         </tbody>

@@ -42,7 +42,7 @@ func (e *Entity) Acquisition() {
 			soldrent = soldrent + u.PassingRent/12*float64(monthstosell)*u.PercentSoldRent
 		}
 	}
-	fees := soldrent * -.025
+	fees := soldrent * 0.0 //-.025
 	cf0 := Dateadd(e.StartDate, -1)
 	e.COA[cf0.Dateint] = FloatCOA{
 		MarketValue:             e.COA[cf0.Dateint].MarketValue,
