@@ -6,13 +6,12 @@ import (
 
 // MetricsCalc -
 func (e *Entity) MetricsCalc() {
-
 	nlatirr := IRR(&e.COA, Dateadd(e.StartDate, -1), e.SalesDate, FloatCOA{NetCashFlow: 1})
 	e.Metrics.IRR.NetLeveredAfterTax = math.Round(nlatirr*100) / 100
 	ytm := IRR(&e.COA, Dateadd(e.StartDate, -1), e.SalesDate, FloatCOA{BondExpense: 1})
 	e.Metrics.BondHolder.YTM = math.Round(ytm*100) / 100
 	e.Duration()
-	e.EquityMultipleCalc()
+	e.Metrics.EM.NetLeveredAfterTax = EquityMultipleCalc(e.StartDate, e.SalesDate, e.COA)
 }
 
 // IRR -
@@ -67,15 +66,15 @@ func (e *Entity) Duration() {
 }
 
 // EquityMultipleCalc -
-func (e *Entity) EquityMultipleCalc() {
+func EquityMultipleCalc(start Datetype, end Datetype, coa IntFloatCOAMap) float64 {
 	numerator := 0.0
 	denominator := 0.0
-	for date := Dateadd(e.StartDate, -1); date.Dateint <= e.SalesDate.Dateint; date.Add(1) {
-		if e.COA[date.Dateint].NetCashFlow < 0 {
-			denominator = denominator + e.COA[date.Dateint].NetCashFlow
+	for date := Dateadd(start, -1); date.Dateint <= end.Dateint; date.Add(1) {
+		if coa[date.Dateint].NetCashFlow < 0 {
+			denominator = denominator + coa[date.Dateint].NetCashFlow
 		} else {
-			numerator = numerator + e.COA[date.Dateint].NetCashFlow
+			numerator = numerator + coa[date.Dateint].NetCashFlow
 		}
 	}
-	e.Metrics.EM.NetLeveredAfterTax = numerator / -denominator
+	return math.Round((numerator/-denominator)*100) / 100
 }

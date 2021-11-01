@@ -1,11 +1,21 @@
 package controllers
 
+import (
+	"sync"
+)
+
 // PopulateModels - moves data from datastores to Models
 func PopulateModels() {
 	for _, v := range EntityStore {
 		temp := CreateEntity(*v)
-		Models[v.MasterID] = &temp
-		ModelsList[temp.Name] = temp.MasterID
+		Entities[v.MasterID] = &temp
+		if v.Parent != 0 {
+			ModelsList[temp.Name] = temp.MasterID
+			EntitiesList[temp.Name] = temp.MasterID
+		} else {
+			FundsList[temp.Name] = temp.MasterID
+			EntitiesList[temp.Name] = temp.MasterID
+		}
 	}
 }
 
@@ -17,11 +27,13 @@ func CreateEntity(v EntityData) (e Entity) {
 	growth["CPI"] = v.CPIGrowth
 	growth["ERV"] = v.ERVGrowth
 	e = Entity{
+		Mutex:         &sync.Mutex{},
 		MasterID:      v.MasterID,
 		Name:          v.Name,
-		ChildEntities: map[int]Entity{},
+		ChildEntities: map[int]*Entity{},
 		ChildUnits:    map[int]*Unit{},
 		Metrics:       Metrics{},
+		ParentID:      v.Parent,
 		Parent:        &Entity{},
 		StartDate:     startdate,
 		HoldPeriod:    dateintdiff(salesdate.Dateint, startdate.Dateint) / 12,
@@ -77,13 +89,23 @@ func (e *Entity) UpdateEntity(mc bool, v *EntityData) {
 	growthinput := map[string]HModel{}
 	growthinput["CPI"] = v.CPIGrowth
 	growthinput["ERV"] = v.ERVGrowth
+	parent := Entities[v.Parent].MasterID
+	childentitiesmap := map[int]*Entity{}
+	// if len(e.ChildEntities) > 0 {
+	// 	childentitiesmap = e.ChildEntities
+	// 	for _, v := range e.ChildEntities {
+	// 		fmt.Println(v.Name)
+	// 	}
+	// }
 	*e = Entity{
+		Mutex:         &sync.Mutex{},
 		MasterID:      v.MasterID,
 		Name:          v.Name,
-		ChildEntities: map[int]Entity{},
+		ChildEntities: childentitiesmap,
 		ChildUnits:    map[int]*Unit{},
 		Metrics:       Metrics{},
-		Parent:        &Entity{},
+		ParentID:      v.Parent,
+		Parent:        Entities[parent],
 		StartDate:     startdate,
 		HoldPeriod:    v.HoldPeriod,
 		SalesDate:     salesdate,
@@ -133,76 +155,79 @@ func (e *Entity) UpdateEntity(mc bool, v *EntityData) {
 		BalloonPercent: v.BalloonPercent,
 	}
 	e.CalculateModel(mc)
+	e.PopulateChildEntities()
 }
 
 // CalculateModel - mc == MonteCarlo; if true then table is not made
 func (e *Entity) CalculateModel(mc bool) {
-	e.StartDate.Add(0)
-	e.SalesDate.Add(0)
-	e.EndDate.Add(0)
-	e.Growth = make(map[string]map[int]float64)
-	e.GrowthCalc(mc)
-	e.PopulateUnits()
-	// e.CalculateUnits()
-	e.AssetRentCalc(mc)
-	e.DirectCapCalc()
-	// e.DCFCalc()
-	e.Acquisition()
-	e.PropertyCFCalc()
-	e.Disposal()
-	e.SumCOA()
-	e.CIT()
-	e.SumNCF()
-	e.SumCOA()
-	if mc == false {
-		coas := BoolCOA{
-			MarketValue:             true,
-			TotalERV:                true,
-			OccupiedERV:             false,
-			VacantERV:               false,
-			TopSlice:                false,
-			TotalArea:               false,
-			OccupiedArea:            false,
-			VacantArea:              false,
-			PassingRent:             true,
-			Indexation:              true,
-			TheoreticalRentalIncome: true,
-			BPUplift:                true,
-			Vacancy:                 true,
-			ContractRent:            true,
-			RentFree:                false,
-			TurnoverRent:            false,
-			MallRent:                false,
-			ParkingIncome:           false,
-			OtherIncome:             false,
-			OperatingIncome:         false,
-			OperatingExpenses:       true,
-			NetOperatingIncome:      true,
-			Capex:                   false,
-			AcqDispProperty:         true,
-			AcqDispCosts:            false,
-			LoanProceeds:            false,
-			InterestExpense:         true,
-			LoanBalance:             false,
-			Debt:                    false,
-			Tax:                     true,
-			Fees:                    true,
-			NetCashFlow:             true,
-			CashBalance:             true,
-			BondIncome:              true,
-			BondExpense:             true,
+	if e.ParentID != 0 {
+		e.StartDate.Add(0)
+		e.SalesDate.Add(0)
+		e.EndDate.Add(0)
+		e.Growth = make(map[string]map[int]float64)
+		e.GrowthCalc(mc)
+		e.PopulateUnits()
+		// e.CalculateUnits()
+		e.AssetRentCalc(mc)
+		e.DirectCapCalc()
+		// e.DCFCalc()
+		e.Acquisition()
+		e.PropertyCFCalc()
+		e.Disposal()
+		e.SumCOA()
+		e.CIT()
+		e.SumNCF()
+		e.SumCOA()
+		if !mc {
+			coas := BoolCOA{
+				MarketValue:             true,
+				TotalERV:                true,
+				OccupiedERV:             false,
+				VacantERV:               false,
+				TopSlice:                false,
+				TotalArea:               false,
+				OccupiedArea:            false,
+				VacantArea:              false,
+				PassingRent:             true,
+				Indexation:              true,
+				TheoreticalRentalIncome: true,
+				BPUplift:                true,
+				Vacancy:                 true,
+				ContractRent:            true,
+				RentFree:                false,
+				TurnoverRent:            false,
+				MallRent:                false,
+				ParkingIncome:           false,
+				OtherIncome:             false,
+				OperatingIncome:         false,
+				OperatingExpenses:       true,
+				NetOperatingIncome:      true,
+				Capex:                   false,
+				AcqDispProperty:         true,
+				AcqDispCosts:            false,
+				LoanProceeds:            false,
+				InterestExpense:         true,
+				LoanBalance:             false,
+				Debt:                    false,
+				Tax:                     true,
+				Fees:                    true,
+				NetCashFlow:             true,
+				CashBalance:             true,
+				BondIncome:              true,
+				BondExpense:             true,
+			}
+			switch e.Strategy {
+			case "Standard":
+				coas.BPUplift = false
+				coas.RentFree = true
+				coas.Debt = true
+				coas.BondIncome = false
+				coas.BondExpense = false
+			}
+			e.MakeTable(coas)
 		}
-		switch e.Strategy {
-		case "Standard":
-			coas.BPUplift = false
-			coas.RentFree = true
-			coas.Debt = true
-			coas.BondIncome = false
-			coas.BondExpense = false
-		}
-		e.MakeTable(coas)
+		e.MetricsCalc()
 	}
-	e.MetricsCalc()
 }
 
 // PopulateUnits -
@@ -266,12 +291,20 @@ func (e *Entity) PopulateUnits() {
 	}
 }
 
-// CalculateUnits -
-func (e *Entity) CalculateUnits() {
-	for _, u := range e.ChildUnits {
-		u.LeaseStartDate.Add(0)
-		u.LeaseExpiryDate.Add(0)
-		// u.RentScheduleCalc()
-		// fmt.Printf("%+v\n", u)
+// // CalculateUnits -
+// func (e *Entity) CalculateUnits() {
+// 	for _, u := range e.ChildUnits {
+// 		u.LeaseStartDate.Add(0)
+// 		u.LeaseExpiryDate.Add(0)
+// 		// u.RentScheduleCalc()
+// 		// fmt.Printf("%+v\n", u)
+// 	}
+// }
+
+func (e *Entity) PopulateChildEntities() {
+	for _, v := range EntityStore {
+		if v.Parent == e.MasterID {
+			e.ChildEntities[v.MasterID] = Entities[v.MasterID]
+		}
 	}
 }

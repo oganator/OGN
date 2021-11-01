@@ -14,7 +14,7 @@ type MCDetailsController struct {
 
 // Post -
 func (c *MCDetailsController) Post() {
-	tempkey := ModelsList[GetStringMCDetails(c, "name")]
+	tempkey := EntitiesList[GetStringMCDetails(c, "name")]
 	page := GetIntMCDetails(c, "page")
 	order := GetStringMCDetails(c, "order")
 	startindex := (page - 1) * 10
@@ -22,68 +22,68 @@ func (c *MCDetailsController) Post() {
 	temp := make(map[interface{}]interface{})
 	switch order {
 	case "irr":
-		sort.Sort(ByIRR(Models[tempkey].MCSlice))
+		sort.Sort(ByIRR(Entities[tempkey].MCSlice))
 	case "irr-r":
-		sort.Sort(ByIRRr(Models[tempkey].MCSlice))
+		sort.Sort(ByIRRr(Entities[tempkey].MCSlice))
 	case "em":
-		sort.Sort(ByEM(Models[tempkey].MCSlice))
+		sort.Sort(ByEM(Entities[tempkey].MCSlice))
 	case "em-r":
-		sort.Sort(ByEMr(Models[tempkey].MCSlice))
+		sort.Sort(ByEMr(Entities[tempkey].MCSlice))
 	case "ytm":
-		sort.Sort(ByYTM(Models[tempkey].MCSlice))
+		sort.Sort(ByYTM(Entities[tempkey].MCSlice))
 	case "ytm-r":
-		sort.Sort(ByYTMr(Models[tempkey].MCSlice))
+		sort.Sort(ByYTMr(Entities[tempkey].MCSlice))
 	case "duration":
-		sort.Sort(ByDuration(Models[tempkey].MCSlice))
+		sort.Sort(ByDuration(Entities[tempkey].MCSlice))
 	case "duration-r":
-		sort.Sort(ByDurationr(Models[tempkey].MCSlice))
+		sort.Sort(ByDurationr(Entities[tempkey].MCSlice))
 	case "void":
-		sort.Sort(ByVoid(Models[tempkey].MCSlice))
+		sort.Sort(ByVoid(Entities[tempkey].MCSlice))
 	case "void-r":
-		sort.Sort(ByVoidr(Models[tempkey].MCSlice))
+		sort.Sort(ByVoidr(Entities[tempkey].MCSlice))
 	case "extdur":
-		sort.Sort(ByEXTDUR(Models[tempkey].MCSlice))
+		sort.Sort(ByEXTDUR(Entities[tempkey].MCSlice))
 	case "extdur-r":
-		sort.Sort(ByEXTDURr(Models[tempkey].MCSlice))
+		sort.Sort(ByEXTDURr(Entities[tempkey].MCSlice))
 	case "hazard":
-		sort.Sort(ByHazard(Models[tempkey].MCSlice))
+		sort.Sort(ByHazard(Entities[tempkey].MCSlice))
 	case "hazard-r":
-		sort.Sort(ByHazardr(Models[tempkey].MCSlice))
+		sort.Sort(ByHazardr(Entities[tempkey].MCSlice))
 	case "opex":
-		sort.Sort(ByOpEx(Models[tempkey].MCSlice))
+		sort.Sort(ByOpEx(Entities[tempkey].MCSlice))
 	case "opex-r":
-		sort.Sort(ByOpExr(Models[tempkey].MCSlice))
+		sort.Sort(ByOpExr(Entities[tempkey].MCSlice))
 	case "cpi":
-		sort.Sort(ByCPI(Models[tempkey].MCSlice))
+		sort.Sort(ByCPI(Entities[tempkey].MCSlice))
 	case "cpi-r":
-		sort.Sort(ByCPIr(Models[tempkey].MCSlice))
+		sort.Sort(ByCPIr(Entities[tempkey].MCSlice))
 	case "erv":
-		sort.Sort(ByERV(Models[tempkey].MCSlice))
+		sort.Sort(ByERV(Entities[tempkey].MCSlice))
 	case "erv-r":
-		sort.Sort(ByERVr(Models[tempkey].MCSlice))
+		sort.Sort(ByERVr(Entities[tempkey].MCSlice))
 	case "yieldshift":
-		sort.Sort(ByYieldShift(Models[tempkey].MCSlice))
+		sort.Sort(ByYieldShift(Entities[tempkey].MCSlice))
 	case "yieldshift-r":
-		sort.Sort(ByYieldShiftr(Models[tempkey].MCSlice))
+		sort.Sort(ByYieldShiftr(Entities[tempkey].MCSlice))
 	case "endcash":
-		sort.Sort(ByEndCash(Models[tempkey].MCSlice))
+		sort.Sort(ByEndCash(Entities[tempkey].MCSlice))
 	case "endcash-r":
-		sort.Sort(ByEndCashr(Models[tempkey].MCSlice))
+		sort.Sort(ByEndCashr(Entities[tempkey].MCSlice))
 	case "endncf":
-		sort.Sort(ByEndNCF(Models[tempkey].MCSlice))
+		sort.Sort(ByEndNCF(Entities[tempkey].MCSlice))
 	case "endncf-r":
-		sort.Sort(ByEndNCFr(Models[tempkey].MCSlice))
+		sort.Sort(ByEndNCFr(Entities[tempkey].MCSlice))
 	case "endmarketvalue":
-		sort.Sort(ByEndMarketValue(Models[tempkey].MCSlice))
+		sort.Sort(ByEndMarketValue(Entities[tempkey].MCSlice))
 	case "endmarketvalue-r":
-		sort.Sort(ByEndMarketValuer(Models[tempkey].MCSlice))
+		sort.Sort(ByEndMarketValuer(Entities[tempkey].MCSlice))
 	case "prob":
-		sort.Sort(ByProb(Models[tempkey].MCSlice))
+		sort.Sort(ByProb(Entities[tempkey].MCSlice))
 	case "prob-r":
-		sort.Sort(ByProbr(Models[tempkey].MCSlice))
+		sort.Sort(ByProbr(Entities[tempkey].MCSlice))
 	}
-	temp["MCSlice"] = Models[tempkey].MCSlice[startindex:endindex]
-	temp["Strategy"] = Models[tempkey].Strategy
+	temp["MCSlice"] = Entities[tempkey].MCSlice[startindex:endindex]
+	temp["Strategy"] = Entities[tempkey].Strategy
 	c.TplName = "MCDetails.tpl"
 	c.Data = temp
 }
@@ -106,47 +106,54 @@ type MCTabsController struct {
 	beego.Controller
 }
 
+// GetStringMCDetails -
+func GetStringMCTabs(c *MCTabsController, field string) string {
+	c.Data[field] = c.GetString(field)
+	return c.Data[field].(string)
+}
+
 // Post -
 func (c *MCTabsController) Post() {
 	temp := make(map[interface{}]interface{})
 	c.Data["tab"] = c.GetString("tab")
+	tempkey := EntitiesList[GetStringMCTabs(c, "name")]
 	tab := c.Data["tab"].(string)
 	switch tab {
 	case "cf":
-		temp["entity"] = Models[Key]
+		temp["entity"] = Entities[tempkey]
 		c.TplName = "CFTable.tpl"
 	case "endcash":
-		temp["data"] = Models[Key].MCResults.EndCash
-		temp["varp"] = Models[Key].MCResults.CashBalanceVaR
+		temp["data"] = Entities[tempkey].MCResults.EndCash
+		temp["varp"] = Entities[tempkey].MCResults.CashBalanceVaR
 		c.TplName = "MCHist.tpl"
 	case "cashbalance":
-		temp["data"] = Models[Key].MCResults.CashBalance
+		temp["data"] = Entities[tempkey].MCResults.CashBalance
 		c.TplName = "3dchart.tpl"
 	case "endncf":
-		temp["data"] = Models[Key].MCResults.EndNCF
-		temp["varp"] = Models[Key].MCResults.NCFVaR
+		temp["data"] = Entities[tempkey].MCResults.EndNCF
+		temp["varp"] = Entities[tempkey].MCResults.NCFVaR
 		c.TplName = "MCHist.tpl"
 	case "ncf":
-		temp["data"] = Models[Key].MCResults.NCF
+		temp["data"] = Entities[tempkey].MCResults.NCF
 		c.TplName = "3dchart.tpl"
 	case "endmarketvalue":
-		temp["data"] = Models[Key].MCResults.EndMarketValue
-		temp["varp"] = Models[Key].MCResults.MarketValueVaR
+		temp["data"] = Entities[tempkey].MCResults.EndMarketValue
+		temp["varp"] = Entities[tempkey].MCResults.MarketValueVaR
 		c.TplName = "MCHist.tpl"
 	case "marketvalue":
-		temp["data"] = Models[Key].MCResults.MarketValue
+		temp["data"] = Entities[tempkey].MCResults.MarketValue
 		c.TplName = "3dchart.tpl"
 	case "irr":
-		temp["data"] = Models[Key].MCResults.IRR
+		temp["data"] = Entities[tempkey].MCResults.IRR
 		c.TplName = "MCHist.tpl"
 	case "em":
-		temp["data"] = Models[Key].MCResults.EM
+		temp["data"] = Entities[tempkey].MCResults.EM
 		c.TplName = "MCHist.tpl"
 	case "ytm":
-		temp["data"] = Models[Key].MCResults.YTM
+		temp["data"] = Entities[tempkey].MCResults.YTM
 		c.TplName = "MCHist.tpl"
 	case "duration":
-		temp["data"] = Models[Key].MCResults.Duration
+		temp["data"] = Entities[tempkey].MCResults.Duration
 		c.TplName = "MCHist.tpl"
 	}
 	c.Data = temp
@@ -157,6 +164,6 @@ type TestController struct {
 }
 
 func (c *TestController) Get() {
-	c.Data["json"] = Models[1].MCResults
+	c.Data["json"] = Entities[1].MCResults
 	c.ServeJSON()
 }

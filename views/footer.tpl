@@ -10,63 +10,55 @@
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-route.min.js"></script>
 <script src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.12.1.min.js" data-require="ui-bootstrap@*" data-semver="0.12.1"></script>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
 <script src="static/js/app.js"></script>
 <script src="static/js/misc.js"></script>
 <script>
 var ognApp = angular.module('ognApp', []);
-
 	// testController
 	ognApp.controller('assetViewController', ['$scope', '$http', '$sce', function($scope, $http, $sce) {
 		$scope.entity = [[.entity.Name]];
+		$scope.settingsTab = "settings";
+		$scope.tableTab = "cf";
 		$scope.mcdetailspage = 1;
 		$scope.mcdetailspagestotal = [[.entity.MCSetup.Sims]]/10;
 		$scope.mcdetailsorder = "";
 		$scope.strategy = [[.entity.Strategy]];
 
-		// getRequest
+		// getRequest - used to update the table (cf, irr...etc)
 		$scope.getRequest = function(route) {
 			var url = "http://localhost:8080/MCTabs?tab="
-			if (route == 'cf'){
-				$scope.post(url+"cf");
-			}
-			if (route == 'endcash'){
-				$scope.post(url+"endcash");
-			}
-			if (route == 'cashbalance'){
-				$scope.post(url+"cashbalance");
-			}
-			if (route == 'endncf'){
-				$scope.post(url+"endncf");
-			}
-			if (route == 'endmarketvalue'){
-				$scope.post(url+"endmarketvalue");
-			}
-			if (route == 'marketvalue'){
-				$scope.post(url+"marketvalue");
-			}
-			if (route == 'ncf'){
-				$scope.post(url+"ncf");
-			}
-			if (route == 'irr'){
-				$scope.post(url+"irr");
-			}
-			if (route == 'em'){
-				$scope.post(url+"em");
-			}
-			if (route == 'ytm'){
-				$scope.post(url+"ytm");
-			} 
-			if (route == 'duration'){
-				$scope.post(url+"duration");
-			} 
+			var entity = "&name="+$scope.entity
+			$scope.tableTab = route;
 			if (route == 'details'){
 				$scope.post("http://localhost:8080/MCDetails?name="+$scope.entity+"&page=1");
-				//$scope.post("http://localhost:8080/MCDetails?name=Markerkant 13 9&page=1");
 				$scope.mcdetailspage = 1;
+			} else {
+				$scope.post(url+route+entity);
 			}
-			var cftable = angular.element( document.querySelector( '#cftable' ) );
-			cftable.remove();
-		}; // getRequest
+		}; // /getRequest
+
+		// getSettings
+		$scope.getSettings = function(entity){
+			var url = "http://localhost:8080/GetSettings?entity="+entity
+			$scope.entity = entity;
+			
+			$http.post(url).then(
+				function successCallback(response) {
+					$scope.settingsResponse = $sce.trustAsHtml(response.data);
+				},
+				function errorCallback(response) {
+					console.log("getSettings failed");
+				}
+			);
+			$scope.getRequest($scope.tableTab);
+			$scope.getUnitTable(-1);
+		}; // /getSettings
+
+		// updateSettingsTab
+		$scope.updateSettingsTab = function(tab){
+			$scope.settingsTab = tab;
+		};
 
 		// get
 		$scope.get = function(url){
@@ -75,10 +67,10 @@ var ognApp = angular.module('ognApp', []);
 					$scope.response = $sce.trustAsHtml(response.data);
 				},
 				function errorCallback(response) {
-					console.log("Unable to perform get request");
+					console.log("get failed");
 				}
 			);
-		}; // get
+		}; // /get
 
 		// post
 		$scope.post = function(url){
@@ -87,9 +79,10 @@ var ognApp = angular.module('ognApp', []);
 					$scope.response = $sce.trustAsHtml(response.data);
 				},
 				function errorCallback(response) {
-					console.log("POST-ing of data failed");
+					console.log("post failed");
 				}
-			); 		}; // post
+			);
+		}; // /post
 
 		// viewCFIndex
 		$scope.viewCFIndex = function(index){
@@ -101,10 +94,10 @@ var ognApp = angular.module('ognApp', []);
 					$scope.data = $sce.trustAsHtml(response.data);
 				},
 				function errorCallback(response) {
-					console.log("POST-ing of data failed");
+					console.log("viewCFIndex failed");
 				}
 			);
-		}; // viewCFIndex
+		}; // /viewCFIndex
 	   
 		// sortMCDetails
 		$scope.sortMCDetails = function(order){
@@ -114,7 +107,7 @@ var ognApp = angular.module('ognApp', []);
 			$scope.mcdetailsorder = order;
 			$scope.post("http://localhost:8080/MCDetails?name="+$scope.entity+"&page=1"+"&order="+order);
 			$scope.mcdetailspage = 1;
-		}; // sortMCDetails
+		}; // /sortMCDetails
 
 		// nextMCDetails
 		$scope.nextMCDetails = function(direction){
@@ -124,7 +117,7 @@ var ognApp = angular.module('ognApp', []);
 				$scope.mcdetailspage--;
 			}
 			$scope.post("http://localhost:8080/MCDetails?name="+$scope.entity+"&page="+$scope.mcdetailspage);
-		}; //nextMCDetails
+		}; // /nextMCDetails
 
 		// getRentSchedule
 		$scope.getRentSchedule = function(unit, index){
@@ -137,10 +130,10 @@ var ognApp = angular.module('ognApp', []);
 					$scope.rentschedule = $sce.trustAsHtml(response.data);
 				},
 				function errorCallback(response) {
-					console.log("POST-ing of data failed");
+					console.log("getRentSchedule failed");
 				}
 			);
-		}; //getRentSchedule
+		}; // /getRentSchedule
 
 		// getUnitCF
 		$scope.getUnitCF = function(unit){
@@ -149,10 +142,10 @@ var ognApp = angular.module('ognApp', []);
 					$scope.unitcf = $sce.trustAsHtml(response.data);
 				},
 				function errorCallback(response) {
-					console.log("POST-ing of data failed");
+					console.log("getUnitCF failed");
 				}
 			);
-		}; //getUnitCF
+		}; // /getUnitCF
 
 		// getUnitTable
 		$scope.getUnitTable = function(index){
@@ -161,22 +154,29 @@ var ognApp = angular.module('ognApp', []);
 					$scope.unittable = $sce.trustAsHtml(response.data);
 				},
 				function errorCallback(response) {
-					console.log("POST-ing of data failed");
+					console.log("getUnitTable failed");
 				}
 			);
-		}; //getUnitTable
+		}; // /getUnitTable
 
 		// hideNext
 		$scope.hideNext = function(){
 			return $scope.mcdetailspage == $scope.mcdetailspagestotal;
-		} //hideNext
+		} // /hideNext
 
 		// hidePrevious
 		$scope.hidePrevious = function(){
 			return $scope.mcdetailspage == 1;
-		} //hidePrevious
+		} // /hidePrevious
 
-	}]); // testController
+		// init
+		var init = function () {
+			$scope.getSettings([[.entity.Name]]);
+		};// /init
+
+		init();
+
+	}]); // /testController
 
 	//bindHtmlCompile directive 
 	ognApp.directive('bindHtmlCompile', ['$compile', function ($compile) {
@@ -197,7 +197,7 @@ var ognApp = angular.module('ognApp', []);
 				});
 			}
 		};
-	}]); // bindHtmlCompile directive
+	}]); // /bindHtmlCompile directive
 
 </script>
 </html>

@@ -107,21 +107,3 @@ func (e *Entity) Disposal() {
 	temp.Add(e.COA[e.SalesDate.Dateint])
 	e.COA[e.SalesDate.Dateint] = temp
 }
-
-// SumNCF -
-func (e *Entity) SumNCF() {
-	cashbalance := e.COA[Dateadd(e.StartDate, -1).Dateint].NetCashFlow
-	for date := e.StartDate; date.Dateint <= e.SalesDate.Dateint; date.Add(1) {
-		ncf := e.COA[date.Dateint].NetOperatingIncome + e.COA[date.Dateint].Capex + e.COA[date.Dateint].AcqDispProperty + e.COA[date.Dateint].AcqDispCosts + e.COA[date.Dateint].InterestExpense + e.COA[date.Dateint].Debt + e.COA[date.Dateint].Tax + e.COA[date.Dateint].Fees
-		if date.Dateint == e.SalesDate.Dateint && e.Strategy == "Balloon" {
-			ncf = ncf + (e.COA[date.Dateint].BPUplift-e.COA[Dateadd(e.StartDate, -1).Dateint].BPUplift)*e.BalloonPercent
-		}
-		temp := FloatCOA{
-			NetCashFlow: ncf,
-			CashBalance: ncf + e.COA[Dateadd(date, -1).Dateint].CashBalance + cashbalance,
-		}
-		temp.Add(e.COA[date.Dateint])
-		e.COA[date.Dateint] = temp
-		cashbalance = 0
-	}
-}

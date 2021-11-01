@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"math"
+	"math/rand"
 	"sort"
 	"sync"
 
@@ -82,25 +83,7 @@ type Hist struct {
 
 // MonteCarlo -
 func (e *Entity) MonteCarlo() {
-	e.MCSlice = make([]*Entity, e.MCSetup.Sims)
-	duration := dateintdiff(e.SalesDate.Dateint, e.StartDate.Dateint)
-	e.MCResultSlice = MCResultSlice{
-		EndCash:        make([]float64, e.MCSetup.Sims),
-		CashBalance:    make([][]float64, duration-2),
-		EndNCF:         make([]float64, e.MCSetup.Sims),
-		NCF:            make([][]float64, duration-2),
-		EndMarketValue: make([]float64, e.MCSetup.Sims),
-		MarketValue:    make([][]float64, duration-2),
-		IRR:            make([]float64, e.MCSetup.Sims),
-		EM:             make([]float64, e.MCSetup.Sims),
-		YTM:            make([]float64, e.MCSetup.Sims),
-		Duration:       make([]float64, e.MCSetup.Sims),
-	}
-	for i := 0; i < duration-2; i++ {
-		e.MCResultSlice.CashBalance[i] = make([]float64, e.MCSetup.Sims)
-		e.MCResultSlice.NCF[i] = make([]float64, e.MCSetup.Sims)
-		e.MCResultSlice.MarketValue[i] = make([]float64, e.MCSetup.Sims)
-	}
+	duration := e.MCDataObjectsCreate(-2)
 	wg := sync.WaitGroup{}
 	for i := 1; i <= e.MCSetup.Sims; i++ {
 		wg.Add(1)
@@ -133,8 +116,8 @@ func (e *Entity) MonteCarlo() {
 			// mutex lock
 			e.Mutex.Lock()
 			e.MCSlice[index-1] = &temp
-			// assign results for every month
-			for ii := 0; ii < duration-2; ii++ {
+			// assign results for every month. ii is the month, index is the simulation
+			for ii := 0; ii < duration; ii++ {
 				e.MCResultSlice.CashBalance[ii][index-1] = temp.COA[date.Dateint].CashBalance
 				e.MCResultSlice.NCF[ii][index-1] = temp.COA[date.Dateint].NetCashFlow
 				e.MCResultSlice.MarketValue[ii][index-1] = temp.COA[date.Dateint].MarketValue
@@ -152,13 +135,13 @@ func (e *Entity) MonteCarlo() {
 	}
 	wg.Wait()
 	e.MCResults.EndCash = MCStatsCalc(e.MCResultSlice.EndCash, e.MCSetup.Sims)
-	e.MCResults.CashBalance, e.MCResults.CashBalanceVaR = RibbonPlot(e.MCResultSlice.CashBalance, duration-2, 100, e.MCSetup.Sims)
+	e.MCResults.CashBalance, e.MCResults.CashBalanceVaR = RibbonPlot(e.MCResultSlice.CashBalance, duration, 100, e.MCSetup.Sims)
 
 	e.MCResults.EndNCF = MCStatsCalc(e.MCResultSlice.EndNCF, e.MCSetup.Sims)
-	e.MCResults.NCF, e.MCResults.NCFVaR = RibbonPlot(e.MCResultSlice.NCF, duration-2, 100, e.MCSetup.Sims)
+	e.MCResults.NCF, e.MCResults.NCFVaR = RibbonPlot(e.MCResultSlice.NCF, duration, 100, e.MCSetup.Sims)
 
 	e.MCResults.EndMarketValue = MCStatsCalc(e.MCResultSlice.EndMarketValue, e.MCSetup.Sims)
-	e.MCResults.MarketValue, e.MCResults.MarketValueVaR = RibbonPlot(e.MCResultSlice.MarketValue, duration-2, 100, e.MCSetup.Sims)
+	e.MCResults.MarketValue, e.MCResults.MarketValueVaR = RibbonPlot(e.MCResultSlice.MarketValue, duration, 100, e.MCSetup.Sims)
 
 	switch e.Strategy {
 	case "Standard":
@@ -167,56 +150,136 @@ func (e *Entity) MonteCarlo() {
 	case "Balloon", "Pure Discount":
 		e.MCResults.YTM = MCStatsCalc(e.MCResultSlice.YTM, e.MCSetup.Sims)
 		e.MCResults.Duration = MCStatsCalc(e.MCResultSlice.Duration, e.MCSetup.Sims)
-		e.MCResults.IRR = MCStatsCalc(e.MCResultSlice.IRR, e.MCSetup.Sims)
-		e.MCResults.EM = MCStatsCalc(e.MCResultSlice.EM, e.MCSetup.Sims)
 	}
+}
+
+// Used in Monte Carlo methods - creates MCResultSlice
+func (e *Entity) MCDataObjectsCreate(addperiods int) int {
+	e.MCSlice = make([]*Entity, e.MCSetup.Sims)
+	duration := dateintdiff(e.SalesDate.Dateint, e.StartDate.Dateint) + addperiods
+	e.MCResultSlice = MCResultSlice{
+		EndCash:        make([]float64, e.MCSetup.Sims),
+		CashBalance:    make([][]float64, duration),
+		EndNCF:         make([]float64, e.MCSetup.Sims),
+		NCF:            make([][]float64, duration),
+		EndMarketValue: make([]float64, e.MCSetup.Sims),
+		MarketValue:    make([][]float64, duration),
+		IRR:            make([]float64, e.MCSetup.Sims),
+		EM:             make([]float64, e.MCSetup.Sims),
+		YTM:            make([]float64, e.MCSetup.Sims),
+		Duration:       make([]float64, e.MCSetup.Sims),
+	}
+	for i := 0; i < duration; i++ {
+		e.MCResultSlice.CashBalance[i] = make([]float64, e.MCSetup.Sims)
+		e.MCResultSlice.NCF[i] = make([]float64, e.MCSetup.Sims)
+		e.MCResultSlice.MarketValue[i] = make([]float64, e.MCSetup.Sims)
+	}
+	return duration
+}
+
+// FundMonteCarlo - Random sample from the ChildEntities
+func (e *Entity) FundMonteCarlo() {
+	// make slices
+	duration := e.MCDataObjectsCreate(1)
+	for sim := 0; sim < e.MCSetup.Sims; sim++ {
+		// get CPI
+		for _, v := range e.ChildEntities {
+			// select one of the simulations
+			samplefloat := rand.Float64()
+			simsfloat := float64(e.MCSetup.Sims)
+			simratio := float64(v.MCSetup.Sims) / float64(e.MCSetup.Sims)
+			sampleint := int(samplefloat * simsfloat * simratio)
+			// fmt.Println("samplefloat: ", samplefloat, " simsfloat: ", simsfloat, " simratio: ", simratio, " sampleint: ", sampleint)
+			e.MCResultSlice.CashBalance[0][sim] = e.MCResultSlice.CashBalance[0][sim] + v.MCSlice[sampleint].COA[Dateadd(e.StartDate, -1).Dateint].CashBalance
+			e.MCResultSlice.NCF[0][sim] = e.MCResultSlice.NCF[0][sim] + v.MCSlice[sampleint].COA[Dateadd(e.StartDate, -1).Dateint].NetCashFlow
+			e.MCResultSlice.MarketValue[0][sim] = e.MCResultSlice.MarketValue[0][sim] + v.MCSlice[sampleint].COA[Dateadd(e.StartDate, -1).Dateint].MarketValue
+			for i, date := 1, e.StartDate; i < duration; i, date = i+1, Dateadd(date, 1) {
+				e.MCResultSlice.CashBalance[i-1][sim] = e.MCResultSlice.CashBalance[i][sim] + v.MCSlice[sampleint].COA[date.Dateint].NetCashFlow
+				e.MCResultSlice.NCF[i][sim] = e.MCResultSlice.NCF[i][sim] + v.MCSlice[sampleint].COA[date.Dateint].NetCashFlow
+				e.MCResultSlice.MarketValue[i][sim] = e.MCResultSlice.MarketValue[i][sim] + v.MCSlice[sampleint].COA[date.Dateint].MarketValue
+			}
+			e.MCResultSlice.EndCash[sim] = e.MCResultSlice.EndCash[sim] + v.MCSlice[sampleint].COA[v.SalesDate.Dateint].CashBalance
+			e.MCResultSlice.EndNCF[sim] = e.MCResultSlice.EndNCF[sim] + v.MCSlice[sampleint].COA[v.SalesDate.Dateint].NetCashFlow
+			e.MCResultSlice.EndMarketValue[sim] = e.MCResultSlice.EndMarketValue[sim] + v.MCSlice[sampleint].COA[v.SalesDate.Dateint].MarketValue
+		}
+		// create slice for IRR
+		irrslice := make([]float64, duration)
+		for i := 0; i < duration; i++ {
+			irrslice[i] = e.MCResultSlice.NCF[i][sim]
+		}
+		e.MCResultSlice.IRR[sim] = (math.Pow(IRRCalc(irrslice)+1, 12) - 1) * 100
+		// e.MCResultSlice.EM[sim] = EquityMultipleCalc(e.MCSlice[sim].StartDate, e.MCSlice[sim].SalesDate, e.MCSlice[sim].COA)
+
+		// fmt.Println(sim, e.MCResultSlice.NCF[sim])
+		// fmt.Println(e.MCResultSlice.IRR[sim])
+		// fmt.Println("irr: ", math.Pow(IRRCalc(e.MCResultSlice.NCF[sim])+1, 12)-1) //v.MCSlice[sampleint].Metrics.IRR.NetLeveredAfterTax
+
+		// e.MCResultSlice.EM[sim] = v.MCSlice[sampleint].Metrics.EM.NetLeveredAfterTax
+		// e.MCResultSlice.YTM[sim] = v.MCSlice[sampleint].Metrics.BondHolder.YTM
+		// e.MCResultSlice.Duration[sim] = v.MCSlice[sampleint].Metrics.BondHolder.Duration
+	}
+	// fmt.Println(e.MCResultSlice.NCF[0])
+	e.MCResults.EndCash = MCStatsCalc(e.MCResultSlice.EndCash, e.MCSetup.Sims)
+	e.MCResults.CashBalance, e.MCResults.CashBalanceVaR = RibbonPlot(e.MCResultSlice.CashBalance, duration-0, 100, e.MCSetup.Sims)
+
+	e.MCResults.EndNCF = MCStatsCalc(e.MCResultSlice.EndNCF, e.MCSetup.Sims)
+	e.MCResults.NCF, e.MCResults.NCFVaR = RibbonPlot(e.MCResultSlice.NCF, duration-0, 100, e.MCSetup.Sims)
+
+	e.MCResults.EndMarketValue = MCStatsCalc(e.MCResultSlice.EndMarketValue, e.MCSetup.Sims)
+	e.MCResults.MarketValue, e.MCResults.MarketValueVaR = RibbonPlot(e.MCResultSlice.MarketValue, duration-0, 100, e.MCSetup.Sims)
+
+	e.MCResults.IRR = MCStatsCalc(e.MCResultSlice.IRR, e.MCSetup.Sims)
+	// e.MCResults.EM = MCStatsCalc(e.MCResultSlice.EM, e.MCSetup.Sims)
 }
 
 // MCStatsCalc -
 func MCStatsCalc(slice []float64, sims int) (stats MCStats) {
-	variance := stat.Variance(slice, nil)
-	stdev := math.Pow(variance, .5)
-	mean := stat.Mean(slice, nil)
-	// Sample from normal dist to compare to observed IRR array
-	norm := make([]float64, len(slice))
-	for i := range norm {
-		norm[i] = NormalSample(mean, stdev)
-	}
-	sort.Float64s(norm)
-	sort.Float64s(slice)
-	lra, lrb := stat.LinearRegression(norm, slice, nil, false)
-	stats = MCStats{
-		Mean:     mean,
-		Variance: variance,
-		StDev:    stdev,
-		Skew:     stat.Skew(slice, nil),
-		Kurtosis: stat.ExKurtosis(slice, nil),
-		P1:       slice[int(float64(sims)*.01)],
-		P5:       slice[int(float64(sims)*.05)],
-		P10:      slice[int(float64(sims)*.10)],
-		P25:      slice[int(float64(sims)*.25)],
-		P50:      slice[int(float64(sims)*.50)],
-		P75:      slice[int(float64(sims)*.75)],
-		P90:      slice[int(float64(sims)*.90)],
-		P95:      slice[int(float64(sims)*.95)],
-		P99:      slice[int(float64(sims)*.99)],
-		LRalpha:  lra,
-		LRbeta:   lrb,
-		Hist:     Hist{},
-	}
-	histslice := make(plotter.Values, sims)
-	histslice = slice
-	raw, _ := plotter.NewHist(histslice, 100)
-	stats.Hist.Vals = make([]float64, 100)
-	stats.Hist.Keys = make([]float64, 100)
-	for i := 1; i <= 100; i++ {
-		if i >= len(raw.Bins) {
-			break
+	if sims >= 100 {
+		variance := stat.Variance(slice, nil)
+		stdev := math.Pow(variance, .5)
+		mean := stat.Mean(slice, nil)
+		// Sample from normal dist to compare to observed IRR array
+		norm := make([]float64, len(slice))
+		for i := range norm {
+			norm[i] = NormalSample(mean, stdev)
 		}
-		stats.Hist.Vals[i] = raw.Bins[i].Weight
-		stats.Hist.Keys[i] = raw.Bins[i].Max
+		sort.Float64s(norm)
+		sort.Float64s(slice)
+		lra, lrb := stat.LinearRegression(norm, slice, nil, false)
+		stats = MCStats{
+			Mean:     mean,
+			Variance: variance,
+			StDev:    stdev,
+			Skew:     stat.Skew(slice, nil),
+			Kurtosis: stat.ExKurtosis(slice, nil),
+			P1:       slice[int(float64(sims)*.01)],
+			P5:       slice[int(float64(sims)*.05)],
+			P10:      slice[int(float64(sims)*.10)],
+			P25:      slice[int(float64(sims)*.25)],
+			P50:      slice[int(float64(sims)*.50)],
+			P75:      slice[int(float64(sims)*.75)],
+			P90:      slice[int(float64(sims)*.90)],
+			P95:      slice[int(float64(sims)*.95)],
+			P99:      slice[int(float64(sims)*.99)],
+			LRalpha:  lra,
+			LRbeta:   lrb,
+			Hist:     Hist{},
+		}
+		histslice := make(plotter.Values, sims)
+		histslice = slice
+		raw, _ := plotter.NewHist(histslice, 100)
+		stats.Hist.Vals = make([]float64, 100)
+		stats.Hist.Keys = make([]float64, 100)
+		for i := 1; i <= 100; i++ {
+			if i >= len(raw.Bins) {
+				break
+			}
+			stats.Hist.Vals[i] = raw.Bins[i].Weight
+			stats.Hist.Keys[i] = raw.Bins[i].Max
+		}
+		stats.Hist.Keys = roundslice(2, 0, stats.Hist.Keys)
+		return stats
 	}
-	stats.Hist.Keys = roundslice(2, 0, stats.Hist.Keys)
 	return stats
 }
 
@@ -248,73 +311,76 @@ type XYFloatSlice struct {
 
 // RibbonPlot -
 func RibbonPlot(matrix [][]float64, duration int, bucketnum int, sims int) (ribbonslice []Ribbon, varpslice VaRPercentile) {
-	ribbonslice = make([]Ribbon, duration)
-	varpslice = VaRPercentile{
-		One: XYFloatSlice{
-			X: make([]float64, duration),
-			Y: make([]float64, duration),
-		},
-		Five: XYFloatSlice{
-			X: make([]float64, duration),
-			Y: make([]float64, duration),
-		},
-		Ten: XYFloatSlice{
-			X: make([]float64, duration),
-			Y: make([]float64, duration),
-		},
-		TwentyFive: XYFloatSlice{
-			X: make([]float64, duration),
-			Y: make([]float64, duration),
-		},
-		Fifty: XYFloatSlice{
-			X: make([]float64, duration),
-			Y: make([]float64, duration),
-		},
-	}
-	for i, v := range matrix {
-		sort.Float64s(v)
-		histslice := make(plotter.Values, duration)
-		histslice = v
-		raw, _ := plotter.NewHist(histslice, bucketnum)
-		vals := make([]float64, bucketnum)
-		keys := make([]float64, bucketnum)
-		tempval := 0.0
-		for iii := 0; iii < bucketnum; iii++ {
-			if iii >= len(raw.Bins) {
-				break
+	if sims >= 100 {
+		ribbonslice = make([]Ribbon, duration)
+		varpslice = VaRPercentile{
+			One: XYFloatSlice{
+				X: make([]float64, duration),
+				Y: make([]float64, duration),
+			},
+			Five: XYFloatSlice{
+				X: make([]float64, duration),
+				Y: make([]float64, duration),
+			},
+			Ten: XYFloatSlice{
+				X: make([]float64, duration),
+				Y: make([]float64, duration),
+			},
+			TwentyFive: XYFloatSlice{
+				X: make([]float64, duration),
+				Y: make([]float64, duration),
+			},
+			Fifty: XYFloatSlice{
+				X: make([]float64, duration),
+				Y: make([]float64, duration),
+			},
+		}
+		for i, v := range matrix {
+			sort.Float64s(v)
+			histslice := make(plotter.Values, duration)
+			histslice = v
+			raw, _ := plotter.NewHist(histslice, bucketnum)
+			vals := make([]float64, bucketnum)
+			keys := make([]float64, bucketnum)
+			tempval := 0.0
+			for iii := 0; iii < bucketnum; iii++ {
+				if iii >= len(raw.Bins) {
+					break
+				}
+				vals[iii] = (raw.Bins[iii].Weight + tempval) / float64(sims)
+				keys[iii] = raw.Bins[iii].Max
+				tempval = raw.Bins[iii].Weight + tempval
 			}
-			vals[iii] = (raw.Bins[iii].Weight + tempval) / float64(sims)
-			keys[iii] = raw.Bins[iii].Max
-			tempval = raw.Bins[iii].Weight + tempval
+			keys = roundslice(2, 0, keys)
+			// create slice for x axis - used as the index in the ribbon
+			y := make([]float64, bucketnum)
+			for index := range y {
+				y[index] = float64((1 + i))
+			}
+			ribbonslice[i] = Ribbon{
+				X:         CreateTupleArray(vals, false),
+				Y:         CreateTupleArray(y, true),
+				Z:         CreateTupleArray(keys, false),
+				Plottype:  "surface",
+				Showscale: "false",
+			}
+			varpslice.One.X[i] = y[0]
+			one := int(float64(sims) * .01)
+			varpslice.One.Y[i] = v[one-1]
+			varpslice.Five.X[i] = y[4]
+			five := int(float64(sims) * .05)
+			varpslice.Five.Y[i] = v[five-1]
+			varpslice.Ten.X[i] = y[9]
+			ten := int(float64(sims) * .1)
+			varpslice.Ten.Y[i] = v[ten-1]
+			varpslice.TwentyFive.X[i] = y[24]
+			twentyfive := int(float64(sims) * .25)
+			varpslice.TwentyFive.Y[i] = v[twentyfive-1]
+			varpslice.Fifty.X[i] = y[49]
+			fifty := int(float64(sims) * .5)
+			varpslice.Fifty.Y[i] = v[fifty-1]
 		}
-		keys = roundslice(2, 0, keys)
-		// create slice for x axis - used as the index in the ribbon
-		y := make([]float64, bucketnum)
-		for index := range y {
-			y[index] = float64((1 + i))
-		}
-		ribbonslice[i] = Ribbon{
-			X:         CreateTupleArray(vals, false),
-			Y:         CreateTupleArray(y, true),
-			Z:         CreateTupleArray(keys, false),
-			Plottype:  "surface",
-			Showscale: "false",
-		}
-		varpslice.One.X[i] = y[0]
-		one := int(float64(sims) * .01)
-		varpslice.One.Y[i] = v[one-1]
-		varpslice.Five.X[i] = y[4]
-		five := int(float64(sims) * .05)
-		varpslice.Five.Y[i] = v[five-1]
-		varpslice.Ten.X[i] = y[9]
-		ten := int(float64(sims) * .1)
-		varpslice.Ten.Y[i] = v[ten-1]
-		varpslice.TwentyFive.X[i] = y[24]
-		twentyfive := int(float64(sims) * .25)
-		varpslice.TwentyFive.Y[i] = v[twentyfive-1]
-		varpslice.Fifty.X[i] = y[49]
-		fifty := int(float64(sims) * .5)
-		varpslice.Fifty.Y[i] = v[fifty-1]
+		return ribbonslice, varpslice
 	}
 	return ribbonslice, varpslice
 }

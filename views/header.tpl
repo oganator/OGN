@@ -13,21 +13,9 @@
     <body>
         <nav class="first-second navbar navbar-expand-lg navbar-dark shadow-lg">
             <a class="navbar-brand" style="color:white;"> Ogan Capital &nbsp &nbsp &nbsp</a>
-            <form class="form-horizontal form-well" role="form" method="post" action="/ChangeEntity">
-                <div class="tab-pane fade in show active" id="header" role="tabpanel">
-                    <div class="form-row">
-                        <div class="form-group col">
-                            <select class="form-select" size="1" id="modelname" name="modelname" value="[[.entity.Name]]">
-                                <option selected hidden>[[.entity.Name]]</option>
-                                [[range $key,$value := .modelslist]]
-                                <option>[[$key]]</option>
-                                [[end]]
-                            </select>
-                        </div>
-                        <div class="form-group col-md-1 d-flex align-items-end">
-                            <button type="submit" class="btn">Submit</button>
-                        </div>
-                    </div>
+             <form id="query_form" class="form-horizontal form-well" role="form" action="/" method="get">
+                <div>
+                    <button type="submit" class="btn">Home</button>
                 </div>
             </form>
         </nav>

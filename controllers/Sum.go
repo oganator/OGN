@@ -9,7 +9,7 @@ func SumCOALines(setup FloatCOA, COA IntFloatCOAMap, start Datetype, end Datetyp
 	return sum
 }
 
-// SumCOA - Yearly sum of COA based on their monthly values
+// SumCOA - Yearly sum of COA based on their monthly values. Sums an entities monthly values.
 func (e *Entity) SumCOA() {
 	x := FloatCOA{}
 	for date := Dateadd(e.StartDate, -1); date.Dateint <= e.SalesDate.Dateint; date = Dateadd(date, 1) {
@@ -20,6 +20,24 @@ func (e *Entity) SumCOA() {
 		if date.Month == 12 || date.Dateint == e.SalesDate.Dateint {
 			e.COA[date.Year] = x
 		}
+	}
+}
+
+// SumNCF -
+func (e *Entity) SumNCF() {
+	cashbalance := e.COA[Dateadd(e.StartDate, -1).Dateint].NetCashFlow
+	for date := e.StartDate; date.Dateint <= e.SalesDate.Dateint; date.Add(1) {
+		ncf := e.COA[date.Dateint].NetOperatingIncome + e.COA[date.Dateint].Capex + e.COA[date.Dateint].AcqDispProperty + e.COA[date.Dateint].AcqDispCosts + e.COA[date.Dateint].InterestExpense + e.COA[date.Dateint].Debt + e.COA[date.Dateint].Tax + e.COA[date.Dateint].Fees
+		if date.Dateint == e.SalesDate.Dateint && e.Strategy == "Balloon" {
+			ncf = ncf + (e.COA[date.Dateint].BPUplift-e.COA[Dateadd(e.StartDate, -1).Dateint].BPUplift)*e.BalloonPercent
+		}
+		temp := FloatCOA{
+			NetCashFlow: ncf,
+			CashBalance: ncf + e.COA[Dateadd(date, -1).Dateint].CashBalance + cashbalance,
+		}
+		temp.Add(e.COA[date.Dateint])
+		e.COA[date.Dateint] = temp
+		cashbalance = 0
 	}
 }
 
@@ -226,7 +244,7 @@ func CreateTupleArray(slice []float64, xaxis bool) (tuplearray [][]float64) {
 	tuplearray = make([][]float64, len(slice))
 	for i, v := range slice {
 		v2 := v
-		if xaxis == true {
+		if xaxis {
 			v2 = v - 1
 		}
 		tuplearray[i] = []float64{v2, v}

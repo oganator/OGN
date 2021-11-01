@@ -5,6 +5,7 @@ go 1.15
 require github.com/astaxie/beego v1.12.3
 
 require (
+	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 // indirect
 	github.com/shiena/ansicolor v0.0.0-20200904210342-c7312218db18 // indirect
 	github.com/xuri/excelize/v2 v2.4.1
 	golang.org/x/exp v0.0.0-20191030013958-a1ab85dbe136 // indirect

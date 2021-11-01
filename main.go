@@ -22,6 +22,7 @@ func main() {
 	}))
 	end := time.Date(2021, 11, 15, 0, 0, 0, 0, time.UTC)
 	fmt.Println("This Trial ends: ", end)
+	// browser.OpenURL("http://localhost:8080/")
 	if time.Now().Before(end) {
 		beego.Run()
 	}

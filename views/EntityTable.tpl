@@ -5,16 +5,13 @@
                 <tr>
                     <th scope="col">Name</th>
                     <th scope="col">Parent</th>
-                    <th scope="col">Level</th>
                     <th scope="col">Yield</th>
                     <th scope="col">OpEx</th>
                     <th scope="col">Debt</th>
-                    <th scope="col">Metrics</th>
+                    <th scope="col">IRR</th>
+                    <th scope="col">Equity Multiple</th>
                     <th scope="col">Start Date</th>
                     <th scope="col">Sales Date</th>
-                    <th scope="col">Frequency</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Year Span</th>
                 </tr>
             </thead>
             <tbody>
@@ -22,24 +19,28 @@
                 <tr>
                     <td> 
                         <div class="post-content">
-                            <form id="query_form" class="form-horizontal form-well" role="form" action="/ViewEntity" method="post">
+                            [[if (gt .ParentID 0)]] 
+                            <form id="query_form" class="form-horizontal form-well" role="form" action="/ViewEntity" method="get">
                                 <div>
-                                    <button type="submit" class="btn" id="name" name="name" style="background-color: #006A4D; color:#FFFFFF;" Value="[[.Name]]">[[.Name]]</button>
+                                    <button type="submit" class="btn" id="name" name="name"  Value="[[.Name]]">[[.Name]]</button>
                                 </div>
-                            </form>
+                            </form>[[end]]
+                            [[if (eq .ParentID 0)]] 
+                            <form id="query_form" class="form-horizontal form-well" role="form" action="/Fund" method="get">
+                                <div>
+                                    <button type="submit" class="btn" id="name" name="name"  Value="[[.Name]]">[[.Name]]</button>
+                                </div>
+                            </form>[[end]]                            
                         </div>
                     </td>
                     <td style="border-color:006A4D;">[[if .Parent]] [[.Parent.Name]] [[end]]</td>
-                    <td style="border-color:006A4D;">[[.Level]]</td>
-                    <td style="border-color:006A4D;">[[.Model.Valuation.Yield]]</td>
-                    <td style="border-color:006A4D;">[[.Model.OpEx]]</td>
-                    <td style="border-color:006A4D;">[[.Model.DebtInput]]</td>
-                    <td style="border-color:006A4D;">[[.Metrics]]</td>
-                    <td style="border-color:006A4D;">[[.Model.StartDate.Value.Year]]/[[.Model.StartDate.Value.Month]]</td>
-                    <td style="border-color:006A4D;">[[.Model.SalesDate.Value.Year]]/[[.Model.SalesDate.Value.Month]]</td>
-                    <td style="border-color:006A4D;">[[.Model.Settings.Frequency]]</td>
-                    <td style="border-color:006A4D;">[[.Model.Settings.Type]]</td>
-                    <td style="border-color:006A4D;">[[.Model.Settings.YearSpan]]</td>
+                    <td style="border-color:006A4D;">[[.Valuation.EntryYield]]</td>
+                    <td style="border-color:006A4D;">[[.OpEx]]</td>
+                    <td style="border-color:006A4D;">[[.DebtInput]]</td>
+                    <td style="border-color:006A4D;">[[.Metrics.IRR.NetLeveredAfterTax]]</td>
+                    <td style="border-color:006A4D;">[[.Metrics.EM.NetLeveredAfterTax]]</td>
+                    <td style="border-color:006A4D;">[[.StartDate.Year]]/[[.StartDate.Month]]</td>
+                    <td style="border-color:006A4D;">[[.SalesDate.Year]]/[[.SalesDate.Month]]</td>
                 </tr>
                 [[end]]
             </tbody>

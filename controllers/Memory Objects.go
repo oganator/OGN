@@ -12,17 +12,23 @@ var UnitStore = map[int]UnitData{}
 //GrowthItemsStore -
 var GrowthItemsStore = make(map[int]map[string]float64)
 
-// EntityAssociations -
-var EntityAssociations = make(map[int][]int)
+// // EntityAssociations -
+// var EntityAssociations = make(map[int][]int)
 
-// UnitAssociations -
-var UnitAssociations = make(map[int][]int)
+// // UnitAssociations -
+// var UnitAssociations = make(map[int][]int)
 
-// Models - MasterID as key
-var Models = map[int]*Entity{}
+// Entities - MasterID as key
+var Entities = map[int]*Entity{}
+
+// EnitiesList -
+var EntitiesList = make(map[string]int)
 
 // ModelsList -
 var ModelsList = make(map[string]int)
+
+// FundsList -
+var FundsList = make(map[string]int)
 
 // Units -
 var Units = map[int]Unit{}
@@ -32,6 +38,10 @@ var Key = 1
 
 func init() {
 	ReadXLSX()
-	Associations()
 	PopulateModels()
+	// parent assignment
+	for i, v := range Entities {
+		v.Parent = Entities[EntityStore[i].Parent]
+		v.PopulateChildEntities()
+	}
 }

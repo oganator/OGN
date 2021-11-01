@@ -3,6 +3,7 @@
             <thead>
                 <tr>
                 <th scope="col"></th>
+                [[$name := .entity.Name]]
                 [[$months := .entity.TableHeader.Monthly]]
                 [[$years := .entity.TableHeader.Yearly]]
                 [[range $years]] 
@@ -11,11 +12,11 @@
                         [[range $months]] 
                             [[if .Bool]]
                                 [[if eq .Year $year.Year]]
-                                    <th scope="col" hidden name="[[.Year]]">[[.MonthName]]</th> 
+                                    <th scope="col" hidden name="[[$name]][[.Year]]">[[.MonthName]]</th> 
                                 [[end]] 
                             [[end]] 
                         [[end]]
-                        <th scope="col"><button class="btn" onclick="chooseYear('[[.Year]]')">[[.Year]]</button></th>
+                        <th scope="col"><button class="btn" onclick="chooseYear('[[$name]][[.Year]]')">[[.Year]]</button></th>
                     [[end]] 
                 [[end]]
                 </tr>
@@ -31,7 +32,7 @@
                                 [[range $months]] 
                                     [[if .Bool]]
                                         [[if eq .Year $year.Year]]
-                                            <td hidden name="[[.Year]]" class="second-bg">[[index $table.Value .Dateint]]</td>
+                                            <td hidden name="[[$name]][[.Year]]" class="second-bg">[[index $table.Value .Dateint]]</td>
                                         [[end]] 
                                     [[end]] 
                                 [[end]]

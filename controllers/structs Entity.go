@@ -4,11 +4,13 @@ import "sync"
 
 // Entity -
 type Entity struct {
+	Mutex          *sync.Mutex `json:"MCMutex,omitempty"` //
 	MasterID       int
-	Name           string            `json:"Name,omitempty"`            //
-	ChildEntities  map[int]Entity    `json:"ChildEntities,omitempty"`   // MasterID as key. created by ModelCreate().
-	ChildUnits     map[int]*Unit     `json:"ChildUnits,omitempty"`      // MasterID as key. created by ModelCreate().
-	Metrics        Metrics           `json:"Metrics,omitempty"`         //
+	Name           string            `json:"Name,omitempty"`          //
+	ChildEntities  map[int]*Entity   `json:"ChildEntities,omitempty"` // MasterID as key. created by ModelCreate().
+	ChildUnits     map[int]*Unit     `json:"ChildUnits,omitempty"`    // MasterID as key. created by ModelCreate().
+	Metrics        Metrics           `json:"Metrics,omitempty"`       //
+	ParentID       int               `json:"ParentID,omitempty"`
 	Parent         *Entity           `json:"-"`                         //
 	StartDate      Datetype          `json:"StartDate,omitempty"`       // used for cash flow calculations
 	HoldPeriod     int               `json:"HoldPeriod,omitempty"`      //
@@ -24,7 +26,6 @@ type Entity struct {
 	MC             bool              `json:"MC,omitempty"`              //
 	MCSetup        MCSetup           `json:"MCSetup,omitempty"`         //
 	MCSlice        []*Entity         `json:"MCSlice,omitempty"`         //
-	Mutex          sync.Mutex        `json:"MCMutex,omitempty"`         //
 	MCResultSlice  MCResultSlice     `json:"MCResultSlice,omitempty"`   //
 	MCResults      MCResults         `json:"MCResults,omitempty"`       //
 	Tax            Tax               `json:"Tax,omitempty"`             //

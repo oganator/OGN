@@ -292,14 +292,15 @@ func ReadXLSX() {
 }
 
 // Associations -
-func Associations() {
-	for _, v := range EntityStore {
-		EntityAssociations[v.Parent] = append(EntityAssociations[v.Parent], v.MasterID)
-	}
-	for _, v := range UnitStore {
-		UnitAssociations[v.ParentMasterID] = append(UnitAssociations[v.ParentMasterID], v.MasterID)
-	}
-}
+// func Associations() {
+// 	for _, v := range EntityStore {
+// 		EntityAssociations[v.Parent] = append(EntityAssociations[v.Parent], v.MasterID)
+// 	}
+// 	fmt.Println(EntityAssociations)
+// 	for _, v := range UnitStore {
+// 		UnitAssociations[v.ParentMasterID] = append(UnitAssociations[v.ParentMasterID], v.MasterID)
+// 	}
+// }
 
 // // GDSlice -
 // type GDSlice []GrowthData

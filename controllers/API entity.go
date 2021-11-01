@@ -17,15 +17,6 @@ type ChangeEntityController struct {
 	beego.Controller
 }
 
-// Get -
-func (c *ViewEntityController) Get() {
-	temp := make(map[interface{}]interface{})
-	temp["entity"] = Models[Key]
-	temp["modelslist"] = ModelsList
-	c.TplName = "EntityView.tpl"
-	c.Data = temp
-}
-
 // GetString -
 func GetString(c *ViewEntityController, field string) string {
 	c.Data[field] = c.GetString(field)
@@ -46,6 +37,16 @@ func GetInt(c *ViewEntityController, field string) (result int) {
 	temp := c.Data[field].(string)
 	result, _ = strconv.Atoi(temp)
 	return result
+}
+
+// Get -
+func (c *ViewEntityController) Get() {
+	Key = ModelsList[GetString(c, "name")]
+	temp := make(map[interface{}]interface{})
+	temp["entity"] = Entities[Key]
+	temp["modelslist"] = ModelsList
+	c.TplName = "EntityView.tpl"
+	c.Data = temp
 }
 
 // Post -
@@ -107,16 +108,23 @@ func (c *ViewEntityController) Post() {
 	EntityStore[Key].CarryForwardYrs = GetInt(c, "carryforwardyrs")
 	//
 	temp := make(map[interface{}]interface{})
-	Models[Key].UpdateEntity(false, EntityStore[Models[Key].MasterID])
-	Models[Key].MCSetup = mcsetup
-	go WriteXLSXEntities(Models[Key])
-	Models[Key].MonteCarlo()
-	Models[Key].MultiplyInputs()
-	temp["entity"] = Models[Key]
+	Entities[Key].UpdateEntity(false, EntityStore[Entities[Key].MasterID])
+	Entities[Key].MCSetup = mcsetup
+	WriteXLSXEntities(Entities[Key])
+	if Entities[Key].Parent != Entities[Key] && Entities[Key].MCSetup.Sims >= 100 {
+		Entities[Key].MonteCarlo()
+	}
+	Entities[Key].MultiplyInputs()
+
+	temp["entity"] = Entities[Key]
+	if Entities[Key].ParentID != 0 {
+		temp["entity"] = Entities[Key].Parent
+	}
+	temp["entityName"] = GetString(c, "name")
 	temp["modelslist"] = ModelsList
+	temp["fundslist"] = FundsList
 	c.TplName = "EntityView.tpl"
 	c.Data = temp
-
 }
 
 // MultiplyInputs -
@@ -179,7 +187,7 @@ func (c *ChangeEntityController) Post() {
 	//
 	c.TplName = "EntityView.tpl"
 	temp := make(map[interface{}]interface{})
-	temp["entity"] = Models[Key]
+	temp["entity"] = Entities[Key]
 	temp["modelslist"] = ModelsList
 	c.Data = temp
 }
