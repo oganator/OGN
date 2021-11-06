@@ -4,36 +4,46 @@
             <div class="tabs-wrapper">
                 <ul class="nav nav-tabs tabPinned" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link waves-light active" data-toggle="tab" href="#settings" role="tab">Settings</a>
+                        [[if eq .tab "settings"]]<a class="nav-link waves-light active" data-toggle="tab" href="#settings" role="tab" ng-click="updateSettingsTab('settings')">Settings</a>[[end]]
+                        [[if ne .tab "settings"]]<a class="nav-link waves-light" data-toggle="tab" href="#settings" role="tab" ng-click="updateSettingsTab('settings')">Settings</a>[[end]]
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link waves-light" data-toggle="tab" href="#leasing" role="tab">Leasing</a>
+                        [[if eq .tab "leasing"]]<a class="nav-link waves-light active" data-toggle="tab" href="#leasing" role="tab" ng-click="updateSettingsTab('leasing')">Leasing</a>[[end]]
+                        [[if ne .tab "leasing"]]<a class="nav-link waves-light" data-toggle="tab" href="#leasing" role="tab" ng-click="updateSettingsTab('leasing')">Leasing</a>[[end]]
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link waves-light" data-toggle="tab" href="#ervcpi" role="tab">ERV/CPI Growth</a>
+                        [[if eq .tab "ervcpi"]]<a class="nav-link waves-light active" data-toggle="tab" href="#ervcpi" role="tab" ng-click="updateSettingsTab('ervcpi')">ERV/CPI Growth</a>[[end]]
+                        [[if ne .tab "ervcpi"]]<a class="nav-link waves-light" data-toggle="tab" href="#ervcpi" role="tab" ng-click="updateSettingsTab('ervcpi')">ERV/CPI Growth</a>[[end]]
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link waves-light" data-toggle="tab" href="#val" role="tab">Valuation</a>
+                        [[if eq .tab "valuation"]]<a class="nav-link waves-light active" data-toggle="tab" href="#val" role="tab" ng-click="updateSettingsTab('valuation')">Valuation</a>[[end]]
+                        [[if ne .tab "valuation"]]<a class="nav-link waves-light" data-toggle="tab" href="#val" role="tab" ng-click="updateSettingsTab('valuation')">Valuation</a>[[end]]
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link waves-light" data-toggle="tab" href="#tax" role="tab">Tax</a>
+                        [[if eq .tab "tax"]]<a class="nav-link waves-light active" data-toggle="tab" href="#tax" role="tab" ng-click="updateSettingsTab('tax')">Tax</a>[[end]]
+                        [[if ne .tab "tax"]]<a class="nav-link waves-light" data-toggle="tab" href="#tax" role="tab" ng-click="updateSettingsTab('tax')">Tax</a>[[end]]
                     </li>
                 </ul>
             </div>
             <div class="tab-content">
-                <div class="tab-pane fade in show active" id="settings" role="tabpanel">
+                [[if eq .tab "settings"]]<div class="tab-pane fade active show" id="settings" role="tabpanel">[[end]]
+                [[if ne .tab "settings"]]<div class="tab-pane fade" id="settings" role="tabpanel">[[end]]
                     [[template "EntitySettingsDefault" .]]
                 </div>
-                <div class="tab-pane fade" id="leasing" role="tabpanel">
+                [[if eq .tab "leasing"]]<div class="tab-pane fade active show" id="leasing" role="tabpanel">[[end]]
+                [[if ne .tab "leasing"]]<div class="tab-pane fade" id="leasing" role="tabpanel">[[end]]
                     [[template "EntitySettingsLeasing" .]]
                 </div>
-                <div class="tab-pane fade" id="ervcpi" role="tabpanel">
+                [[if eq .tab "ervcpi"]]<div class="tab-pane fade active show" id="ervcpi" role="tabpanel">[[end]]
+                [[if ne .tab "ervcpi"]]<div class="tab-pane fade" id="ervcpi" role="tabpanel">[[end]]
                     [[template "EntitySettingsERVCPI" .]]
                 </div>
-                <div class="tab-pane fade" id="val" role="tabpanel">
+                [[if eq .tab "valuation"]]<div class="tab-pane fade active show" id="val" role="tabpanel">[[end]]
+                [[if ne .tab "valuation"]]<div class="tab-pane  fade" id="val" role="tabpanel">[[end]]
                     [[template "EntitySettingsValuation" .]]
                 </div>
-                <div class="tab-pane fade" id="tax" role="tabpanel">
+                [[if eq .tab "tax"]]<div class="tab-pane fade active show" id="tax" role="tabpanel">[[end]]
+                [[if ne .tab "tax"]]<div class="tab-pane fade" id="tax" role="tabpanel">[[end]]
                     [[template "EntitySettingsTax" .]]
                 </div>
             </div>
@@ -48,19 +58,19 @@
                     <input type="text" class="form-control" id="sims" name="sims" Value="[[.entity.MCSetup.Sims]]">
                 </div>
                 <div class="form-group col-sm-1">
-                    <input readonly type="text" class="form-control" id="irr[[.entity.Name]]" name="irr[[.entity.Name]]" Value="IRR: [[.entity.Metrics.IRR.NetLeveredAfterTax]]">
+                    <input readonly type="text" class="form-control" id="irr" name="irr" Value="IRR: [[.entity.Metrics.IRR.NetLeveredAfterTax]]">
                 </div>
                 <div class="form-group col-sm-1">
-                    <input readonly type="text" class="form-control" id="em[[.entity.Name]]" name="em[[.entity.Name]]" Value="EM: [[.entity.Metrics.EM.NetLeveredAfterTax]]">
+                    <input readonly type="text" class="form-control" id="em" name="em" Value="EM: [[.entity.Metrics.EM.NetLeveredAfterTax]]">
                 </div>
-                <div class="form-group col-sm-1 offset-sm-5" ng-show="strategy != 'Standard' ">
-                    <input readonly type="text" class="form-control" id="ytm[[.entity.Name]]" name="ytm[[.entity.Name]]" Value="YTM: [[.entity.Metrics.BondHolder.YTM]]">
+                <div class="form-group col-sm-1 offset-sm-5">
+                    <input readonly type="text" class="form-control" id="ytm" name="ytm" Value="YTM: [[.entity.Metrics.BondHolder.YTM]]">
                 </div>
-                <div class="form-group col-sm-1" ng-show="strategy != 'Standard' ">
-                    <input readonly type="text" class="form-control" id="dur[[.entity.Name]]" name="dur[[.entity.Name]]" Value="DUR: [[.entity.Metrics.BondHolder.Duration]]">
+                <div class="form-group col-sm-1">
+                    <input readonly type="text" class="form-control" id="dur" name="dur" Value="DUR: [[.entity.Metrics.BondHolder.Duration]]">
                 </div>
-                <div class="form-group col-sm-1" ng-show="strategy != 'Standard' ">
-                    <input readonly type="text" class="form-control" id="ytmdur[[.entity.Name]]" name="ytmdur[[.entity.Name]]" Value="YTM/DUR: ">
+                <div class="form-group col-sm-1">
+                    <input readonly type="text" class="form-control" id="ytmdur" name="ytmdur" Value="YTM/DUR: {{[[.entity.Metrics.BondHolder.YTMDUR]] | number:4}}">
                 </div>
             </div>
         </form>
@@ -68,15 +78,42 @@
     <br>
     <br>
     <script>
-    
-        function ytmDur(){
-            temp = Math.round([[.entity.Metrics.BondHolder.YTM]] / [[.entity.Metrics.BondHolder.Duration]]*1000)/1000
-            document.getElementById('ytmdur').value = document.getElementById('ytmdur').value.concat(temp);
-        }
+        window.onload = strategyChange();
+        
+        function strategyChange() {
+            var input = document.getElementById("strategy");
+            if (input.value == "Standard"){
+                document.getElementById("ytm").style.visibility = 'hidden';
+                document.getElementById("dur").style.visibility = 'hidden';
+                document.getElementById("ytmdur").style.visibility = 'hidden';
+                document.getElementById("ltv").style.visibility = 'visible';
+                document.getElementById("rate").style.visibility = 'visible';
+                document.getElementById("discount").style.visibility = 'hidden';
+                document.getElementById("soldrent").style.visibility = 'hidden';
+                document.getElementById("balpercent").style.visibility = 'hidden';
+                document.getElementById("durationtabletab").style.visibility = 'hidden';
+                document.getElementById("ytmtabletab").style.visibility = 'hidden';
+                document.getElementById("irrtabletab").style.visibility = 'visible';
+                document.getElementById("emtabletab").style.visibility = 'visible';
+            }else{
+                document.getElementById("ytm").style.visibility = 'visible';
+                document.getElementById("dur").style.visibility = 'visible';
+                document.getElementById("ytmdur").style.visibility = 'visible';
+                document.getElementById("ltv").style.visibility = 'hidden';
+                document.getElementById("rate").style.visibility = 'hidden';
+                document.getElementById("discount").style.visibility = 'visible';
+                document.getElementById("soldrent").style.visibility = 'visible';
+                document.getElementById("balpercent").style.visibility = 'visible';
+                document.getElementById("durationtabletab").style.visibility = 'visible';
+                document.getElementById("ytmtabletab").style.visibility = 'visible';
+                document.getElementById("irrtabletab").style.visibility = 'hidden';
+                document.getElementById("emtabletab").style.visibility = 'hidden';
+            }
+        };
     </script>
 [[end]]
 
-[[define "EntitySettingsDefault"]]                  
+[[define "EntitySettingsDefault"]]
     <div class="form-row">
         <input hidden id="name" name="name" ng-model="entity" value="[[.entity.Name]]">
         <div class="form-group col-sm-1">
@@ -93,32 +130,32 @@
         </div>
         <div class="form-group col-sm-1">
             <label for="rate">Strategy</label>
-            <select type="text" class="form-control" id="strategy" name="strategy" placeholder="[[.strategy]]" ng-model="strategy">
-                <option hidden>[[.strategy]]</option>
+            <select type="text" class="form-control" id="strategy" name="strategy" value="[[.entity.Strategy]]" onchange="strategyChange()">
+                <option hidden>[[.entity.Strategy]]</option>
                 <option>Standard</option>
                 <option>Balloon</option>
                 <option>Pure Discount</option>
             </select>
         </div>
-        <div class="form-group col-sm-1" ng-show="strategy == 'Standard' ">
+        <div class="form-group col-sm-1" id="ltv">
             <label for="ltv">LTV</label>
-            <input type="text" class="form-control" id="ltv" name="ltv" Value="[[.entity.DebtInput.LTV]]">
+            <input type="text" class="form-control" name="ltv" Value="[[.entity.DebtInput.LTV]]">
         </div>
-        <div class="form-group col-sm-1" ng-show="strategy == 'Standard' ">
+        <div class="form-group col-sm-1" id="rate">
             <label for="rate">Loan Rate</label>
-            <input type="text" class="form-control" id="rate" name="rate" Value="[[.entity.DebtInput.InterestRate]]">
+            <input type="text" class="form-control" name="rate" Value="[[.entity.DebtInput.InterestRate]]">
         </div>
-        <div class="form-group col-sm-1" ng-show="strategy != 'Standard' ">
+        <div class="form-group col-sm-1" id="discount">
             <label for="discount">Discount Rate</label>
-            <input type="text" class="form-control" id="discount" name="discount" Value="[[.entity.GLA.DiscountRate]]">
+            <input type="text" class="form-control" name="discount" Value="[[.entity.GLA.DiscountRate]]">
         </div>
-        <div class="form-group col-sm-1" ng-show="strategy != 'Standard' ">
+        <div class="form-group col-sm-1" id="soldrent">
             <label for="rate">Rent to Sell %</label>
-            <input type="text" class="form-control" id="soldrent" name="soldrent" Value="[[.entity.GLA.PercentSoldRent]]">
+            <input type="text" class="form-control" name="soldrent" Value="[[.entity.GLA.PercentSoldRent]]">
         </div>
-        <div class="form-group col-sm-1" ng-show="strategy != 'Standard' ">
+        <div class="form-group col-sm-1" id="balpercent">
             <label for="balpercent">Balloon Percent</label>
-            <input type="text" class="form-control" id="balpercent" name="balpercent" Value="[[.entity.BalloonPercent]]" >
+            <input type="text" class="form-control" name="balpercent" Value="[[.entity.BalloonPercent]]" >
         </div>
     </div>
     <div class="form-row">
@@ -299,7 +336,7 @@
                 <input type="text" class="form-control" id="" name="" Value="">
             </div>
             <div class="form-group col-sm-1">
-                <input type="text" class="form-control" id="" name="" Value="">
+                <input type="text" class="form-control" id="hazardsigma" name="hazardsigma" Value="[[.entity.MCSetup.Hazard]]">
             </div>
         </div>
     </div>
@@ -371,13 +408,13 @@
                 <div class="form-group col-sm-1">
                     <input readonly type="text" class="form-control" id="em" name="em" Value="EM: [[.entity.Metrics.EM.NetLeveredAfterTax]]">
                 </div>                
-                <div class="form-group col-sm-1 offset-sm-5" ng-show="strategy != 'Standard' ">
+                <div class="form-group col-sm-1 offset-sm-5">
                     <input readonly type="text" class="form-control" id="ytm" name="ytm" Value="YTM: [[.entity.Metrics.BondHolder.YTM]]">
                 </div>
-                <div class="form-group col-sm-1" ng-show="strategy != 'Standard' ">
+                <div class="form-group col-sm-1">
                     <input readonly type="text" class="form-control" id="dur" name="dur" Value="DUR: [[.entity.Metrics.BondHolder.Duration]]">
                 </div>
-                <div class="form-group col-sm-1" ng-show="strategy != 'Standard' ">
+                <div class="form-group col-sm-1">
                     <input readonly type="text" class="form-control" id="ytmdur" name="ytmdur" Value="YTM/DUR: ">
                 </div>
             </div>
@@ -399,17 +436,13 @@
             <input type="text" class="form-control" id="fundholdperiod" name="holdperiod" value="[[.entity.HoldPeriod]]">
         </div>
         <div class="form-group col-sm-1">
-            <label for="fees">Fees (bps)</label>
-            <input type="text" class="form-control" id="fundfees" name="fees" Value="[[.entity.Fees.PercentOfGAV]]">
-        </div>
-
-        <div class="form-group col-sm-1" ng-show="strategy == 'Standard' ">
-            <label for="ltv">LTV</label>
-            <input type="text" class="form-control" id="fundltv" name="ltv" Value="[[.entity.DebtInput.LTV]]">
-        </div>
-        <div class="form-group col-sm-1" ng-show="strategy == 'Standard' ">
-            <label for="rate">Loan Rate</label>
-            <input type="text" class="form-control" id="fundrate" name="rate" Value="[[.entity.DebtInput.InterestRate]]">
+            <label for="rate">Strategy</label>
+            <select type="text" class="form-control" id="strategy" name="strategy" value="[[.entity.Strategy]]" onchange="strategyChange()">
+                <option hidden>[[.entity.Strategy]]</option>
+                <option>Standard</option>
+                <option>Balloon</option>
+                <option>Pure Discount</option>
+            </select>
         </div>
     </div>
 [[end]]

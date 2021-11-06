@@ -24,7 +24,7 @@ type Entity struct {
 	Capex          map[int]CostInput `json:"Capex,omitempty"`           // yearly input for costs.
 	GLA            Unit              `json:"GLA,omitempty"`             //
 	MC             bool              `json:"MC,omitempty"`              //
-	MCSetup        MCSetup           `json:"MCSetup,omitempty"`         //
+	MCSetup        MCSetup           `json:"MCSetup,omitempty"`         // used to store sigmas of the variables - the mean values are all stored elsewhere
 	MCSlice        []*Entity         `json:"MCSlice,omitempty"`         //
 	MCResultSlice  MCResultSlice     `json:"MCResultSlice,omitempty"`   //
 	MCResults      MCResults         `json:"MCResults,omitempty"`       //

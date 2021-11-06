@@ -175,6 +175,7 @@ func (c *AddChildUnitController) Post() {
 	unit.LeaseEndYear = GetIntAddChildUnit(c, "expiryyear")
 	unit.ERVAmount = GetFloatAddChildUnit(c, "amount")
 	unit.ERVArea = GetFloatAddChildUnit(c, "area")
+	// fmt.Printf("%+v\n", unit)
 	UnitStore[unit.MasterID] = unit
 	unit.WriteXLSXUnits()
 	// Associations()
@@ -183,5 +184,6 @@ func (c *AddChildUnitController) Post() {
 	c.TplName = "EntityView.tpl"
 	temp["entity"] = Entities[parentmasterid]
 	temp["modelslist"] = ModelsList
+	temp["fundslist"] = FundsList
 	c.Data = temp
 }

@@ -50,6 +50,7 @@ func (c *FundController) Get() {
 func (c *FundController) Post() {
 	name := GetStringFund(c, "name")
 	key := FundsList[name]
+	Entities[key].Strategy = GetStringFund(c, "strategy")
 	Entities[key].CalculateFund()
 	Entities[key].MCSetup.Sims = GetIntFund(c, "sims")
 	Entities[key].FundMonteCarlo()

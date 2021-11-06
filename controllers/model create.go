@@ -51,6 +51,9 @@ func CreateEntity(v EntityData) (e Entity) {
 			DiscountRate:    v.GLA.DiscountRate,
 			RentRevisionERV: v.GLA.RentRevisionERV,
 			EXTDuration:     v.GLA.EXTDuration,
+			Default: Default{
+				Hazard: v.GLA.Default.Hazard,
+			},
 			RentIncentives: CostInput{
 				PercentOfContractRent: v.GLA.RentIncentives.PercentOfContractRent,
 				IsCapitalized:         false,

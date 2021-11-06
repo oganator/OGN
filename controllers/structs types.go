@@ -32,6 +32,7 @@ type ReturnType struct {
 type BondReturnType struct {
 	Duration float64
 	YTM      float64
+	YTMDUR   float64
 }
 
 // Default -

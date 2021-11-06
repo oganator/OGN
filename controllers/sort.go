@@ -107,7 +107,7 @@ type ByHazard []*Entity
 
 func (a ByHazard) Len() int { return len(a) }
 func (a ByHazard) Less(i, j int) bool {
-	return float64(a[i].GLA.Default.NumberOfDefaults) < float64(a[j].GLA.Default.NumberOfDefaults)
+	return float64(a[i].GLA.Default.Hazard) < float64(a[j].GLA.Default.Hazard)
 }
 func (a ByHazard) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
@@ -115,7 +115,7 @@ type ByHazardr []*Entity
 
 func (a ByHazardr) Len() int { return len(a) }
 func (a ByHazardr) Less(i, j int) bool {
-	return float64(a[i].GLA.Default.NumberOfDefaults) > float64(a[j].GLA.Default.NumberOfDefaults)
+	return float64(a[i].GLA.Default.Hazard) > float64(a[j].GLA.Default.Hazard)
 }
 func (a ByHazardr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
@@ -141,7 +141,7 @@ type ByCPI []*Entity
 
 func (a ByCPI) Len() int { return len(a) }
 func (a ByCPI) Less(i, j int) bool {
-	return a[i].GrowthInput["CPI"].ShortTermRate < a[j].GrowthInput["CPI"].ShortTermRate
+	return a[i].GrowthInput["CPI"].EndingIndex < a[j].GrowthInput["CPI"].EndingIndex
 }
 func (a ByCPI) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
@@ -149,7 +149,7 @@ type ByCPIr []*Entity
 
 func (a ByCPIr) Len() int { return len(a) }
 func (a ByCPIr) Less(i, j int) bool {
-	return a[i].GrowthInput["CPI"].ShortTermRate > a[j].GrowthInput["CPI"].ShortTermRate
+	return a[i].GrowthInput["CPI"].EndingIndex > a[j].GrowthInput["CPI"].EndingIndex
 }
 func (a ByCPIr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
@@ -158,7 +158,7 @@ type ByERV []*Entity
 
 func (a ByERV) Len() int { return len(a) }
 func (a ByERV) Less(i, j int) bool {
-	return a[i].GrowthInput["ERV"].ShortTermRate < a[j].GrowthInput["ERV"].ShortTermRate
+	return a[i].GrowthInput["ERV"].EndingIndex < a[j].GrowthInput["ERV"].EndingIndex
 }
 func (a ByERV) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
@@ -166,7 +166,7 @@ type ByERVr []*Entity
 
 func (a ByERVr) Len() int { return len(a) }
 func (a ByERVr) Less(i, j int) bool {
-	return a[i].GrowthInput["ERV"].ShortTermRate > a[j].GrowthInput["ERV"].ShortTermRate
+	return a[i].GrowthInput["ERV"].EndingIndex > a[j].GrowthInput["ERV"].EndingIndex
 }
 func (a ByERVr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 

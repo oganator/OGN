@@ -2,12 +2,14 @@ package controllers
 
 import (
 	"math"
-	"math/rand"
+
+	//"math/rand"
 	"sort"
 	"sync"
 
+	"golang.org/x/exp/rand"
+
 	"gonum.org/v1/gonum/stat"
-	"gonum.org/v1/gonum/stat/distuv"
 	"gonum.org/v1/plot/plotter"
 )
 
@@ -89,23 +91,25 @@ func (e *Entity) MonteCarlo() {
 		wg.Add(1)
 		go func(e *Entity, index int) {
 			defer wg.Done()
+			mu := sync.Mutex{}
+			mu.Lock()
+			rand.Seed(uint64(int64(index)))
 			temp := *e
 			tempentitydata := EntityStore[e.MasterID]
-			tempentitydata.ERVGrowth.ShortTermRate = NormalSample(e.GrowthInput["ERV"].ShortTermRate, e.MCSetup.ERV.ShortTermRate)
-			tempentitydata.ERVGrowth.ShortTermPeriod = int(NormalSample(float64(e.GrowthInput["ERV"].ShortTermPeriod), float64(e.MCSetup.ERV.ShortTermPeriod)))
-			tempentitydata.ERVGrowth.TransitionPeriod = int(NormalSample(float64(e.GrowthInput["ERV"].TransitionPeriod), float64(e.MCSetup.ERV.TransitionPeriod)))
-			tempentitydata.ERVGrowth.LongTermRate = NormalSample(e.GrowthInput["ERV"].LongTermRate, e.MCSetup.ERV.LongTermRate)
-
-			tempentitydata.CPIGrowth.ShortTermRate = NormalSample(e.GrowthInput["CPI"].ShortTermRate, e.MCSetup.CPI.ShortTermRate)
-			tempentitydata.CPIGrowth.ShortTermPeriod = int(NormalSample(float64(e.GrowthInput["CPI"].ShortTermPeriod), float64(e.MCSetup.CPI.ShortTermPeriod)))
-			tempentitydata.CPIGrowth.TransitionPeriod = int(NormalSample(float64(e.GrowthInput["CPI"].TransitionPeriod), float64(e.MCSetup.CPI.TransitionPeriod)))
-			tempentitydata.CPIGrowth.LongTermRate = NormalSample(e.GrowthInput["CPI"].LongTermRate, e.MCSetup.CPI.LongTermRate)
-
-			tempentitydata.OpExpercent = NormalSample(e.OpEx.PercentOfTRI, e.MCSetup.OpEx)
-			tempentitydata.YieldShift = NormalSample(e.Valuation.YieldShift, e.MCSetup.YieldShift)
-			tempentitydata.GLA.Void = int(NormalSample(float64(e.GLA.Void), e.MCSetup.Void))
-			tempentitydata.GLA.Probability = NormalSample(e.GLA.Probability, e.MCSetup.Probability)
-			tempentitydata.GLA.Default.Hazard = LogNormalSample(float64(e.GLA.Default.Hazard), float64(e.MCSetup.Hazard))
+			tempentitydata.ERVGrowth.ShortTermRate = NormalSample(e.GrowthInput["ERV"].ShortTermRate, e.MCSetup.ERV.ShortTermRate, 0.0)
+			tempentitydata.ERVGrowth.ShortTermPeriod = int(NormalSample(float64(e.GrowthInput["ERV"].ShortTermPeriod), float64(e.MCSetup.ERV.ShortTermPeriod), 0.0))
+			tempentitydata.ERVGrowth.TransitionPeriod = int(NormalSample(float64(e.GrowthInput["ERV"].TransitionPeriod), float64(e.MCSetup.ERV.TransitionPeriod), 0.0))
+			tempentitydata.ERVGrowth.LongTermRate = NormalSample(e.GrowthInput["ERV"].LongTermRate, e.MCSetup.ERV.LongTermRate, 0.0)
+			tempentitydata.CPIGrowth.ShortTermRate = NormalSample(e.GrowthInput["CPI"].ShortTermRate, e.MCSetup.CPI.ShortTermRate, 0.0)
+			tempentitydata.CPIGrowth.ShortTermPeriod = int(NormalSample(float64(e.GrowthInput["CPI"].ShortTermPeriod), float64(e.MCSetup.CPI.ShortTermPeriod), 0.0))
+			tempentitydata.CPIGrowth.TransitionPeriod = int(NormalSample(float64(e.GrowthInput["CPI"].TransitionPeriod), float64(e.MCSetup.CPI.TransitionPeriod), 0.0))
+			tempentitydata.CPIGrowth.LongTermRate = NormalSample(e.GrowthInput["CPI"].LongTermRate, e.MCSetup.CPI.LongTermRate, 0.0)
+			tempentitydata.OpExpercent = NormalSample(e.OpEx.PercentOfTRI, e.MCSetup.OpEx, 0.0)
+			tempentitydata.YieldShift = NormalSample(e.Valuation.YieldShift, e.MCSetup.YieldShift, -99.9)
+			tempentitydata.GLA.Void = int(NormalSample(float64(e.GLA.Void), e.MCSetup.Void, 0.0))
+			tempentitydata.GLA.Probability = NormalSample(e.GLA.Probability, e.MCSetup.Probability, 0.0)
+			tempentitydata.GLA.Default.Hazard = NormalSample(float64(e.GLA.Default.Hazard), float64(e.MCSetup.Hazard), 0.0)
+			mu.Unlock()
 			//
 			temp.MC = true
 			temp.UpdateEntity(true, tempentitydata)
@@ -189,7 +193,6 @@ func (e *Entity) FundMonteCarlo() {
 			simsfloat := float64(e.MCSetup.Sims)
 			simratio := float64(v.MCSetup.Sims) / float64(e.MCSetup.Sims)
 			sampleint := int(samplefloat * simsfloat * simratio)
-			// fmt.Println("samplefloat: ", samplefloat, " simsfloat: ", simsfloat, " simratio: ", simratio, " sampleint: ", sampleint)
 			e.MCResultSlice.CashBalance[0][sim] = e.MCResultSlice.CashBalance[0][sim] + v.MCSlice[sampleint].COA[Dateadd(e.StartDate, -1).Dateint].CashBalance
 			e.MCResultSlice.NCF[0][sim] = e.MCResultSlice.NCF[0][sim] + v.MCSlice[sampleint].COA[Dateadd(e.StartDate, -1).Dateint].NetCashFlow
 			e.MCResultSlice.MarketValue[0][sim] = e.MCResultSlice.MarketValue[0][sim] + v.MCSlice[sampleint].COA[Dateadd(e.StartDate, -1).Dateint].MarketValue
@@ -204,11 +207,13 @@ func (e *Entity) FundMonteCarlo() {
 		}
 		// create slice for IRR
 		irrslice := make([]float64, duration)
-		for i := 0; i < duration; i++ {
+		emslice := map[int]FloatCOA{}
+		for i, date := 0, Dateadd(e.StartDate, -1); i < duration; i, date = i+1, Dateadd(date, 1) {
 			irrslice[i] = e.MCResultSlice.NCF[i][sim]
+			emslice[date.Dateint] = FloatCOA{NetCashFlow: e.MCResultSlice.NCF[i][sim]}
 		}
 		e.MCResultSlice.IRR[sim] = (math.Pow(IRRCalc(irrslice)+1, 12) - 1) * 100
-		// e.MCResultSlice.EM[sim] = EquityMultipleCalc(e.MCSlice[sim].StartDate, e.MCSlice[sim].SalesDate, e.MCSlice[sim].COA)
+		e.MCResultSlice.EM[sim] = EquityMultipleCalc(e.StartDate, e.SalesDate, emslice)
 
 		// fmt.Println(sim, e.MCResultSlice.NCF[sim])
 		// fmt.Println(e.MCResultSlice.IRR[sim])
@@ -229,7 +234,7 @@ func (e *Entity) FundMonteCarlo() {
 	e.MCResults.MarketValue, e.MCResults.MarketValueVaR = RibbonPlot(e.MCResultSlice.MarketValue, duration-0, 100, e.MCSetup.Sims)
 
 	e.MCResults.IRR = MCStatsCalc(e.MCResultSlice.IRR, e.MCSetup.Sims)
-	// e.MCResults.EM = MCStatsCalc(e.MCResultSlice.EM, e.MCSetup.Sims)
+	e.MCResults.EM = MCStatsCalc(e.MCResultSlice.EM, e.MCSetup.Sims)
 }
 
 // MCStatsCalc -
@@ -241,7 +246,7 @@ func MCStatsCalc(slice []float64, sims int) (stats MCStats) {
 		// Sample from normal dist to compare to observed IRR array
 		norm := make([]float64, len(slice))
 		for i := range norm {
-			norm[i] = NormalSample(mean, stdev)
+			norm[i] = NormalSample(mean, stdev, -999.9)
 		}
 		sort.Float64s(norm)
 		sort.Float64s(slice)
@@ -383,69 +388,4 @@ func RibbonPlot(matrix [][]float64, duration int, bucketnum int, sims int) (ribb
 		return ribbonslice, varpslice
 	}
 	return ribbonslice, varpslice
-}
-
-// BetaSample - give mu and stdev, alpha and beta are calculated, and then used to randomly sample the beta distribution
-func BetaSample(mu, stdev float64) float64 {
-	if stdev == 0 || mu == 0 {
-		return mu
-	}
-	v := math.Pow(stdev, 2)
-	alpha := ((1-mu)/v - 1/mu) * math.Pow(mu, 2)
-	beta := ((1-mu)/v - 1/mu) * mu * (1 - mu)
-	x := distuv.Beta{
-		Alpha: alpha,
-		Beta:  beta,
-	}
-	return x.Rand()
-}
-
-func AlphaCheck(mu, sigma float64) (alphaZero float64) {
-	var alpha = ((1-mu)/math.Pow(sigma, 2) - 1/mu) * math.Pow(mu, 2)
-	alphaZero = sigma
-	if alpha <= 0 {
-		mtwo := math.Pow(mu, 2)
-		mthree := math.Pow(mu, 3)
-		x := (mtwo - mthree)
-		alphaZero = math.Pow(x/mu, .5) - .00001
-		return alphaZero
-	}
-	return alphaZero
-}
-
-// BinomialSample - Skew must be between 0 and 1. a value of .5 indicates no Skew, <.5 is positive Skew and >.5 is negative Skew.
-func BinomialSample(expval float64, Skew float64) float64 {
-	if Skew == 0 {
-		return expval
-	}
-	n := expval / Skew
-	x := distuv.Binomial{
-		N: n,
-		P: Skew,
-	}
-	return math.Round(x.Rand())
-}
-
-// NormalSample -
-func NormalSample(mean float64, stdev float64) float64 {
-	if stdev == 0 {
-		return mean
-	}
-	x := distuv.Normal{
-		Mu:    mean,
-		Sigma: stdev,
-	}
-	return x.Rand()
-}
-
-// LogNormalSample -
-func LogNormalSample(mean float64, stdev float64) float64 {
-	if stdev == 0 {
-		return mean
-	}
-	x := distuv.LogNormal{
-		Mu:    mean,
-		Sigma: stdev,
-	}
-	return x.Rand()
 }

@@ -23,7 +23,6 @@ var ognApp = angular.module('ognApp', []);
 		$scope.mcdetailspage = 1;
 		$scope.mcdetailspagestotal = [[.entity.MCSetup.Sims]]/10;
 		$scope.mcdetailsorder = "";
-		$scope.strategy = [[.entity.Strategy]];
 
 		// getRequest - used to update the table (cf, irr...etc)
 		$scope.getRequest = function(route) {
@@ -40,9 +39,8 @@ var ognApp = angular.module('ognApp', []);
 
 		// getSettings
 		$scope.getSettings = function(entity){
-			var url = "http://localhost:8080/GetSettings?entity="+entity
+			var url = "http://localhost:8080/GetSettings?entity="+entity+"&tab="+$scope.settingsTab;
 			$scope.entity = entity;
-			
 			$http.post(url).then(
 				function successCallback(response) {
 					$scope.settingsResponse = $sce.trustAsHtml(response.data);
@@ -53,12 +51,13 @@ var ognApp = angular.module('ognApp', []);
 			);
 			$scope.getRequest($scope.tableTab);
 			$scope.getUnitTable(-1);
+
 		}; // /getSettings
 
 		// updateSettingsTab
 		$scope.updateSettingsTab = function(tab){
 			$scope.settingsTab = tab;
-		};
+		}; // /updateSettingsTab
 
 		// get
 		$scope.get = function(url){

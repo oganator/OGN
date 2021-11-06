@@ -11,6 +11,7 @@ func (e *Entity) MetricsCalc() {
 	ytm := IRR(&e.COA, Dateadd(e.StartDate, -1), e.SalesDate, FloatCOA{BondExpense: 1})
 	e.Metrics.BondHolder.YTM = math.Round(ytm*100) / 100
 	e.Duration()
+	e.Metrics.BondHolder.YTMDUR = e.Metrics.BondHolder.YTM / e.Metrics.BondHolder.Duration
 	e.Metrics.EM.NetLeveredAfterTax = EquityMultipleCalc(e.StartDate, e.SalesDate, e.COA)
 }
 

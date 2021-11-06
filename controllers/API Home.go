@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"fmt"
-
 	"github.com/astaxie/beego"
 )
 
@@ -32,9 +30,8 @@ func GetStringSettings(c *SettingsController, field string) string {
 func (c *SettingsController) Post() {
 	temp := make(map[interface{}]interface{})
 	tempkey := EntitiesList[GetStringSettings(c, "entity")]
+	temp["tab"] = GetStringSettings(c, "tab")
 	temp["entity"] = Entities[tempkey]
-	temp["strategy"] = Entities[tempkey].Strategy
 	c.TplName = "Settings.tpl"
-	fmt.Println(Entities[tempkey].Strategy, Entities[tempkey].Name)
 	c.Data = temp
 }
