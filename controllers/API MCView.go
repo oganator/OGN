@@ -155,6 +155,9 @@ func (c *MCTabsController) Post() {
 	case "duration":
 		temp["data"] = Entities[tempkey].MCResults.Duration
 		c.TplName = "MCHist.tpl"
+	case "ytmdur":
+		temp["data"] = Entities[tempkey].MCResults.YTMDUR
+		c.TplName = "MCHist.tpl"
 	}
 	c.Data = temp
 }

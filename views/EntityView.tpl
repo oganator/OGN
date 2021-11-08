@@ -73,6 +73,9 @@
 				<li class="nav-item">
 					<a class="nav-link" id="durationtabletab" data-toggle="tab" href="#durationtabletab" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('duration')">Duration</a>
 				</li>
+				<li class="nav-item">
+					<a class="nav-link" id="ytmdurtabletab" data-toggle="tab" href="#ytmdurtabletab" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('ytmdur')">YTM/DUR</a>
+				</li>
 			</ul>
 		</div>
 		<div class="container-fluid shadow-lg rounded" style="width: 95%; overflow-x:scroll;">
