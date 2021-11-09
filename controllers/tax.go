@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -42,7 +41,6 @@ func (e *Entity) CIT() {
 			e.COA[e.SalesDate.Dateint] = temp
 			break
 		}
-		fmt.Printf("%+v\n", temp)
 		temp.Add(e.COA[date.Dateint])
 		e.COA[date.Dateint] = temp
 		taxyear++
