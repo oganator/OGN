@@ -1,8 +1,8 @@
 package controllers
 
 // MakeTable - Date, COA, Amount
-func (e *Entity) MakeTable(coas BoolCOA) {
-	e.CreateTableHeader(false, false, true)
+func (e *Entity) MakeTable(coas BoolCOA, monthly bool, quarterly bool, yearly bool) {
+	e.CreateTableHeader(true, quarterly, yearly)
 	e.Table = make([]TableJSON, 0)
 	marketvalue := make(map[int]string)
 	totalerv := make(map[int]string)
@@ -19,6 +19,8 @@ func (e *Entity) MakeTable(coas BoolCOA) {
 	debt := make(map[int]string)
 	acqdispcosts := make(map[int]string)
 	tax := make(map[int]string)
+	taxableincome := make(map[int]string)
+	depreciation := make(map[int]string)
 	fees := make(map[int]string)
 	operatingincome := make(map[int]string)
 	operatingexpenses := make(map[int]string)
@@ -57,6 +59,8 @@ func (e *Entity) MakeTable(coas BoolCOA) {
 			debt[date.Year] = RenderFloat("#,###.", e.COA[date.Year].Debt)
 			acqdispcosts[date.Year] = RenderFloat("#,###.", e.COA[date.Year].AcqDispCosts)
 			tax[date.Year] = RenderFloat("#,###.", e.COA[date.Year].Tax)
+			taxableincome[date.Year] = RenderFloat("#,###.", e.COA[date.Year].TaxableIncome)
+			depreciation[date.Year] = RenderFloat("#,###.", e.COA[date.Year].Depreciation)
 			fees[date.Year] = RenderFloat("#,###.", e.COA[date.Year].Fees)
 			operatingincome[date.Year] = RenderFloat("#,###.", e.COA[date.Year].OperatingIncome)
 			operatingexpenses[date.Year] = RenderFloat("#,###.", e.COA[date.Year].OperatingExpenses)
@@ -95,6 +99,8 @@ func (e *Entity) MakeTable(coas BoolCOA) {
 		debt[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].Debt)
 		acqdispcosts[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].AcqDispCosts)
 		tax[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].Tax)
+		taxableincome[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].TaxableIncome)
+		depreciation[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].Depreciation)
 		fees[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].Fees)
 		operatingincome[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].OperatingIncome)
 		operatingexpenses[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].OperatingExpenses)
@@ -330,6 +336,20 @@ func (e *Entity) MakeTable(coas BoolCOA) {
 		}
 		e.Table = append(e.Table, x)
 	}
+	if coas.TaxableIncome == true {
+		x := TableJSON{
+			COA:   "Taxable Income",
+			Value: taxableincome,
+		}
+		e.Table = append(e.Table, x)
+	}
+	if coas.Depreciation == true {
+		x := TableJSON{
+			COA:   "Depreciation",
+			Value: depreciation,
+		}
+		e.Table = append(e.Table, x)
+	}
 	if coas.Fees == true {
 		x := TableJSON{
 			COA:   "Fees",
@@ -410,6 +430,8 @@ type BoolCOA struct {
 	LoanBalance             bool
 	Debt                    bool
 	Tax                     bool
+	TaxableIncome           bool
+	Depreciation            bool
 	Fees                    bool
 	NetCashFlow             bool
 	CashBalance             bool
@@ -449,6 +471,8 @@ type FloatCOA struct {
 	LoanBalance             float64
 	Debt                    float64
 	Tax                     float64
+	TaxableIncome           float64
+	Depreciation            float64
 	Fees                    float64
 	NetCashFlow             float64
 	CashBalance             float64

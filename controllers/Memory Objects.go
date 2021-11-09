@@ -21,10 +21,10 @@ var GrowthItemsStore = make(map[int]map[string]float64)
 // Entities - MasterID as key
 var Entities = map[int]*Entity{}
 
-// EnitiesList -
+// EnitiesList - all entities, funds and assets
 var EntitiesList = make(map[string]int)
 
-// ModelsList -
+// ModelsList - Just the Assets, no funds
 var ModelsList = make(map[string]int)
 
 // FundsList -

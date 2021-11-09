@@ -64,6 +64,6 @@ func (e *Entity) CalculateFund() {
 		coas.BondIncome = false
 		coas.BondExpense = false
 	}
-	e.MakeTable(coas)
+	e.MakeTable(coas, false, false, true)
 	e.MetricsCalc()
 }

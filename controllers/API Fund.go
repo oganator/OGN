@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"strconv"
 
 	beego "github.com/astaxie/beego"
@@ -59,6 +58,5 @@ func (c *FundController) Post() {
 	temp["modelslist"] = ModelsList
 	temp["fundslist"] = FundsList
 	c.TplName = "EntityView.tpl"
-	fmt.Println(Entities[key].Strategy)
 	c.Data = temp
 }

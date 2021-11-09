@@ -75,6 +75,7 @@ func (c *ViewEntityController) Post() {
 	EntityStore[key].GLA.Probability = GetFloat(c, "probability") / 100
 	EntityStore[key].GLA.RentIncentives.Duration = GetInt(c, "incentivemonths")
 	EntityStore[key].GLA.RentIncentives.PercentOfContractRent = GetFloat(c, "incentivepercent") / 100
+	EntityStore[key].GLA.FitOutCosts.AmountPerTotalArea = GetFloat(c, "fitoutcosts")
 	EntityStore[key].OpExpercent = GetFloat(c, "opex") / 100
 	EntityStore[key].Fees = GetFloat(c, "fees")
 	EntityStore[key].GLA.Default.Hazard = GetFloat(c, "hazard") / 100
@@ -114,7 +115,7 @@ func (c *ViewEntityController) Post() {
 	if Entities[key].Parent != Entities[key] && Entities[key].MCSetup.Sims >= 100 {
 		Entities[key].MonteCarlo()
 	}
-	Entities[key].MultiplyInputs()
+	// Entities[key].MultiplyInputs()
 	temp["entity"] = Entities[key]
 	// temp["entityName"] = GetString(c, "name")
 	temp["modelslist"] = ModelsList

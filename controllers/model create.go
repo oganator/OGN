@@ -205,7 +205,6 @@ func (e *Entity) CalculateModel(mc bool) {
 				OperatingIncome:         false,
 				OperatingExpenses:       true,
 				NetOperatingIncome:      true,
-				Capex:                   false,
 				AcqDispProperty:         true,
 				AcqDispCosts:            false,
 				LoanProceeds:            false,
@@ -213,6 +212,9 @@ func (e *Entity) CalculateModel(mc bool) {
 				LoanBalance:             false,
 				Debt:                    false,
 				Tax:                     true,
+				TaxableIncome:           true,
+				Depreciation:            true,
+				Capex:                   true,
 				Fees:                    true,
 				NetCashFlow:             true,
 				CashBalance:             true,
@@ -227,7 +229,7 @@ func (e *Entity) CalculateModel(mc bool) {
 				coas.BondIncome = false
 				coas.BondExpense = false
 			}
-			e.MakeTable(coas)
+			e.MakeTable(coas, false, false, true)
 		}
 		e.MetricsCalc()
 	}

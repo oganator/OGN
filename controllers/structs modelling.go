@@ -60,5 +60,6 @@ type CostInput struct {
 	PercentOfNAV          float64
 	PercentOfGAV          float64
 	IsCapitalized         bool
-	Duration              int // number of months
+	Duration              int  // number of months
+	IsIndexed             bool // if true, the cost grows with CPI
 }

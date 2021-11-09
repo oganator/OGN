@@ -45,6 +45,7 @@ func (c *MCIndexController) Post() {
 		InterestExpense:         true,
 		Tax:                     true,
 		Fees:                    true,
+		Capex:                   true,
 		NetCashFlow:             true,
 		CashBalance:             true,
 		BondIncome:              true,
@@ -56,7 +57,7 @@ func (c *MCIndexController) Post() {
 		coas.BondIncome = false
 		coas.Debt = true
 	}
-	Entities[tempkey].MCSlice[index].MakeTable(coas)
+	Entities[tempkey].MCSlice[index].MakeTable(coas, false, false, true)
 	temp["entity"] = Entities[tempkey].MCSlice[index]
 	c.TplName = "CFTable.tpl"
 	c.Data = temp

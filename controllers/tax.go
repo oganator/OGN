@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"math"
 )
 
@@ -35,12 +36,13 @@ func (e *Entity) CIT() {
 		} else {
 			taxespayable = taxableincome * .15
 		}
-		temp := FloatCOA{Tax: -taxespayable}
+		temp := FloatCOA{Tax: -taxespayable, Depreciation: 1.0, TaxableIncome: 2.0}
 		if date.Dateint == Dateadd(e.SalesDate, 5).Dateint {
 			temp.Add(e.COA[e.SalesDate.Dateint])
 			e.COA[e.SalesDate.Dateint] = temp
 			break
 		}
+		fmt.Printf("%+v\n", temp)
 		temp.Add(e.COA[date.Dateint])
 		e.COA[date.Dateint] = temp
 		taxyear++
@@ -49,8 +51,7 @@ func (e *Entity) CIT() {
 
 // Depreciation -
 func Depreciation(e *Entity) float64 {
-	depr := (-e.Valuation.AcqPrice - (-e.Valuation.AcqPrice * e.Tax.MinValue) - (-e.Valuation.AcqPrice * e.Tax.LandValue)) / float64(e.Tax.UsablePeriod)
-	return depr
+	return (-e.Valuation.AcqPrice - (-e.Valuation.AcqPrice * e.Tax.MinValue) - (-e.Valuation.AcqPrice * e.Tax.LandValue)) / float64(e.Tax.UsablePeriod)
 }
 
 // CarryBack -

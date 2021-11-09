@@ -85,7 +85,7 @@ func (c *ViewUnitCFController) Post() {
 		OperatingIncome:         true,
 		Capex:                   true,
 		NetCashFlow:             true,
-	})
+	}, true, false, true)
 	temp["entity"] = &tempentity
 	c.TplName = "CFTable.tpl"
 	c.Data = temp

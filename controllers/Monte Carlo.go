@@ -280,7 +280,14 @@ func MCStatsCalc(slice []float64, sims int) (stats MCStats) {
 		}
 		histslice := make(plotter.Values, sims)
 		histslice = slice
-		raw, _ := plotter.NewHist(histslice, 100)
+		raw := &plotter.Histogram{}
+		if _, err := plotter.NewHist(histslice, 100); err != nil {
+			time.Sleep(10000 * time.Millisecond)
+			fmt.Println("MCStatsCalc Error")
+			raw, _ = plotter.NewHist(histslice, 100)
+		} else {
+			raw, _ = plotter.NewHist(histslice, 100)
+		}
 		stats.Hist.Vals = make([]float64, 100)
 		stats.Hist.Keys = make([]float64, 100)
 		for i := 1; i <= 100; i++ {
@@ -350,8 +357,6 @@ func RibbonPlot(matrix [][]float64, duration int, bucketnum int, sims int) (ribb
 		}
 		for i, v := range matrix {
 			sort.Float64s(v)
-			//histslice := make(plotter.Values, duration)
-			//histslice = v
 			raw := &plotter.Histogram{}
 			if _, err := plotter.NewHist(make(plotter.Values, duration), bucketnum); err != nil {
 				time.Sleep(10000 * time.Millisecond)

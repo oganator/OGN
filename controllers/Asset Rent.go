@@ -4,6 +4,8 @@ import (
 	"math"
 	"math/rand"
 	"sync"
+
+	"gonum.org/v1/gonum/floats"
 )
 
 // AssetRentCalc - Calculates up to NOI. calculates units concurrently, then sums at entity level.
@@ -26,9 +28,11 @@ func (e *Entity) AssetRentCalc(mc bool) {
 			bondincome := uu.BondIncome
 			for date := ee.StartDate; date.Dateint <= ee.EndDate.Dateint; date.Add(1) {
 				passingrent, indexation := IndexCalc(uu, date, ee, mcmc)
+				// CAPEX - create capex before a pointer to it is sent to vacancy and rent incentives, that way they can both modify it
+				capex := 0.0
 				// VACANCY
-				vacancy, void := VacancyCalc(mcmc, uu, date, ee)
-				capex, rentfree := RentIncentivesCalc(date, uu)
+				vacancy, void := VacancyCalc(mcmc, uu, date, ee, &capex)
+				rentfree := RentIncentivesCalc(date, uu, &capex)
 				// BPUPLIFT
 				var bpuplift float64
 				var bondexpense float64
@@ -123,41 +127,59 @@ func IndexCalc(uu *Unit, date Datetype, ee *Entity, mcmc bool) (float64, float64
 	return passingrent, indexation
 }
 
-func RentIncentivesCalc(date Datetype, uu *Unit) (capex float64, rentfree float64) {
+func RentIncentivesCalc(date Datetype, uu *Unit, capex *float64) (rentfree float64) {
+	// RENEW
 	if date.Dateint <= uu.RentSchedule.RentIncentivesEndRenew.Dateint {
 		if uu.RentIncentives.IsCapitalized {
-			capex = capex + uu.RentSchedule.RenewRent*-uu.RentIncentives.PercentOfContractRent
+			*capex = *capex + uu.RentSchedule.RenewRent*-uu.RentIncentives.PercentOfContractRent
 		} else {
 			rentfree = uu.RentSchedule.RenewRent * -uu.RentIncentives.PercentOfContractRent
 		}
 	}
+	// ROTATE
 	if date.Dateint <= uu.RentSchedule.RentIncentivesEndRotate.Dateint && date.Dateint > uu.RentSchedule.VacancyEnd.Dateint {
 		if uu.RentIncentives.IsCapitalized {
-			capex = capex + uu.RentSchedule.RotateRent*-uu.RentIncentives.PercentOfContractRent
+			*capex = *capex + uu.RentSchedule.RotateRent*-uu.RentIncentives.PercentOfContractRent
 		} else {
 			rentfree = rentfree + uu.RentSchedule.RotateRent*-uu.RentIncentives.PercentOfContractRent
 		}
 	}
-	return capex, rentfree
+	return rentfree
 }
 
-func VacancyCalc(mcmc bool, uu *Unit, date Datetype, ee *Entity) (vacancy float64, void float64) {
+func FitOutCostsCalc(uu *Unit, date Datetype) float64 {
+	endingindex := 1.0
+	// uu.FitOutCosts.AmountPerTotalArea = 15.0
+	uu.FitOutCosts.IsIndexed = true
+	if uu.FitOutCosts.IsIndexed {
+		endingindex = uu.Parent.Growth["CPI"][date.Dateint]
+	}
+	voidslice := []float64{float64(uu.Void), 1.0}
+	void := floats.Max(voidslice)
+	return uu.FitOutCosts.AmountPerTotalArea * uu.ERVArea * -endingindex / void
+}
+
+func VacancyCalc(mcmc bool, uu *Unit, date Datetype, ee *Entity, capex *float64) (vacancy float64, void float64) {
 	void = 1.0
 	switch {
-	case mcmc && uu.RSStore[len(uu.RSStore)-1].DefaultDate.Year > 1:
+	case mcmc && uu.RSStore[len(uu.RSStore)-1].DefaultDate.Year > 1: // case - tenant has just defaulted
 		if date.Dateint <= uu.RentSchedule.VacancyEnd.Dateint {
 			vacancy = -uu.ERVAmount * uu.ERVArea * ee.Growth["ERV"][date.Dateint] / 12
+			duration := dateintdiff(uu.RSStore[len(uu.RSStore)-1].DefaultDate.Dateint, uu.RSStore[len(uu.RSStore)-1].StartDate.Dateint)
+			*capex = *capex + FitOutCostsCalc(uu, date)*float64((duration/uu.EXTDuration))
 			void = 0.0
 		}
 	case mcmc:
 		if date.Dateint <= uu.RentSchedule.VacancyEnd.Dateint {
 			vacancy = -uu.ERVAmount * uu.ERVArea * uu.RentSchedule.ProbabilitySim / 12 * ee.Growth["ERV"][date.Dateint]
 			void = 0.0
+			*capex = *capex + FitOutCostsCalc(uu, date)
 		}
 	case !mcmc:
 		if date.Dateint <= uu.RentSchedule.VacancyEnd.Dateint {
 			vacancy = -uu.ERVAmount * uu.ERVArea * (1 - uu.RentSchedule.Probability) / 12 * ee.Growth["ERV"][date.Dateint]
 			void = 0.0
+			*capex = *capex + FitOutCostsCalc(uu, date)
 		}
 	}
 	return vacancy, void
