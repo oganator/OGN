@@ -89,6 +89,10 @@ func AddCOA(x, y FloatCOA) FloatCOA {
 		LoanBalance:             x.LoanBalance + y.LoanBalance,
 		Debt:                    x.Debt + y.Debt,
 		Tax:                     x.Tax + y.Tax,
+		TaxableIncome:           x.TaxableIncome + y.TaxableIncome,
+		TaxableIncomeCarryBack:  x.TaxableIncomeCarryBack + y.TaxableIncomeCarryBack,
+		DTA:                     x.DTA + y.DTA,
+		Depreciation:            x.Depreciation + y.Depreciation,
 		Fees:                    x.Fees + y.Fees,
 		NetCashFlow:             x.NetCashFlow + y.NetCashFlow,
 		CashBalance:             x.CashBalance + y.CashBalance,
@@ -130,6 +134,10 @@ func MultiplyCOA(x, y FloatCOA) FloatCOA {
 		LoanBalance:             x.LoanBalance * y.LoanBalance,
 		Debt:                    x.Debt * y.Debt,
 		Tax:                     x.Tax * y.Tax,
+		TaxableIncome:           x.TaxableIncome * y.TaxableIncome,
+		TaxableIncomeCarryBack:  x.TaxableIncomeCarryBack * y.TaxableIncomeCarryBack,
+		DTA:                     x.DTA * y.DTA,
+		Depreciation:            x.Depreciation * y.Depreciation,
 		Fees:                    x.Fees * y.Fees,
 		NetCashFlow:             x.NetCashFlow * y.NetCashFlow,
 		CashBalance:             x.CashBalance * y.CashBalance,
@@ -171,6 +179,10 @@ func SumCOAAcross(x, y FloatCOA) FloatCOA {
 		LoanBalance:             x.LoanBalance + y.LoanBalance,
 		Debt:                    x.Debt + y.Debt,
 		Tax:                     x.Tax + y.Tax,
+		TaxableIncome:           x.TaxableIncome + y.TaxableIncome,
+		TaxableIncomeCarryBack:  x.TaxableIncomeCarryBack + y.TaxableIncomeCarryBack,
+		DTA:                     x.DTA + y.DTA,
+		Depreciation:            x.Depreciation + y.Depreciation,
 		Fees:                    x.Fees + y.Fees,
 		NetCashFlow:             x.NetCashFlow + y.NetCashFlow,
 		CashBalance:             y.CashBalance,
@@ -211,6 +223,10 @@ func SumCOADown(x FloatCOA) float64 {
 		x.LoanBalance +
 		x.Debt +
 		x.Tax +
+		x.TaxableIncome +
+		x.TaxableIncomeCarryBack +
+		x.DTA +
+		x.Depreciation +
 		x.Fees +
 		x.NetCashFlow +
 		x.CashBalance +

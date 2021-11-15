@@ -20,6 +20,8 @@ func (e *Entity) MakeTable(coas BoolCOA, monthly bool, quarterly bool, yearly bo
 	acqdispcosts := make(map[int]string)
 	tax := make(map[int]string)
 	taxableincome := make(map[int]string)
+	taxableincomecarryback := make(map[int]string)
+	dta := make(map[int]string)
 	depreciation := make(map[int]string)
 	fees := make(map[int]string)
 	operatingincome := make(map[int]string)
@@ -60,6 +62,8 @@ func (e *Entity) MakeTable(coas BoolCOA, monthly bool, quarterly bool, yearly bo
 			acqdispcosts[date.Year] = RenderFloat("#,###.", e.COA[date.Year].AcqDispCosts)
 			tax[date.Year] = RenderFloat("#,###.", e.COA[date.Year].Tax)
 			taxableincome[date.Year] = RenderFloat("#,###.", e.COA[date.Year].TaxableIncome)
+			taxableincomecarryback[date.Year] = RenderFloat("#,###.", e.COA[date.Year].TaxableIncomeCarryBack)
+			dta[date.Year] = RenderFloat("#,###.", e.COA[date.Year].DTA)
 			depreciation[date.Year] = RenderFloat("#,###.", e.COA[date.Year].Depreciation)
 			fees[date.Year] = RenderFloat("#,###.", e.COA[date.Year].Fees)
 			operatingincome[date.Year] = RenderFloat("#,###.", e.COA[date.Year].OperatingIncome)
@@ -100,6 +104,8 @@ func (e *Entity) MakeTable(coas BoolCOA, monthly bool, quarterly bool, yearly bo
 		acqdispcosts[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].AcqDispCosts)
 		tax[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].Tax)
 		taxableincome[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].TaxableIncome)
+		taxableincomecarryback[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].TaxableIncomeCarryBack)
+		dta[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].DTA)
 		depreciation[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].Depreciation)
 		fees[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].Fees)
 		operatingincome[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].OperatingIncome)
@@ -343,6 +349,20 @@ func (e *Entity) MakeTable(coas BoolCOA, monthly bool, quarterly bool, yearly bo
 		}
 		e.Table = append(e.Table, x)
 	}
+	if coas.TaxableIncomeCarryBack == true {
+		x := TableJSON{
+			COA:   "Taxable Income Carry Back",
+			Value: taxableincomecarryback,
+		}
+		e.Table = append(e.Table, x)
+	}
+	if coas.DTA == true {
+		x := TableJSON{
+			COA:   "DTA",
+			Value: dta,
+		}
+		e.Table = append(e.Table, x)
+	}
 	if coas.Depreciation == true {
 		x := TableJSON{
 			COA:   "Depreciation",
@@ -431,6 +451,8 @@ type BoolCOA struct {
 	Debt                    bool
 	Tax                     bool
 	TaxableIncome           bool
+	TaxableIncomeCarryBack  bool
+	DTA                     bool
 	Depreciation            bool
 	Fees                    bool
 	NetCashFlow             bool
@@ -472,6 +494,8 @@ type FloatCOA struct {
 	Debt                    float64
 	Tax                     float64
 	TaxableIncome           float64
+	TaxableIncomeCarryBack  float64
+	DTA                     float64
 	Depreciation            float64
 	Fees                    float64
 	NetCashFlow             float64

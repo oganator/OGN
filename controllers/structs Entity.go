@@ -68,6 +68,7 @@ type Unit struct {
 	ERVArea            float64        `json:"ERVArea,omitempty"`            //
 	ERVAmount          float64        `json:"ERVAmount,omitempty"`          //
 	COA                IntFloatCOAMap `json:"COA,omitempty"`                // Contains monthly values, as well as yearly values (rolling or calendar) up to the sales date\
+	CapexQueue         IntFloatMap    `json:CapexQueue,omitempty"`          //
 }
 
 // ChildEntities -

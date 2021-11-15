@@ -103,6 +103,7 @@ func WriteXLSXEntities(e *Entity) {
 	XLSX.SetCellValue("Entities", "W"+fmt.Sprint(rows), e.Tax.RETT)
 	XLSX.SetCellValue("Entities", "X"+fmt.Sprint(rows), e.Tax.VAT)
 	XLSX.SetCellValue("Entities", "Y"+fmt.Sprint(rows), e.Tax.MinValue)
+	XLSX.SetCellValue("Entities", "Z"+fmt.Sprint(rows), e.Tax.UsablePeriod)
 	XLSX.SetCellValue("Entities", "AA"+fmt.Sprint(rows), e.Tax.LandValue)
 	XLSX.SetCellValue("Entities", "AB"+fmt.Sprint(rows), e.DebtInput.LTV)
 	XLSX.SetCellValue("Entities", "AC"+fmt.Sprint(rows), e.DebtInput.InterestRate)
@@ -133,6 +134,7 @@ func WriteXLSXEntities(e *Entity) {
 	XLSX.SetCellValue("Entities", "BB"+fmt.Sprint(rows), e.GLA.Default.Hazard)
 	XLSX.SetCellValue("Entities", "BC"+fmt.Sprint(rows), e.GLA.RentIncentives.Duration)
 	XLSX.SetCellValue("Entities", "BD"+fmt.Sprint(rows), e.GLA.RentIncentives.PercentOfContractRent)
+	XLSX.SetCellValue("Entities", "BF"+fmt.Sprint(rows), e.GLA.FitOutCosts.AmountPerTotalArea)
 	XLSX.Save()
 }
 
@@ -222,8 +224,10 @@ func ReadXLSX() {
 		tempentity.GLA.Default.Hazard, _ = strconv.ParseFloat(row[53], 64)
 		tempentity.GLA.RentIncentives.Duration, _ = strconv.Atoi(row[54])
 		tempentity.GLA.RentIncentives.PercentOfContractRent, _ = strconv.ParseFloat(row[55], 64)
+		tempentity.GLA.FitOutCosts.AmountPerTotalArea, _ = strconv.ParseFloat(row[57], 64)
 		EntityStore[tempentity.MasterID] = &tempentity
 	}
+
 	// UNITS
 	units, _ := XLSX.GetRows("Units")
 	// unitfile, _ := os.Open("./models/Units.csv")

@@ -107,7 +107,7 @@ type ByHazard []*Entity
 
 func (a ByHazard) Len() int { return len(a) }
 func (a ByHazard) Less(i, j int) bool {
-	return float64(a[i].GLA.Default.Hazard) < float64(a[j].GLA.Default.Hazard)
+	return float64(a[i].GLA.Default.NumberOfDefaults) < float64(a[j].GLA.Default.NumberOfDefaults)
 }
 func (a ByHazard) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
@@ -115,7 +115,7 @@ type ByHazardr []*Entity
 
 func (a ByHazardr) Len() int { return len(a) }
 func (a ByHazardr) Less(i, j int) bool {
-	return float64(a[i].GLA.Default.Hazard) > float64(a[j].GLA.Default.Hazard)
+	return float64(a[i].GLA.Default.NumberOfDefaults) > float64(a[j].GLA.Default.NumberOfDefaults)
 }
 func (a ByHazardr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 

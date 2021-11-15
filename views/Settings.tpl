@@ -179,70 +179,70 @@
         [[$erv := index .entity.GrowthInput "ERV"]]
         <div class="form-group col-sm-1">
             <label for="ervshorttermrate">ERV Short Rate</label>
-            <input type="text" class="form-control" id="ervshorttermrate" name="ervshorttermrate" Value='{{[[$erv.ShortTermRate]] * 100 | number:2}}'>
+            <input type="text" class="form-control" id="ervshorttermrate" name="ervshorttermrate" Value="{{[[$erv.ShortTermRate]] * 100 | number:2}}">
             </div>
         <div class="form-group col-sm-1">
             <label for="ervshorttermperiod">ERV Short Period</label>
-            <input type="text" class="form-control" id="ervshorttermperiod" name="ervshorttermperiod" Value='[[$erv.ShortTermPeriod]] '>
+            <input type="text" class="form-control" id="ervshorttermperiod" name="ervshorttermperiod" Value="[[$erv.ShortTermPeriod]]">
         </div>
         <div class="form-group col-sm-1">
             <label for="ervtransitionperiod">ERV Transition Period</label>
-            <input type="text" class="form-control" id="ervtransitionperiod" name="ervtransitionperiod" Value='[[$erv.TransitionPeriod]]'>
+            <input type="text" class="form-control" id="ervtransitionperiod" name="ervtransitionperiod" Value="[[$erv.TransitionPeriod]]">
         </div>
         <div class="form-group col-sm-1">
             <label for="ervlongtermrate">ERV Long Rate</label>
-            <input type="text" class="form-control" id="ervlongtermrate" name="ervlongtermrate" Value='{{[[$erv.LongTermRate]] * 100 | number:2}}'>
+            <input type="text" class="form-control" id="ervlongtermrate" name="ervlongtermrate" Value="{{[[$erv.LongTermRate]] * 100 | number:2}}">
         </div>
         [[$cpi := index .entity.GrowthInput "CPI"]]
         <div class="form-group col-sm-1">
             <label for="cpishorttermrate">CPI Short Rate</label>
-            <input type="text" class="form-control" id="cpishorttermrate" name="cpishorttermrate" Value='{{[[$cpi.ShortTermRate]] * 100 | number:2}}'>
+            <input type="text" class="form-control" id="cpishorttermrate" name="cpishorttermrate" Value="{{[[$cpi.ShortTermRate]] * 100 | number:2}}">
             </div>
         <div class="form-group col-sm-1">
             <label for="cpishorttermperiod">CPI Short Period</label>
-            <input type="text" class="form-control" id="cpishorttermperiod" name="cpishorttermperiod" Value='[[$cpi.ShortTermPeriod]]'>
+            <input type="text" class="form-control" id="cpishorttermperiod" name="cpishorttermperiod" Value="[[$cpi.ShortTermPeriod]]">
         </div>
         <div class="form-group col-sm-1">
             <label for="cpitransitionperiod">CPI Transition Period</label>
-            <input type="text" class="form-control" id="cpitransitionperiod" name="cpitransitionperiod" Value='[[$cpi.TransitionPeriod]]'>
+            <input type="text" class="form-control" id="cpitransitionperiod" name="cpitransitionperiod" Value="[[$cpi.TransitionPeriod]]">
         </div>
         <div class="form-group col-sm-1">
             <label for="cpilongtermrate">CPI Long Rate</label>
-            <input type="text" class="form-control" id="cpilongtermrate" name="cpilongtermrate" Value='{{[[$cpi.LongTermRate]] * 100 | number:2}}'>
+            <input type="text" class="form-control" id="cpilongtermrate" name="cpilongtermrate" Value="{{[[$cpi.LongTermRate]] * 100 | number:2}}">
         </div>
     </div>
     <div class="form-row">
         <div class="form-group col-sm-1">
             <label for="ervshorttermratesigma"></label>
-            <input type="text" class="form-control" id="ervshorttermratesigma" name="ervshorttermratesigma" Value='{{[[.entity.MCSetup.ERV.ShortTermRate]] * 100 | number:2}}'>
+            <input type="text" class="form-control" id="ervshorttermratesigma" name="ervshorttermratesigma" Value="{{[[.entity.MCSetup.ERV.ShortTermRate]] * 100 | number:2}}">
             </div>
         <div class="form-group col-sm-1">
             <label for="ervshorttermperiodsigma"></label>
-            <input type="text" class="form-control" id="ervshorttermperiodsigma" name="ervshorttermperiodsigma" Value='[[.entity.MCSetup.ERV.ShortTermPeriod]]'>
+            <input type="text" class="form-control" id="ervshorttermperiodsigma" name="ervshorttermperiodsigma" Value="[[.entity.MCSetup.ERV.ShortTermPeriod]]">
         </div>
         <div class="form-group col-sm-1">
             <label for="ervtransitionperiodsigma"></label>
-            <input type="text" class="form-control" id="ervtransitionperiodsigma" name="ervtransitionperiodsigma" Value='[[.entity.MCSetup.ERV.TransitionPeriod]]'>
+            <input type="text" class="form-control" id="ervtransitionperiodsigma" name="ervtransitionperiodsigma" Value="[[.entity.MCSetup.ERV.TransitionPeriod]]">
         </div>
         <div class="form-group col-sm-1">
             <label for="ervlongtermratesigma"></label>
-            <input type="text" class="form-control" id="ervlongtermratesigma" name="ervlongtermratesigma" Value='{{[[.entity.MCSetup.ERV.LongTermRate]] * 100 | number:2}}'>
+            <input type="text" class="form-control" id="ervlongtermratesigma" name="ervlongtermratesigma" Value="{{[[.entity.MCSetup.ERV.LongTermRate]] * 100 | number:2}}">
         </div>
         <div class="form-group col-sm-1">
             <label for="cpishorttermratesigma"></label>
-            <input type="text" class="form-control" id="cpishorttermratesigma" name="cpishorttermratesigma" Value='{{[[.entity.MCSetup.CPI.ShortTermRate]] * 100 | number:2}}'>
+            <input type="text" class="form-control" id="cpishorttermratesigma" name="cpishorttermratesigma" Value="{{[[.entity.MCSetup.CPI.ShortTermRate]] * 100 | number:2}}">
             </div>
         <div class="form-group col-sm-1">
             <label for="cpishorttermperiodsigma"></label>
-            <input type="text" class="form-control" id="cpishorttermperiodsigma" name="cpishorttermperiodsigma" Value='[[.entity.MCSetup.CPI.ShortTermPeriod]]'>
+            <input type="text" class="form-control" id="cpishorttermperiodsigma" name="cpishorttermperiodsigma" Value="[[.entity.MCSetup.CPI.ShortTermPeriod]]">
         </div>
         <div class="form-group col-sm-1">
             <label for="cpitransitionperiodsigma"></label>
-            <input type="text" class="form-control" id="cpitransitionperiodsigma" name="cpitransitionperiodsigma" Value='[[.entity.MCSetup.CPI.TransitionPeriod]]'>
+            <input type="text" class="form-control" id="cpitransitionperiodsigma" name="cpitransitionperiodsigma" Value="[[.entity.MCSetup.CPI.TransitionPeriod]]">
         </div>
         <div class="form-group col-sm-1">
             <label for="cpilongtermratesigma"></label>
-            <input type="text" class="form-control" id="cpilongtermratesigma" name="cpilongtermratesigma" Value='{{[[.entity.MCSetup.CPI.LongTermRate]] * 100 | number:2}}'>
+            <input type="text" class="form-control" id="cpilongtermratesigma" name="cpilongtermratesigma" Value="{{[[.entity.MCSetup.CPI.LongTermRate]] * 100 | number:2}}">
         </div>
     </div>
     <br>
@@ -254,33 +254,33 @@
         <div class="form-row">
             <div class="form-group col-sm-1">
                 <label for="rett">RETT</label>
-                <input type="text" class="form-control" id="rett" name="rett" Value='{{[[.entity.Tax.RETT]] * 100 | number:2}}'>
+                <input type="text" class="form-control" id="rett" name="rett" Value="{{[[.entity.Tax.RETT]] * 100 | number:2}}">
                 </div>
             <div class="form-group col-sm-1">
                 <label for="landvalue">Land Value</label>
-                <input type="text" class="form-control" id="landvalue" name="landvalue" Value='{{[[.entity.Tax.LandValue]] * 100 | number:2}}'>
+                <input type="text" class="form-control" id="landvalue" name="landvalue" Value="{{[[.entity.Tax.LandValue]] * 100 | number:2}}">
             </div>
             <div class="form-group col-sm-1">
                 <label for="minvalue">Min Depreciable Value</label>
-                <input type="text" class="form-control" id="minvalue" name="minvalue" Value='{{[[.entity.Tax.MinValue]] * 100 | number:2}}'>
+                <input type="text" class="form-control" id="minvalue" name="minvalue" Value="{{[[.entity.Tax.MinValue]] * 100 | number:2}}">
             </div>
             <div class="form-group col-sm-1">
                 <label for="usableperiod">Depreciation Period</label>
-                <input type="text" class="form-control" id="usableperiod" name="usableperiod" Value='[[.entity.Tax.UsablePeriod]]'>
+                <input type="text" class="form-control" id="usableperiod" name="usableperiod" Value="[[.entity.Tax.UsablePeriod]]">
             </div>
         </div>
         <div class="form-row">
             <div class="form-group col-sm-1">
                 <label for="vat">VAT</label>
-                <input type="text" class="form-control" id="vat" name="vat" Value='{{[[.entity.Tax.VAT]] * 100 | number:2}}'>
+                <input type="text" class="form-control" id="vat" name="vat" Value="{{[[.entity.Tax.VAT]] * 100 | number:2}}">
                 </div>
             <div class="form-group col-sm-1">
                 <label for="carrybackyrs">Carry Back Years</label>
-                <input type="text" class="form-control" id="carrybackyrs" name="carrybackyrs" Value='[[.entity.Tax.CarryBackYrs]]'>
+                <input type="text" class="form-control" id="carrybackyrs" name="carrybackyrs" Value="[[.entity.Tax.CarryBackYrs]]">
             </div>
             <div class="form-group col-sm-1">
                 <label for="carryforwardyrs">Carry Forward Years</label>
-                <input type="text" class="form-control" id="carryforwardyrs" name="carryforwardyrs" Value='[[.entity.Tax.CarryForwardYrs]]'>
+                <input type="text" class="form-control" id="carryforwardyrs" name="carryforwardyrs" Value="[[.entity.Tax.CarryForwardYrs]]">
             </div>
         </div>
     </div>
