@@ -43,7 +43,6 @@
                 [[end]]
             </tbody>
         </table>
-    
     <script>
         function chooseYear(year) {
             var tds = document.getElementsByName(year);

@@ -12,13 +12,36 @@
     </head>
     <body>
         <nav class="first-second navbar navbar-expand-lg navbar-dark shadow-lg">
-            <a class="navbar-brand" style="color:white;"> Ogan Capital &nbsp &nbsp &nbsp</a>
+            <a class="navbar-brand" style="color:white;"> OGANICA &nbsp &nbsp &nbsp</a>
              <form id="query_form" class="form-horizontal form-well" role="form" action="/" method="get">
                 <div>
                     <button type="submit" class="btn">Home</button>
                 </div>
             </form>
+            &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp  
+            <div>
+                <button hidden type="button" class="btn" data-toggle="modal" data-target="#settingsModal">Settings</button>
+            </div>
         </nav>
     </body>
+    <div class="modal fade" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="settingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control" value="[[.baseURL]]" ng-model="baseURL">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" ng-click="updateBaseURL()">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 [[end]]
 [[template "footer"]]

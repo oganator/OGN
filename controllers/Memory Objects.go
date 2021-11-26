@@ -45,3 +45,7 @@ func init() {
 		v.PopulateChildEntities()
 	}
 }
+
+var BaseURL = "" //"http://localhost:8080/"
+
+// var BaseURL = "https://oganica.azurewebsites.net/"

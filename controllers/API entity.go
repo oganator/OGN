@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"math"
+	"runtime/debug"
 	"strconv"
 
 	beego "github.com/astaxie/beego"
@@ -45,6 +45,7 @@ func (c *ViewEntityController) Get() {
 	temp := make(map[interface{}]interface{})
 	temp["entity"] = Entities[key]
 	temp["modelslist"] = ModelsList
+	temp["baseURL"] = BaseURL
 	c.TplName = "EntityView.tpl"
 	c.Data = temp
 }
@@ -120,60 +121,62 @@ func (c *ViewEntityController) Post() {
 	// temp["entityName"] = GetString(c, "name")
 	temp["modelslist"] = ModelsList
 	temp["fundslist"] = FundsList
+	temp["baseURL"] = BaseURL
 	c.TplName = "EntityView.tpl"
 	c.Data = temp
+	go debug.FreeOSMemory()
 }
 
 // MultiplyInputs -
-func (e *Entity) MultiplyInputs() {
-	e.Valuation.EntryYield = math.Round(e.Valuation.EntryYield*100000) / 1000
-	e.Valuation.ExitYield = math.Round(e.Valuation.ExitYield*100000) / 1000
-	e.GLA.DiscountRate = math.Round(e.GLA.DiscountRate*100000) / 1000
-	e.GLA.PercentSoldRent = math.Round(e.GLA.PercentSoldRent*100000) / 1000
-	e.BalloonPercent = math.Round(e.BalloonPercent*100000) / 1000
-	e.GLA.RentIncentives.PercentOfContractRent = math.Round(e.GLA.RentIncentives.PercentOfContractRent*100000) / 1000
-	temperv := HModel{}
-	temperv.ShortTermRate = math.Round(e.GrowthInput["ERV"].ShortTermRate*100000) / 1000
-	temperv.ShortTermPeriod = int(math.Round(float64(e.GrowthInput["ERV"].ShortTermPeriod)))
-	temperv.TransitionPeriod = int(math.Round(float64(e.GrowthInput["ERV"].TransitionPeriod)))
-	temperv.LongTermRate = math.Round(e.GrowthInput["ERV"].LongTermRate*100000) / 1000
-	e.GrowthInput["ERV"] = temperv
-	tempcpi := HModel{}
-	tempcpi.ShortTermRate = math.Round(e.GrowthInput["CPI"].ShortTermRate*100000) / 1000
-	tempcpi.ShortTermPeriod = int(math.Round(float64(e.GrowthInput["CPI"].ShortTermPeriod)))
-	tempcpi.TransitionPeriod = int(math.Round(float64(e.GrowthInput["CPI"].TransitionPeriod)))
-	tempcpi.LongTermRate = math.Round(e.GrowthInput["CPI"].LongTermRate*100000) / 1000
-	e.GrowthInput["CPI"] = tempcpi
-	e.GLA.RentRevisionERV = math.Round(e.GLA.RentRevisionERV*100000) / 1000
-	e.GLA.Probability = math.Round(e.GLA.Probability*100000) / 1000
-	e.OpEx.PercentOfTRI = math.Round(e.OpEx.PercentOfTRI*100000) / 1000
-	e.DebtInput.LTV = math.Round(e.DebtInput.LTV*100000) / 1000
-	e.DebtInput.InterestRate = math.Round(e.DebtInput.InterestRate*100000) / 1000
-	e.GLA.Default.Hazard = math.Round(e.GLA.Default.Hazard*100000) / 1000
-	tempervmc := HModel{}
-	tempervmc.ShortTermRate = math.Round(e.MCSetup.ERV.ShortTermRate*100000) / 1000
-	tempervmc.ShortTermPeriod = int(math.Round(float64(e.MCSetup.ERV.ShortTermPeriod)))
-	tempervmc.TransitionPeriod = int(math.Round(float64(e.MCSetup.ERV.TransitionPeriod)))
-	tempervmc.LongTermRate = math.Round(e.MCSetup.ERV.LongTermRate*100000) / 1000
-	e.MCSetup.ERV = tempervmc
-	tempcpimc := HModel{}
-	tempcpimc.ShortTermRate = math.Round(e.MCSetup.CPI.ShortTermRate*100000) / 1000
-	tempcpimc.ShortTermPeriod = int(math.Round(float64(e.MCSetup.CPI.ShortTermPeriod)))
-	tempcpimc.TransitionPeriod = int(math.Round(float64(e.MCSetup.CPI.TransitionPeriod)))
-	tempcpimc.LongTermRate = math.Round(e.MCSetup.CPI.LongTermRate*100000) / 1000
-	e.MCSetup.CPI = tempcpimc
-	e.MCSetup.Probability = math.Round(e.MCSetup.Probability*100000) / 1000
-	e.MCSetup.OpEx = math.Round(e.MCSetup.OpEx*100000) / 1000
-	e.MCSetup.Hazard = math.Round(e.MCSetup.Hazard*100000) / 1000
-	// TAX
-	e.Tax.RETT = math.Round(e.Tax.RETT*100000) / 1000
-	e.Tax.LandValue = math.Round(e.Tax.LandValue*100000) / 1000
-	e.Tax.MinValue = math.Round(e.Tax.MinValue*100000) / 1000
-	e.Tax.UsablePeriod = int(math.Round(float64(e.Tax.UsablePeriod)))
-	e.Tax.VAT = math.Round(e.Tax.VAT*100000) / 1000
-	e.Tax.CarryBackYrs = int(math.Round(float64(e.Tax.CarryBackYrs)))
-	e.Tax.CarryForwardYrs = int(math.Round(float64(e.Tax.CarryForwardYrs)))
-}
+// func (e *Entity) MultiplyInputs() {
+// 	e.Valuation.EntryYield = math.Round(e.Valuation.EntryYield*100000) / 1000
+// 	e.Valuation.ExitYield = math.Round(e.Valuation.ExitYield*100000) / 1000
+// 	e.GLA.DiscountRate = math.Round(e.GLA.DiscountRate*100000) / 1000
+// 	e.GLA.PercentSoldRent = math.Round(e.GLA.PercentSoldRent*100000) / 1000
+// 	e.BalloonPercent = math.Round(e.BalloonPercent*100000) / 1000
+// 	e.GLA.RentIncentives.PercentOfContractRent = math.Round(e.GLA.RentIncentives.PercentOfContractRent*100000) / 1000
+// 	temperv := HModel{}
+// 	temperv.ShortTermRate = math.Round(e.GrowthInput["ERV"].ShortTermRate*100000) / 1000
+// 	temperv.ShortTermPeriod = int(math.Round(float64(e.GrowthInput["ERV"].ShortTermPeriod)))
+// 	temperv.TransitionPeriod = int(math.Round(float64(e.GrowthInput["ERV"].TransitionPeriod)))
+// 	temperv.LongTermRate = math.Round(e.GrowthInput["ERV"].LongTermRate*100000) / 1000
+// 	e.GrowthInput["ERV"] = temperv
+// 	tempcpi := HModel{}
+// 	tempcpi.ShortTermRate = math.Round(e.GrowthInput["CPI"].ShortTermRate*100000) / 1000
+// 	tempcpi.ShortTermPeriod = int(math.Round(float64(e.GrowthInput["CPI"].ShortTermPeriod)))
+// 	tempcpi.TransitionPeriod = int(math.Round(float64(e.GrowthInput["CPI"].TransitionPeriod)))
+// 	tempcpi.LongTermRate = math.Round(e.GrowthInput["CPI"].LongTermRate*100000) / 1000
+// 	e.GrowthInput["CPI"] = tempcpi
+// 	e.GLA.RentRevisionERV = math.Round(e.GLA.RentRevisionERV*100000) / 1000
+// 	e.GLA.Probability = math.Round(e.GLA.Probability*100000) / 1000
+// 	e.OpEx.PercentOfTRI = math.Round(e.OpEx.PercentOfTRI*100000) / 1000
+// 	e.DebtInput.LTV = math.Round(e.DebtInput.LTV*100000) / 1000
+// 	e.DebtInput.InterestRate = math.Round(e.DebtInput.InterestRate*100000) / 1000
+// 	e.GLA.Default.Hazard = math.Round(e.GLA.Default.Hazard*100000) / 1000
+// 	tempervmc := HModel{}
+// 	tempervmc.ShortTermRate = math.Round(e.MCSetup.ERV.ShortTermRate*100000) / 1000
+// 	tempervmc.ShortTermPeriod = int(math.Round(float64(e.MCSetup.ERV.ShortTermPeriod)))
+// 	tempervmc.TransitionPeriod = int(math.Round(float64(e.MCSetup.ERV.TransitionPeriod)))
+// 	tempervmc.LongTermRate = math.Round(e.MCSetup.ERV.LongTermRate*100000) / 1000
+// 	e.MCSetup.ERV = tempervmc
+// 	tempcpimc := HModel{}
+// 	tempcpimc.ShortTermRate = math.Round(e.MCSetup.CPI.ShortTermRate*100000) / 1000
+// 	tempcpimc.ShortTermPeriod = int(math.Round(float64(e.MCSetup.CPI.ShortTermPeriod)))
+// 	tempcpimc.TransitionPeriod = int(math.Round(float64(e.MCSetup.CPI.TransitionPeriod)))
+// 	tempcpimc.LongTermRate = math.Round(e.MCSetup.CPI.LongTermRate*100000) / 1000
+// 	e.MCSetup.CPI = tempcpimc
+// 	e.MCSetup.Probability = math.Round(e.MCSetup.Probability*100000) / 1000
+// 	e.MCSetup.OpEx = math.Round(e.MCSetup.OpEx*100000) / 1000
+// 	e.MCSetup.Hazard = math.Round(e.MCSetup.Hazard*100000) / 1000
+// 	// TAX
+// 	e.Tax.RETT = math.Round(e.Tax.RETT*100000) / 1000
+// 	e.Tax.LandValue = math.Round(e.Tax.LandValue*100000) / 1000
+// 	e.Tax.MinValue = math.Round(e.Tax.MinValue*100000) / 1000
+// 	e.Tax.UsablePeriod = int(math.Round(float64(e.Tax.UsablePeriod)))
+// 	e.Tax.VAT = math.Round(e.Tax.VAT*100000) / 1000
+// 	e.Tax.CarryBackYrs = int(math.Round(float64(e.Tax.CarryBackYrs)))
+// 	e.Tax.CarryForwardYrs = int(math.Round(float64(e.Tax.CarryForwardYrs)))
+// }
 
 // Post -
 func (c *ChangeEntityController) Post() {
@@ -186,5 +189,6 @@ func (c *ChangeEntityController) Post() {
 	temp := make(map[interface{}]interface{})
 	temp["entity"] = Entities[key]
 	temp["modelslist"] = ModelsList
+	temp["baseURL"] = BaseURL
 	c.Data = temp
 }

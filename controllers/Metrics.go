@@ -7,7 +7,7 @@ import (
 // MetricsCalc -
 func (e *Entity) MetricsCalc() {
 	nlatirr := IRR(&e.COA, Dateadd(e.StartDate, -1), e.SalesDate, FloatCOA{NetCashFlow: 1})
-	e.Metrics.IRR.NetLeveredAfterTax = math.Round(nlatirr*100) / 100
+	e.Metrics.IRR.NetLeveredAfterTax = math.Round(nlatirr*10000) / 10000
 	ytm := IRR(&e.COA, Dateadd(e.StartDate, -1), e.SalesDate, FloatCOA{BondExpense: 1})
 	e.Metrics.BondHolder.YTM = math.Round(ytm*100) / 100
 	e.Duration()
@@ -77,5 +77,5 @@ func EquityMultipleCalc(start Datetype, end Datetype, coa IntFloatCOAMap) float6
 			numerator = numerator + coa[date.Dateint].NetCashFlow
 		}
 	}
-	return math.Round((numerator/-denominator)*100) / 100
+	return math.Round((numerator/-denominator)*100000) / 100000
 }

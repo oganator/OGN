@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"math"
 	"time"
 
@@ -29,17 +28,25 @@ type MCSetup struct {
 
 // MCResultSlice -
 type MCResultSlice struct {
-	EndCash        []float64
-	CashBalance    [][]float64
-	EndNCF         []float64
-	NCF            [][]float64
-	EndMarketValue []float64
-	MarketValue    [][]float64
-	IRR            []float64
-	EM             []float64
-	YTM            []float64
-	Duration       []float64
-	YTMDUR         []float64
+	EndCash          []float64
+	CashBalance      [][]float64
+	EndNCF           []float64
+	NCF              [][]float64
+	EndMarketValue   []float64
+	MarketValue      [][]float64
+	IRR              []float64
+	EM               []float64
+	YTM              []float64
+	Duration         []float64
+	YTMDUR           []float64
+	Void             []float64
+	Probability      []float64
+	NumberOfDefaults []float64
+	OpEx             []float64
+	CPI              []float64
+	ERV              []float64
+	Hazard           []float64
+	YieldShift       []float64
 }
 
 // MCResults - used for final display. NOI, MarketValue and NCF have stats per year, IRR is for the hold period
@@ -89,7 +96,7 @@ type Hist struct {
 
 // MonteCarlo -
 func (e *Entity) MonteCarlo() {
-	duration := e.MCDataObjectsCreate(-2)
+	duration := e.MCDataObjectsCreate(1)
 	wg := sync.WaitGroup{}
 	for i := 1; i <= e.MCSetup.Sims; i++ {
 		wg.Add(1)
@@ -120,10 +127,9 @@ func (e *Entity) MonteCarlo() {
 			temp.MCResults.EndCash.Mean = temp.COA[temp.SalesDate.Dateint].CashBalance
 			temp.MCResults.EndNCF.Mean = temp.COA[temp.SalesDate.Dateint].NetCashFlow
 			temp.MCResults.EndMarketValue.Mean = temp.COA[temp.SalesDate.Dateint].MarketValue
-			date := Dateadd(temp.StartDate, 1)
-			// mutex lock
+			date := Dateadd(temp.StartDate, -1)
 			e.Mutex.Lock()
-			e.MCSlice[index-1] = &temp
+			e.MCSlice[index-1] = &temp //
 			// assign results for every month. ii is the month, index is the simulation
 			for ii := 0; ii < duration; ii++ {
 				e.MCResultSlice.CashBalance[ii][index-1] = temp.COA[date.Dateint].CashBalance
@@ -131,36 +137,65 @@ func (e *Entity) MonteCarlo() {
 				e.MCResultSlice.MarketValue[ii][index-1] = temp.COA[date.Dateint].MarketValue
 				date.Add(1)
 			}
-			e.MCResultSlice.EndCash[index-1] = temp.COA[temp.SalesDate.Dateint].CashBalance
-			e.MCResultSlice.EndNCF[index-1] = temp.COA[temp.SalesDate.Dateint].NetCashFlow
-			e.MCResultSlice.EndMarketValue[index-1] = temp.COA[temp.SalesDate.Dateint].MarketValue
-			e.MCResultSlice.IRR[index-1] = temp.Metrics.IRR.NetLeveredAfterTax
-			e.MCResultSlice.EM[index-1] = temp.Metrics.EM.NetLeveredAfterTax
-			e.MCResultSlice.YTM[index-1] = temp.Metrics.BondHolder.YTM
-			e.MCResultSlice.Duration[index-1] = temp.Metrics.BondHolder.Duration
-			e.MCResultSlice.YTMDUR[index-1] = temp.Metrics.BondHolder.YTMDUR
+			e.MCResultSlice.EndCash[index-1] = e.MCSlice[index-1].COA[temp.SalesDate.Dateint].CashBalance
+			e.MCResultSlice.EndNCF[index-1] = e.MCSlice[index-1].COA[temp.SalesDate.Dateint].NetCashFlow
+			e.MCResultSlice.EndMarketValue[index-1] = e.MCSlice[index-1].COA[temp.SalesDate.Dateint].MarketValue
+			e.MCResultSlice.IRR[index-1] = e.MCSlice[index-1].Metrics.IRR.NetLeveredAfterTax
+			e.MCResultSlice.EM[index-1] = e.MCSlice[index-1].Metrics.EM.NetLeveredAfterTax
+			e.MCResultSlice.YTM[index-1] = e.MCSlice[index-1].Metrics.BondHolder.YTM
+			e.MCResultSlice.Duration[index-1] = e.MCSlice[index-1].Metrics.BondHolder.Duration
+			e.MCResultSlice.YTMDUR[index-1] = e.MCSlice[index-1].Metrics.BondHolder.YTMDUR
+			//
+			e.MCResultSlice.Void[index-1] = float64(e.MCSlice[index-1].GLA.Void)
+			e.MCResultSlice.Probability[index-1] = e.MCSlice[index-1].GLA.Probability
+			e.MCResultSlice.NumberOfDefaults[index-1] = float64(e.MCSlice[index-1].GLA.Default.NumberOfDefaults)
+			e.MCResultSlice.OpEx[index-1] = e.MCSlice[index-1].OpEx.PercentOfTRI
+			e.MCResultSlice.CPI[index-1] = e.MCSlice[index-1].Growth["CPI"][e.SalesDate.Dateint]
+			e.MCResultSlice.ERV[index-1] = e.MCSlice[index-1].Growth["ERV"][e.SalesDate.Dateint]
+			e.MCResultSlice.Hazard[index-1] = e.MCSlice[index-1].GLA.Default.Hazard
+			e.MCResultSlice.YieldShift[index-1] = e.MCSlice[index-1].Valuation.YieldShift
+			//
 			e.Mutex.Unlock()
+			temp.COA = IntFloatCOAMap{}
+			e.MCSlice[index-1].COA = IntFloatCOAMap{}
+			temp.ChildUnits = make(map[int]*Unit)
+			e.MCSlice[index-1].ChildUnits = make(map[int]*Unit)
+			// temp = Entity{}
 		}(e, i)
 	}
 	wg.Wait()
-	e.MCResults.EndCash = MCStatsCalc(e.MCResultSlice.EndCash, e.MCSetup.Sims)
-	e.MCResults.CashBalance, e.MCResults.CashBalanceVaR = RibbonPlot(e.MCResultSlice.CashBalance, duration, 100, e.MCSetup.Sims)
-
-	e.MCResults.EndNCF = MCStatsCalc(e.MCResultSlice.EndNCF, e.MCSetup.Sims)
-	e.MCResults.NCF, e.MCResults.NCFVaR = RibbonPlot(e.MCResultSlice.NCF, duration, 100, e.MCSetup.Sims)
-
-	e.MCResults.EndMarketValue = MCStatsCalc(e.MCResultSlice.EndMarketValue, e.MCSetup.Sims)
-	e.MCResults.MarketValue, e.MCResults.MarketValueVaR = RibbonPlot(e.MCResultSlice.MarketValue, duration, 100, e.MCSetup.Sims)
-
+	//
+	e.MCResults.EndCash = MCStatsCalc(&e.MCResultSlice.EndCash, e.MCSetup.Sims)
+	e.MCResults.CashBalance, e.MCResults.CashBalanceVaR = RibbonPlot(&e.MCResultSlice.CashBalance, duration-2, 100, e.MCSetup.Sims)
+	e.MCResults.EndNCF = MCStatsCalc(&e.MCResultSlice.EndNCF, e.MCSetup.Sims)
+	e.MCResults.NCF, e.MCResults.NCFVaR = RibbonPlot(&e.MCResultSlice.NCF, duration-2, 100, e.MCSetup.Sims)
+	e.MCResults.EndMarketValue = MCStatsCalc(&e.MCResultSlice.EndMarketValue, e.MCSetup.Sims)
+	e.MCResults.MarketValue, e.MCResults.MarketValueVaR = RibbonPlot(&e.MCResultSlice.MarketValue, duration-2, 100, e.MCSetup.Sims)
+	//
 	switch e.Strategy {
 	case "Standard":
-		e.MCResults.IRR = MCStatsCalc(e.MCResultSlice.IRR, e.MCSetup.Sims)
-		e.MCResults.EM = MCStatsCalc(e.MCResultSlice.EM, e.MCSetup.Sims)
+		e.MCResults.IRR = MCStatsCalc(&e.MCResultSlice.IRR, e.MCSetup.Sims)
+		e.MCResults.EM = MCStatsCalc(&e.MCResultSlice.EM, e.MCSetup.Sims)
 	case "Balloon", "Pure Discount":
-		e.MCResults.YTM = MCStatsCalc(e.MCResultSlice.YTM, e.MCSetup.Sims)
-		e.MCResults.Duration = MCStatsCalc(e.MCResultSlice.Duration, e.MCSetup.Sims)
-		e.MCResults.YTMDUR = MCStatsCalc(e.MCResultSlice.YTMDUR, e.MCSetup.Sims)
+		e.MCResults.YTM = MCStatsCalc(&e.MCResultSlice.YTM, e.MCSetup.Sims)
+		e.MCResults.Duration = MCStatsCalc(&e.MCResultSlice.Duration, e.MCSetup.Sims)
+		e.MCResults.YTMDUR = MCStatsCalc(&e.MCResultSlice.YTMDUR, e.MCSetup.Sims)
 	}
+	e.FactorAnalysisCalc(&e.MCResultSlice)
+}
+
+func CopyMatrix(source *[][]float64) [][]float64 {
+	copy := make([][]float64, len(*source))
+	for i, v := range *source {
+		copy[i] = CopyArray(&v)
+	}
+	return copy
+}
+
+func CopyArray(source *[]float64) []float64 {
+	copyslice := make([]float64, len(*source))
+	copy(copyslice, *source)
+	return copyslice
 }
 
 // Used in Monte Carlo methods - creates MCResultSlice
@@ -179,6 +214,15 @@ func (e *Entity) MCDataObjectsCreate(addperiods int) int {
 		YTM:            make([]float64, e.MCSetup.Sims),
 		Duration:       make([]float64, e.MCSetup.Sims),
 		YTMDUR:         make([]float64, e.MCSetup.Sims),
+		//
+		Void:             make([]float64, e.MCSetup.Sims),
+		Probability:      make([]float64, e.MCSetup.Sims),
+		NumberOfDefaults: make([]float64, e.MCSetup.Sims),
+		OpEx:             make([]float64, e.MCSetup.Sims),
+		CPI:              make([]float64, e.MCSetup.Sims),
+		ERV:              make([]float64, e.MCSetup.Sims),
+		Hazard:           make([]float64, e.MCSetup.Sims),
+		YieldShift:       make([]float64, e.MCSetup.Sims),
 	}
 	for i := 0; i < duration; i++ {
 		e.MCResultSlice.CashBalance[i] = make([]float64, e.MCSetup.Sims)
@@ -187,6 +231,62 @@ func (e *Entity) MCDataObjectsCreate(addperiods int) int {
 	}
 	return duration
 }
+
+// // FundMonteCarlo - Random sample from the ChildEntities
+// func (e *Entity) FundMonteCarlo() {
+// 	// make slices
+// 	duration := e.MCDataObjectsCreate(1)
+// 	for sim := 0; sim < e.MCSetup.Sims; sim++ {
+// 		// get CPI
+// 		for _, v := range e.ChildEntities {
+// 			// select one of the simulations
+// 			samplefloat := rand.Float64()
+// 			simsfloat := float64(e.MCSetup.Sims)
+// 			simratio := float64(v.MCSetup.Sims) / float64(e.MCSetup.Sims)
+// 			sampleint := int(samplefloat * simsfloat * simratio)
+// 			e.MCResultSlice.CashBalance[0][sim] = e.MCResultSlice.CashBalance[0][sim] + v.MCSlice[sampleint].COA[Dateadd(e.StartDate, -1).Dateint].CashBalance
+// 			e.MCResultSlice.NCF[0][sim] = e.MCResultSlice.NCF[0][sim] + v.MCSlice[sampleint].COA[Dateadd(e.StartDate, -1).Dateint].NetCashFlow
+// 			e.MCResultSlice.MarketValue[0][sim] = e.MCResultSlice.MarketValue[0][sim] + v.MCSlice[sampleint].COA[Dateadd(e.StartDate, -1).Dateint].MarketValue
+// 			for i, date := 1, e.StartDate; i < duration; i, date = i+1, Dateadd(date, 1) {
+// 				e.MCResultSlice.CashBalance[i][sim] = e.MCResultSlice.CashBalance[i][sim] + v.MCSlice[sampleint].COA[date.Dateint].CashBalance
+// 				e.MCResultSlice.NCF[i][sim] = e.MCResultSlice.NCF[i][sim] + v.MCSlice[sampleint].COA[date.Dateint].NetCashFlow
+// 				e.MCResultSlice.MarketValue[i][sim] = e.MCResultSlice.MarketValue[i][sim] + v.MCSlice[sampleint].COA[date.Dateint].MarketValue
+// 			}
+// 			e.MCResultSlice.EndCash[sim] = e.MCResultSlice.EndCash[sim] + v.MCSlice[sampleint].COA[v.SalesDate.Dateint].CashBalance
+// 			e.MCResultSlice.EndNCF[sim] = e.MCResultSlice.EndNCF[sim] + v.MCSlice[sampleint].COA[v.SalesDate.Dateint].NetCashFlow
+// 			e.MCResultSlice.EndMarketValue[sim] = e.MCResultSlice.EndMarketValue[sim] + v.MCSlice[sampleint].COA[v.SalesDate.Dateint].MarketValue
+// 		}
+// 		// create slice for IRR
+// 		irrslice := make([]float64, duration)
+// 		emslice := map[int]FloatCOA{}
+// 		for i, date := 0, Dateadd(e.StartDate, -1); i < duration; i, date = i+1, Dateadd(date, 1) {
+// 			irrslice[i] = e.MCResultSlice.NCF[i][sim]
+// 			emslice[date.Dateint] = FloatCOA{NetCashFlow: e.MCResultSlice.NCF[i][sim]}
+// 		}
+// 		e.MCResultSlice.IRR[sim] = (math.Pow(IRRCalc(irrslice)+1, 12) - 1) * 100
+// 		e.MCResultSlice.EM[sim] = EquityMultipleCalc(e.StartDate, e.SalesDate, emslice)
+// 		// e.MCResultSlice.EM[sim] = v.MCSlice[sampleint].Metrics.EM.NetLeveredAfterTax
+// 		// e.MCResultSlice.YTM[sim] = v.MCSlice[sampleint].Metrics.BondHolder.YTM
+// 		// e.MCResultSlice.Duration[sim] = v.MCSlice[sampleint].Metrics.BondHolder.Duration
+// 	}
+// 	e.MCResults.EndCash = MCStatsCalc(e.MCResultSlice.EndCash, e.MCSetup.Sims)
+// 	cashslice := e.MCResultSlice.CashBalance[1 : len(e.MCResultSlice.CashBalance)-1]
+// 	e.MCResults.CashBalance, e.MCResults.CashBalanceVaR = RibbonPlot(cashslice, duration-2, 100, e.MCSetup.Sims)
+// 	ncfslice := e.MCResultSlice.NCF[1 : len(e.MCResultSlice.NCF)-1]
+// 	e.MCResults.EndNCF = MCStatsCalc(e.MCResultSlice.EndNCF, e.MCSetup.Sims)
+// 	e.MCResults.NCF, e.MCResults.NCFVaR = RibbonPlot(ncfslice, duration-2, 100, e.MCSetup.Sims)
+// 	e.MCResults.EndMarketValue = MCStatsCalc(e.MCResultSlice.EndMarketValue, e.MCSetup.Sims)
+// 	e.MCResults.MarketValue, e.MCResults.MarketValueVaR = RibbonPlot(e.MCResultSlice.MarketValue, duration-0, 100, e.MCSetup.Sims)
+// 	switch e.Strategy {
+// 	case "Standard":
+// 		e.MCResults.IRR = MCStatsCalc(e.MCResultSlice.IRR, e.MCSetup.Sims)
+// 		e.MCResults.EM = MCStatsCalc(e.MCResultSlice.EM, e.MCSetup.Sims)
+// 	case "Balloon", "Pure Discount":
+// 		e.MCResults.YTM = MCStatsCalc(e.MCResultSlice.YTM, e.MCSetup.Sims)
+// 		e.MCResults.Duration = MCStatsCalc(e.MCResultSlice.Duration, e.MCSetup.Sims)
+// 		e.MCResults.YTMDUR = MCStatsCalc(e.MCResultSlice.YTMDUR, e.MCSetup.Sims)
+// 	}
+// }
 
 // FundMonteCarlo - Random sample from the ChildEntities
 func (e *Entity) FundMonteCarlo() {
@@ -200,17 +300,14 @@ func (e *Entity) FundMonteCarlo() {
 			simsfloat := float64(e.MCSetup.Sims)
 			simratio := float64(v.MCSetup.Sims) / float64(e.MCSetup.Sims)
 			sampleint := int(samplefloat * simsfloat * simratio)
-			e.MCResultSlice.CashBalance[0][sim] = e.MCResultSlice.CashBalance[0][sim] + v.MCSlice[sampleint].COA[Dateadd(e.StartDate, -1).Dateint].CashBalance
-			e.MCResultSlice.NCF[0][sim] = e.MCResultSlice.NCF[0][sim] + v.MCSlice[sampleint].COA[Dateadd(e.StartDate, -1).Dateint].NetCashFlow
-			e.MCResultSlice.MarketValue[0][sim] = e.MCResultSlice.MarketValue[0][sim] + v.MCSlice[sampleint].COA[Dateadd(e.StartDate, -1).Dateint].MarketValue
-			for i, date := 1, e.StartDate; i < duration; i, date = i+1, Dateadd(date, 1) {
-				e.MCResultSlice.CashBalance[i][sim] = e.MCResultSlice.CashBalance[i][sim] + v.MCSlice[sampleint].COA[date.Dateint].CashBalance
-				e.MCResultSlice.NCF[i][sim] = e.MCResultSlice.NCF[i][sim] + v.MCSlice[sampleint].COA[date.Dateint].NetCashFlow
-				e.MCResultSlice.MarketValue[i][sim] = e.MCResultSlice.MarketValue[i][sim] + v.MCSlice[sampleint].COA[date.Dateint].MarketValue
+			for i := 0; i < duration; i++ {
+				e.MCResultSlice.CashBalance[i][sim] = e.MCResultSlice.CashBalance[i][sim] + v.MCResultSlice.CashBalance[i][sampleint]
+				e.MCResultSlice.NCF[i][sim] = e.MCResultSlice.NCF[i][sim] + v.MCResultSlice.NCF[i][sampleint]
+				e.MCResultSlice.MarketValue[i][sim] = e.MCResultSlice.MarketValue[i][sim] + v.MCResultSlice.MarketValue[i][sampleint]
 			}
-			e.MCResultSlice.EndCash[sim] = e.MCResultSlice.EndCash[sim] + v.MCSlice[sampleint].COA[v.SalesDate.Dateint].CashBalance
-			e.MCResultSlice.EndNCF[sim] = e.MCResultSlice.EndNCF[sim] + v.MCSlice[sampleint].COA[v.SalesDate.Dateint].NetCashFlow
-			e.MCResultSlice.EndMarketValue[sim] = e.MCResultSlice.EndMarketValue[sim] + v.MCSlice[sampleint].COA[v.SalesDate.Dateint].MarketValue
+			e.MCResultSlice.EndCash[sim] = e.MCResultSlice.EndCash[sim] + v.MCResultSlice.EndCash[sampleint]
+			e.MCResultSlice.EndNCF[sim] = e.MCResultSlice.EndNCF[sim] + v.MCResultSlice.EndNCF[sampleint]
+			e.MCResultSlice.EndMarketValue[sim] = e.MCResultSlice.EndMarketValue[sim] + v.MCResultSlice.EndMarketValue[sampleint]
 		}
 		// create slice for IRR
 		irrslice := make([]float64, duration)
@@ -221,33 +318,32 @@ func (e *Entity) FundMonteCarlo() {
 		}
 		e.MCResultSlice.IRR[sim] = (math.Pow(IRRCalc(irrslice)+1, 12) - 1) * 100
 		e.MCResultSlice.EM[sim] = EquityMultipleCalc(e.StartDate, e.SalesDate, emslice)
-		// e.MCResultSlice.EM[sim] = v.MCSlice[sampleint].Metrics.EM.NetLeveredAfterTax
 		// e.MCResultSlice.YTM[sim] = v.MCSlice[sampleint].Metrics.BondHolder.YTM
 		// e.MCResultSlice.Duration[sim] = v.MCSlice[sampleint].Metrics.BondHolder.Duration
 	}
-	e.MCResults.EndCash = MCStatsCalc(e.MCResultSlice.EndCash, e.MCSetup.Sims)
-	cashslice := e.MCResultSlice.CashBalance[1 : len(e.MCResultSlice.CashBalance)-1]
-	e.MCResults.CashBalance, e.MCResults.CashBalanceVaR = RibbonPlot(cashslice, duration-2, 100, e.MCSetup.Sims)
-	ncfslice := e.MCResultSlice.NCF[1 : len(e.MCResultSlice.NCF)-1]
-	e.MCResults.EndNCF = MCStatsCalc(e.MCResultSlice.EndNCF, e.MCSetup.Sims)
-	e.MCResults.NCF, e.MCResults.NCFVaR = RibbonPlot(ncfslice, duration-2, 100, e.MCSetup.Sims)
-
-	e.MCResults.EndMarketValue = MCStatsCalc(e.MCResultSlice.EndMarketValue, e.MCSetup.Sims)
-	e.MCResults.MarketValue, e.MCResults.MarketValueVaR = RibbonPlot(e.MCResultSlice.MarketValue, duration-0, 100, e.MCSetup.Sims)
+	e.MCResults.EndCash = MCStatsCalc(&e.MCResultSlice.EndCash, e.MCSetup.Sims)
+	e.MCResults.CashBalance, e.MCResults.CashBalanceVaR = RibbonPlot(&e.MCResultSlice.CashBalance, duration-2, 100, e.MCSetup.Sims)
+	//
+	e.MCResults.EndNCF = MCStatsCalc(&e.MCResultSlice.EndNCF, e.MCSetup.Sims)
+	e.MCResults.NCF, e.MCResults.NCFVaR = RibbonPlot(&e.MCResultSlice.NCF, duration-2, 100, e.MCSetup.Sims)
+	//
+	e.MCResults.EndMarketValue = MCStatsCalc(&e.MCResultSlice.EndMarketValue, e.MCSetup.Sims)
+	e.MCResults.MarketValue, e.MCResults.MarketValueVaR = RibbonPlot(&e.MCResultSlice.MarketValue, duration-2, 100, e.MCSetup.Sims)
 	switch e.Strategy {
 	case "Standard":
-		e.MCResults.IRR = MCStatsCalc(e.MCResultSlice.IRR, e.MCSetup.Sims)
-		e.MCResults.EM = MCStatsCalc(e.MCResultSlice.EM, e.MCSetup.Sims)
+		e.MCResults.IRR = MCStatsCalc(&e.MCResultSlice.IRR, e.MCSetup.Sims)
+		e.MCResults.EM = MCStatsCalc(&e.MCResultSlice.EM, e.MCSetup.Sims)
 	case "Balloon", "Pure Discount":
-		e.MCResults.YTM = MCStatsCalc(e.MCResultSlice.YTM, e.MCSetup.Sims)
-		e.MCResults.Duration = MCStatsCalc(e.MCResultSlice.Duration, e.MCSetup.Sims)
-		e.MCResults.YTMDUR = MCStatsCalc(e.MCResultSlice.YTMDUR, e.MCSetup.Sims)
+		e.MCResults.YTM = MCStatsCalc(&e.MCResultSlice.YTM, e.MCSetup.Sims)
+		e.MCResults.Duration = MCStatsCalc(&e.MCResultSlice.Duration, e.MCSetup.Sims)
+		e.MCResults.YTMDUR = MCStatsCalc(&e.MCResultSlice.YTMDUR, e.MCSetup.Sims)
 	}
 }
 
 // MCStatsCalc -
-func MCStatsCalc(slice []float64, sims int) (stats MCStats) {
+func MCStatsCalc(sourceslice *[]float64, sims int) (stats MCStats) {
 	if sims >= 100 {
+		slice := CopyArray(sourceslice)
 		variance := stat.Variance(slice, nil)
 		stdev := math.Pow(variance, .5)
 		mean := stat.Mean(slice, nil)
@@ -283,7 +379,7 @@ func MCStatsCalc(slice []float64, sims int) (stats MCStats) {
 		raw := &plotter.Histogram{}
 		if _, err := plotter.NewHist(histslice, 100); err != nil {
 			time.Sleep(10000 * time.Millisecond)
-			fmt.Println("MCStatsCalc Error")
+			// fmt.Println("MCStatsCalc Error")
 			raw, _ = plotter.NewHist(histslice, 100)
 		} else {
 			raw, _ = plotter.NewHist(histslice, 100)
@@ -330,7 +426,7 @@ type XYFloatSlice struct {
 }
 
 // RibbonPlot -
-func RibbonPlot(matrix [][]float64, duration int, bucketnum int, sims int) (ribbonslice []Ribbon, varpslice VaRPercentile) {
+func RibbonPlot(matrix *[][]float64, duration int, bucketnum int, sims int) (ribbonslice []Ribbon, varpslice VaRPercentile) {
 	if sims >= 100 {
 		ribbonslice = make([]Ribbon, duration)
 		varpslice = VaRPercentile{
@@ -355,12 +451,16 @@ func RibbonPlot(matrix [][]float64, duration int, bucketnum int, sims int) (ribb
 				Y: make([]float64, duration),
 			},
 		}
-		for i, v := range matrix {
+		temp := *matrix
+		temp = temp[1 : len(temp)-1]
+		newmatrix := CopyMatrix(&temp)
+		// fmt.Println(newmatrix)
+		for i, v := range newmatrix {
 			sort.Float64s(v)
 			raw := &plotter.Histogram{}
 			if _, err := plotter.NewHist(make(plotter.Values, duration), bucketnum); err != nil {
 				time.Sleep(10000 * time.Millisecond)
-				fmt.Println("Ribbon Plot Error")
+				// fmt.Println("Ribbon Plot Error")
 				raw, _ = plotter.NewHist(make(plotter.Values, duration), bucketnum)
 			} else {
 				raw, _ = plotter.NewHist(make(plotter.Values, duration), bucketnum)

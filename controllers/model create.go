@@ -235,10 +235,10 @@ func (e *Entity) CalculateModel(mc bool) {
 				LoanBalance:             false,
 				Debt:                    false,
 				Tax:                     true,
-				TaxableIncome:           true,
-				TaxableIncomeCarryBack:  true,
-				DTA:                     true,
-				Depreciation:            true,
+				TaxableIncome:           false,
+				TaxableIncomeCarryBack:  false,
+				DTA:                     false,
+				Depreciation:            false,
 				Capex:                   true,
 				Fees:                    true,
 				NetCashFlow:             true,
@@ -257,6 +257,11 @@ func (e *Entity) CalculateModel(mc bool) {
 			e.MakeTable(coas, false, false, true)
 		}
 		e.MetricsCalc()
+		if mc {
+			for _, v := range e.ChildUnits {
+				*v = Unit{}
+			}
+		}
 	}
 }
 

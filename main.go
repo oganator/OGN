@@ -2,8 +2,7 @@ package main
 
 import (
 	_ "OGN/routers"
-	"fmt"
-	"time"
+	"runtime/debug"
 
 	beego "github.com/astaxie/beego"
 	"github.com/astaxie/beego/plugins/cors"
@@ -11,6 +10,7 @@ import (
 
 func main() {
 	// rand.Seed(time.Now().UTC().UnixNano())
+	debug.SetGCPercent(2500)
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins: true,
 		// AllowOrigins:     []string{"*"},
@@ -19,10 +19,6 @@ func main() {
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
-	end := time.Date(2121, 11, 15, 0, 0, 0, 0, time.UTC)
-	fmt.Println("This Trial ends: ", end)
 	// browser.OpenURL("http://localhost:8080/")
-	if time.Now().Before(end) {
-		beego.Run()
-	}
+	beego.Run()
 }

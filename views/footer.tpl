@@ -17,6 +17,7 @@
 var ognApp = angular.module('ognApp', []);
 	// testController
 	ognApp.controller('assetViewController', ['$scope', '$http', '$sce', function($scope, $http, $sce) {
+		$scope.baseURL = ""//[[.baseURL]];
 		$scope.entity = [[.entity.Name]];
 		$scope.settingsTab = "settings";
 		$scope.tableTab = "cf";
@@ -26,11 +27,11 @@ var ognApp = angular.module('ognApp', []);
 
 		// getRequest - used to update the table (cf, irr...etc)
 		$scope.getRequest = function(route) {
-			var url = "http://localhost:8080/MCTabs?tab="
+			var url = $scope.baseURL + "MCTabs?tab="
 			var entity = "&name="+$scope.entity
 			$scope.tableTab = route;
 			if (route == 'details'){
-				$scope.post("http://localhost:8080/MCDetails?name="+$scope.entity+"&page=1");
+				$scope.post($scope.baseURL + "MCDetails?name="+$scope.entity+"&page=1");
 				$scope.mcdetailspage = 1;
 			} else {
 				$scope.post(url+route+entity);
@@ -39,7 +40,7 @@ var ognApp = angular.module('ognApp', []);
 
 		// getSettings
 		$scope.getSettings = function(entity){
-			var url = "http://localhost:8080/GetSettings?entity="+entity+"&tab="+$scope.settingsTab;
+			var url = $scope.baseURL + "GetSettings?entity="+entity+"&tab="+$scope.settingsTab;
 			$scope.entity = entity;
 			$http.post(url).then(
 				function successCallback(response) {
@@ -51,7 +52,6 @@ var ognApp = angular.module('ognApp', []);
 			);
 			$scope.getRequest($scope.tableTab);
 			$scope.getUnitTable(-1);
-
 		}; // /getSettings
 
 		// updateSettingsTab
@@ -88,7 +88,7 @@ var ognApp = angular.module('ognApp', []);
 			//$scope.getUnitTable(index);
 			$scope.data = '';
 			var body = "?name="+$scope.entity+"&index="+index*$scope.mcdetailspage;
-			$http.post("http://localhost:8080/MCIndex"+body).then(
+			$http.post($scope.baseURL + "MCIndex"+body).then(
 				function successCallback(response) {
 					$scope.data = $sce.trustAsHtml(response.data);
 				},
@@ -104,7 +104,7 @@ var ognApp = angular.module('ognApp', []);
 				order = order+"-r";
 			}
 			$scope.mcdetailsorder = order;
-			$scope.post("http://localhost:8080/MCDetails?name="+$scope.entity+"&page=1"+"&order="+order);
+			$scope.post($scope.baseURL + "MCDetails?name="+$scope.entity+"&page=1"+"&order="+order);
 			$scope.mcdetailspage = 1;
 		}; // /sortMCDetails
 
@@ -115,14 +115,14 @@ var ognApp = angular.module('ognApp', []);
 			} else if (direction === '-'){
 				$scope.mcdetailspage--;
 			}
-			$scope.post("http://localhost:8080/MCDetails?name="+$scope.entity+"&page="+$scope.mcdetailspage);
+			$scope.post($scope.baseURL + "MCDetails?name="+$scope.entity+"&page="+$scope.mcdetailspage);
 		}; // /nextMCDetails
 
 		// getRentSchedule
 		$scope.getRentSchedule = function(unit, index){
-			var url = "http://localhost:8080/ViewRentSchedule?unit="+unit+"&name="+$scope.entity+"&index="+index
+			var url = $scope.baseURL + "ViewRentSchedule?unit="+unit+"&name="+$scope.entity+"&index="+index
 			if (typeof index == 'undefined'){
-				url = "http://localhost:8080/ViewRentSchedule?unit="+unit+"&name="+$scope.entity
+				url = $scope.baseURL + "ViewRentSchedule?unit="+unit+"&name="+$scope.entity
 			}
 			$http.post(url).then(
 				function successCallback(response) {
@@ -136,7 +136,7 @@ var ognApp = angular.module('ognApp', []);
 
 		// getUnitCF
 		$scope.getUnitCF = function(unit){
-			$http.post("http://localhost:8080/ViewUnitCF?unit="+unit+"&name="+$scope.entity).then(
+			$http.post($scope.baseURL + "ViewUnitCF?unit="+unit+"&name="+$scope.entity).then(
 				function successCallback(response) {
 					$scope.unitcf = $sce.trustAsHtml(response.data);
 				},
@@ -148,7 +148,7 @@ var ognApp = angular.module('ognApp', []);
 
 		// getUnitTable
 		$scope.getUnitTable = function(index){
-			$http.post("http://localhost:8080/ViewUnitTable?name="+$scope.entity+"&index="+index).then(
+			$http.post($scope.baseURL + "ViewUnitTable?name="+$scope.entity+"&index="+index).then(
 				function successCallback(response) {
 					$scope.unittable = $sce.trustAsHtml(response.data);
 				},

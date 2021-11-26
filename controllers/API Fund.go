@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"runtime/debug"
 	"strconv"
 
 	beego "github.com/astaxie/beego"
@@ -36,11 +37,12 @@ func GetFloatFund(c *FundController, field string) (result float64) {
 func (c *FundController) Get() {
 	name := GetStringFund(c, "name")
 	key := FundsList[name]
-	Entities[key].CalculateFund()
+	// Entities[key].CalculateFund()
 	temp := make(map[interface{}]interface{})
 	temp["entity"] = Entities[key]
 	temp["modelslist"] = ModelsList
 	temp["fundslist"] = FundsList
+	temp["baseURL"] = BaseURL
 	c.TplName = "EntityView.tpl"
 	c.Data = temp
 }
@@ -57,6 +59,8 @@ func (c *FundController) Post() {
 	temp["entity"] = Entities[key]
 	temp["modelslist"] = ModelsList
 	temp["fundslist"] = FundsList
+	temp["baseURL"] = BaseURL
 	c.TplName = "EntityView.tpl"
 	c.Data = temp
+	go debug.FreeOSMemory()
 }

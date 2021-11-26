@@ -10,6 +10,7 @@ func init() {
 	// HOME
 	beego.Router("/", &controllers.HomeController{})
 	beego.Router("/GetSettings", &controllers.SettingsController{})
+	beego.Router("/AppSettings", &controllers.AppSettingsController{})
 	// ENTITY
 	beego.Router("/ViewEntity", &controllers.ViewEntityController{})
 	beego.Router("/ChangeEntity", &controllers.ChangeEntityController{})

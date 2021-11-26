@@ -65,6 +65,9 @@
 					<a class="nav-link" id="emtabletab" data-toggle="tab" href="#emtabletab" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('em')">Equity Multiple</a>
 				</li>
 				<li class="nav-item">
+					<a class="nav-link" id="factoranalysistabletab" data-toggle="tab" href="#factoranalysistabletab" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('factoranalysis')">Factor Analysis</a>
+				</li>
+				<li class="nav-item">
 					<a class="nav-link" id="details-tab" data-toggle="tab" href="#details" role="tab" aria-controls="details" aria-selected="false" ng-click="getRequest('details')">Details</a>
 				</li>
 				<li class="nav-item">

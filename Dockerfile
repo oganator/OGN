@@ -1,7 +1,5 @@
 # docker build . -t ogn
-FROM golang:1.15.5
-
-RUN go get -u github.com/beego/bee
+FROM golang:1.16
 
 WORKDIR /OGN
 COPY . .
@@ -9,8 +7,12 @@ COPY . .
 ENV GO111MODULE=on
 # ENV GOFLAGS=-mod=vendor
 # ENV GOFLAGS=-mod=readonly
-# RUN go build
+RUN go mod download
+RUN go mod verify
+RUN go build -o ogn
 EXPOSE 8080
-CMD ["bee", "run"]
-# WORKDIR /OGN
-# RUN ["./ogn.exe"]
+WORKDIR /OGN
+CMD ["./ogn"]
+# docker build -t ogn .
+#  docker tag ogn:latest oganator/dockerhub:push  -- 2
+#  docker push oganator/dockerhub:push

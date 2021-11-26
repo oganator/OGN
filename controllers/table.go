@@ -2,7 +2,7 @@ package controllers
 
 // MakeTable - Date, COA, Amount
 func (e *Entity) MakeTable(coas BoolCOA, monthly bool, quarterly bool, yearly bool) {
-	e.CreateTableHeader(true, quarterly, yearly)
+	e.CreateTableHeader(monthly, quarterly, yearly)
 	e.Table = make([]TableJSON, 0)
 	marketvalue := make(map[int]string)
 	totalerv := make(map[int]string)

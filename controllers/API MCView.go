@@ -19,6 +19,10 @@ func (c *MCDetailsController) Post() {
 	order := GetStringMCDetails(c, "order")
 	startindex := (page - 1) * 10
 	endindex := startindex + 10
+	//
+	// startindex = 0
+	// endindex = Entities[tempkey].MCSetup.Sims
+	//
 	temp := make(map[interface{}]interface{})
 	switch order {
 	case "irr":
@@ -84,6 +88,7 @@ func (c *MCDetailsController) Post() {
 	}
 	temp["MCSlice"] = Entities[tempkey].MCSlice[startindex:endindex]
 	temp["Strategy"] = Entities[tempkey].Strategy
+	temp["baseURL"] = BaseURL
 	c.TplName = "MCDetails.tpl"
 	c.Data = temp
 }
@@ -158,6 +163,14 @@ func (c *MCTabsController) Post() {
 	case "ytmdur":
 		temp["data"] = Entities[tempkey].MCResults.YTMDUR
 		c.TplName = "MCHist.tpl"
+	case "factoranalysis":
+		temp["data"] = Entities[tempkey]
+		c.TplName = "FactorAnalysis.tpl"
+		// for i, v := range Entities[tempkey].FactorAnalysis {
+		// 	fmt.Println(i)
+		// 	fmt.Printf("%+v\n", v)
+		// }
+
 	}
 	c.Data = temp
 }
