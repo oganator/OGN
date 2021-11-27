@@ -43,7 +43,7 @@ func GetInt(c *ViewEntityController, field string) (result int) {
 func (c *ViewEntityController) Get() {
 	key := ModelsList[GetString(c, "name")]
 	temp := make(map[interface{}]interface{})
-	temp["entity"] = Entities[key]
+	temp["entity"] = EntityMap[key].Entity
 	temp["modelslist"] = ModelsList
 	temp["baseURL"] = BaseURL
 	c.TplName = "EntityView.tpl"
@@ -53,33 +53,34 @@ func (c *ViewEntityController) Get() {
 // Post -
 func (c *ViewEntityController) Post() {
 	key := ModelsList[GetString(c, "name")]
-	EntityStore[key].HoldPeriod = GetInt(c, "holdperiod")
-	EntityStore[key].EntryYield = GetFloat(c, "entryyield") / 100
-	EntityStore[key].LTV = GetFloat(c, "ltv") / 100
-	EntityStore[key].LoanRate = GetFloat(c, "rate") / 100
-	EntityStore[key].GLA.DiscountRate = GetFloat(c, "discount") / 100
-	EntityStore[key].GLA.PercentSoldRent = GetFloat(c, "soldrent") / 100
-	EntityStore[key].Strategy = GetString(c, "strategy")
-	EntityStore[key].BalloonPercent = GetFloat(c, "balpercent") / 100
-	EntityStore[key].ERVGrowth.ShortTermRate = GetFloat(c, "ervshorttermrate") / 100
-	EntityStore[key].ERVGrowth.ShortTermPeriod = GetInt(c, "ervshorttermperiod")
-	EntityStore[key].ERVGrowth.TransitionPeriod = GetInt(c, "ervtransitionperiod")
-	EntityStore[key].ERVGrowth.LongTermRate = GetFloat(c, "ervlongtermrate") / 100
-	EntityStore[key].CPIGrowth.ShortTermRate = GetFloat(c, "cpishorttermrate") / 100
-	EntityStore[key].CPIGrowth.ShortTermPeriod = GetInt(c, "cpishorttermperiod")
-	EntityStore[key].CPIGrowth.TransitionPeriod = GetInt(c, "cpitransitionperiod")
-	EntityStore[key].CPIGrowth.LongTermRate = GetFloat(c, "cpilongtermrate") / 100
-	EntityStore[key].YieldShift = GetFloat(c, "yieldshift")
-	EntityStore[key].GLA.Void = GetInt(c, "void")
-	EntityStore[key].GLA.EXTDuration = GetInt(c, "duration")
-	EntityStore[key].GLA.RentRevisionERV = GetFloat(c, "rentrevision") / 100
-	EntityStore[key].GLA.Probability = GetFloat(c, "probability") / 100
-	EntityStore[key].GLA.RentIncentives.Duration = GetInt(c, "incentivemonths")
-	EntityStore[key].GLA.RentIncentives.PercentOfContractRent = GetFloat(c, "incentivepercent") / 100
-	EntityStore[key].GLA.FitOutCosts.AmountPerTotalArea = GetFloat(c, "fitoutcosts")
-	EntityStore[key].OpExpercent = GetFloat(c, "opex") / 100
-	EntityStore[key].Fees = GetFloat(c, "fees")
-	EntityStore[key].GLA.Default.Hazard = GetFloat(c, "hazard") / 100
+	EntityDataStore[key].Mutex.Lock()
+	EntityDataStore[key].HoldPeriod = GetInt(c, "holdperiod")
+	EntityDataStore[key].EntryYield = GetFloat(c, "entryyield") / 100
+	EntityDataStore[key].LTV = GetFloat(c, "ltv") / 100
+	EntityDataStore[key].LoanRate = GetFloat(c, "rate") / 100
+	EntityDataStore[key].GLA.DiscountRate = GetFloat(c, "discount") / 100
+	EntityDataStore[key].GLA.PercentSoldRent = GetFloat(c, "soldrent") / 100
+	EntityDataStore[key].Strategy = GetString(c, "strategy")
+	EntityDataStore[key].BalloonPercent = GetFloat(c, "balpercent") / 100
+	EntityDataStore[key].ERVGrowth.ShortTermRate = GetFloat(c, "ervshorttermrate") / 100
+	EntityDataStore[key].ERVGrowth.ShortTermPeriod = GetInt(c, "ervshorttermperiod")
+	EntityDataStore[key].ERVGrowth.TransitionPeriod = GetInt(c, "ervtransitionperiod")
+	EntityDataStore[key].ERVGrowth.LongTermRate = GetFloat(c, "ervlongtermrate") / 100
+	EntityDataStore[key].CPIGrowth.ShortTermRate = GetFloat(c, "cpishorttermrate") / 100
+	EntityDataStore[key].CPIGrowth.ShortTermPeriod = GetInt(c, "cpishorttermperiod")
+	EntityDataStore[key].CPIGrowth.TransitionPeriod = GetInt(c, "cpitransitionperiod")
+	EntityDataStore[key].CPIGrowth.LongTermRate = GetFloat(c, "cpilongtermrate") / 100
+	EntityDataStore[key].YieldShift = GetFloat(c, "yieldshift")
+	EntityDataStore[key].GLA.Void = GetInt(c, "void")
+	EntityDataStore[key].GLA.EXTDuration = GetInt(c, "duration")
+	EntityDataStore[key].GLA.RentRevisionERV = GetFloat(c, "rentrevision") / 100
+	EntityDataStore[key].GLA.Probability = GetFloat(c, "probability") / 100
+	EntityDataStore[key].GLA.RentIncentives.Duration = GetInt(c, "incentivemonths")
+	EntityDataStore[key].GLA.RentIncentives.PercentOfContractRent = GetFloat(c, "incentivepercent") / 100
+	EntityDataStore[key].GLA.FitOutCosts.AmountPerTotalArea = GetFloat(c, "fitoutcosts")
+	EntityDataStore[key].OpExpercent = GetFloat(c, "opex") / 100
+	EntityDataStore[key].Fees = GetFloat(c, "fees")
+	EntityDataStore[key].GLA.Default.Hazard = GetFloat(c, "hazard") / 100
 	mcsetup := MCSetup{
 		Sims: GetInt(c, "sims"),
 		ERV: HModel{
@@ -101,29 +102,29 @@ func (c *ViewEntityController) Post() {
 		Hazard:      GetFloat(c, "hazardsigma") / 100,
 	}
 	// TAX
-	EntityStore[key].RETT = GetFloat(c, "rett") / 100
-	EntityStore[key].Landvalue = GetFloat(c, "landvalue") / 100
-	EntityStore[key].WOZpercent = GetFloat(c, "minvalue") / 100
-	EntityStore[key].DeprPeriod = GetInt(c, "usableperiod")
-	EntityStore[key].VAT = GetFloat(c, "vat") / 100
-	EntityStore[key].CarryBackYrs = GetInt(c, "carrybackyrs")
-	EntityStore[key].CarryForwardYrs = GetInt(c, "carryforwardyrs")
+	EntityDataStore[key].RETT = GetFloat(c, "rett") / 100
+	EntityDataStore[key].Landvalue = GetFloat(c, "landvalue") / 100
+	EntityDataStore[key].WOZpercent = GetFloat(c, "minvalue") / 100
+	EntityDataStore[key].DeprPeriod = GetInt(c, "usableperiod")
+	EntityDataStore[key].VAT = GetFloat(c, "vat") / 100
+	EntityDataStore[key].CarryBackYrs = GetInt(c, "carrybackyrs")
+	EntityDataStore[key].CarryForwardYrs = GetInt(c, "carryforwardyrs")
 	//
 	temp := make(map[interface{}]interface{})
-	Entities[key].UpdateEntity(false, EntityStore[Entities[key].MasterID])
-	Entities[key].MCSetup = mcsetup
-	WriteXLSXEntities(Entities[key])
-	if Entities[key].Parent != Entities[key] && Entities[key].MCSetup.Sims >= 100 {
-		Entities[key].MonteCarlo()
+	EntityMap[key].Mutex.Lock()
+	EntityMap[key].Entity.UpdateEntity(false, EntityDataStore[EntityMap[key].Entity.MasterID])
+	EntityMap[key].Entity.MCSetup = mcsetup
+	WriteXLSXEntities(EntityMap[key].Entity)
+	if EntityMap[key].Entity.Parent != EntityMap[key].Entity && EntityMap[key].Entity.MCSetup.Sims >= 100 {
+		EntityMap[key].Entity.MonteCarlo()
 	}
-	// Entities[key].MultiplyInputs()
-	temp["entity"] = Entities[key]
-	// temp["entityName"] = GetString(c, "name")
+	temp["entity"] = EntityMap[key].Entity
 	temp["modelslist"] = ModelsList
 	temp["fundslist"] = FundsList
-	temp["baseURL"] = BaseURL
 	c.TplName = "EntityView.tpl"
 	c.Data = temp
+	EntityDataStore[key].Mutex.Unlock()
+	EntityMap[key].Mutex.Unlock()
 	go debug.FreeOSMemory()
 }
 
@@ -187,7 +188,7 @@ func (c *ChangeEntityController) Post() {
 	//
 	c.TplName = "EntityView.tpl"
 	temp := make(map[interface{}]interface{})
-	temp["entity"] = Entities[key]
+	temp["entity"] = EntityMap[key].Entity
 	temp["modelslist"] = ModelsList
 	temp["baseURL"] = BaseURL
 	c.Data = temp

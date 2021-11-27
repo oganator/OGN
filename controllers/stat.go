@@ -48,7 +48,7 @@ func BinomialSample(expval float64, Skew float64) float64 {
 }
 
 // NormalSample -
-func NormalSample(mean float64, stdev float64, min float64) (val float64) {
+func NormalSample(mean, stdev, min, max float64) (val float64) {
 	if stdev == 0 {
 		return mean
 	}
@@ -59,6 +59,9 @@ func NormalSample(mean float64, stdev float64, min float64) (val float64) {
 	val = x.Rand()
 	if val < min {
 		val = min
+	}
+	if val > max {
+		val = max
 	}
 	return val
 }

@@ -4,4 +4,5 @@
     <br>
     [[template "EntityTable" .entity.ChildEntities]]
 </body>
+
 [[template "footer" .]]

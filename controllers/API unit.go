@@ -32,9 +32,9 @@ func (c *ViewRentScheduleController) Post() {
 	indexstring := GetStringRentSchedule(c, "index")
 	index, _ := strconv.Atoi(indexstring)
 	unit := GetIntRentSchedule(c, "unit")
-	temp["data"] = Entities[key].ChildUnits[unit].RSStore
+	temp["data"] = EntityMap[key].Entity.ChildUnits[unit].RSStore
 	if indexstring != "" {
-		temp["data"] = Entities[key].MCSlice[index].ChildUnits[unit].RSStore
+		temp["data"] = EntityMap[key].Entity.MCSlice[index].ChildUnits[unit].RSStore
 	}
 	temp["baseURL"] = BaseURL
 	c.TplName = "RentSchedule.tpl"
@@ -68,10 +68,10 @@ func (c *ViewUnitCFController) Post() {
 	modelkey := ModelsList[GetStringUnitCF(c, "name")]
 	unit := GetIntUnitCF(c, "unit")
 	tempentity := Entity{
-		StartDate: Entities[modelkey].StartDate,
-		SalesDate: Entities[modelkey].SalesDate,
-		EndDate:   Entities[modelkey].EndDate,
-		COA:       Entities[modelkey].ChildUnits[unit].COA,
+		StartDate: EntityMap[modelkey].Entity.StartDate,
+		SalesDate: EntityMap[modelkey].Entity.SalesDate,
+		EndDate:   EntityMap[modelkey].Entity.EndDate,
+		COA:       EntityMap[modelkey].Entity.ChildUnits[unit].COA,
 	}
 	tempentity.SumCOA()
 	tempentity.MakeTable(BoolCOA{
@@ -86,7 +86,7 @@ func (c *ViewUnitCFController) Post() {
 		OperatingIncome:         true,
 		Capex:                   true,
 		NetCashFlow:             true,
-	}, true, false, true)
+	}, false, true)
 	temp["entity"] = &tempentity
 	temp["baseURL"] = BaseURL
 	c.TplName = "CFTable.tpl"
@@ -120,9 +120,9 @@ func (c *ViewUnitTableController) Post() {
 	key := ModelsList[GetStringUnitTable(c, "name")]
 	index := GetIntUnitTable(c, "index")
 	if index == -1 {
-		temp["entity"] = Entities[key]
+		temp["entity"] = EntityMap[key].Entity
 	} else {
-		temp["entity"] = Entities[key].MCSlice[index]
+		temp["entity"] = EntityMap[key].Entity.MCSlice[index]
 	}
 	temp["baseURL"] = BaseURL
 	c.TplName = "UnitTable.tpl"
@@ -178,14 +178,14 @@ func (c *AddChildUnitController) Post() {
 	unit.LeaseEndYear = GetIntAddChildUnit(c, "expiryyear")
 	unit.ERVAmount = GetFloatAddChildUnit(c, "amount")
 	unit.ERVArea = GetFloatAddChildUnit(c, "area")
-	// fmt.Printf("%+v\n", unit)
 	UnitStore[unit.MasterID] = unit
 	unit.WriteXLSXUnits()
-	// Associations()
-	Entities[parentmasterid].CalculateModel(false)
+	EntityMap[parentmasterid].Mutex.Lock()
+	EntityMap[parentmasterid].Entity.CalculateModel(false)
+	EntityMap[parentmasterid].Mutex.Unlock()
 	//
 	c.TplName = "EntityView.tpl"
-	temp["entity"] = Entities[parentmasterid]
+	temp["entity"] = EntityMap[parentmasterid].Entity
 	temp["modelslist"] = ModelsList
 	temp["fundslist"] = FundsList
 	temp["baseURL"] = BaseURL

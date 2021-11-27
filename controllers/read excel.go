@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"strconv"
+	"sync"
 
 	xl "github.com/xuri/excelize/v2"
 )
@@ -11,6 +12,7 @@ var XLSX, _ = xl.OpenFile("./models/Data.xlsx")
 
 // EntityData -
 type EntityData struct {
+	Mutex               *sync.Mutex
 	MasterID            int
 	Name                string
 	Parent              int // MasterID
@@ -168,6 +170,7 @@ func ReadXLSX() {
 			continue
 		}
 		tempentity := EntityData{}
+		tempentity.Mutex = &sync.Mutex{}
 		tempentity.MasterID, _ = strconv.Atoi(row[1])
 		tempentity.Name = row[2]
 		tempentity.Parent, _ = strconv.Atoi(row[3])
@@ -225,7 +228,7 @@ func ReadXLSX() {
 		tempentity.GLA.RentIncentives.Duration, _ = strconv.Atoi(row[54])
 		tempentity.GLA.RentIncentives.PercentOfContractRent, _ = strconv.ParseFloat(row[55], 64)
 		tempentity.GLA.FitOutCosts.AmountPerTotalArea, _ = strconv.ParseFloat(row[57], 64)
-		EntityStore[tempentity.MasterID] = &tempentity
+		EntityDataStore[tempentity.MasterID] = &tempentity
 	}
 
 	// UNITS

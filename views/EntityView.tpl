@@ -34,7 +34,7 @@
     </div>
     <div bind-html-compile = settingsResponse></div>
     </div>
-	[[if .entity.Table]]
+	
 		<div class="container-fluid" style="width: 95%;">
 			<ul class="nav nav-pills" id="CFtabletabs[[.entity.Name]]">
 				<li class="nav-item">
@@ -88,7 +88,7 @@
 		</div>
 		<br>
 		<br>
-	[[end]]
+	
 		<div id="unitTable" bind-html-compile = unittable></div>
 	[[template "footer" .]]
 </body>

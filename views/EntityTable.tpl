@@ -16,6 +16,7 @@
             </thead>
             <tbody>
                 [[range .]]
+                [[if (ne .MasterID 0)]]
                 <tr>
                     <td> 
                         <div class="post-content">
@@ -25,7 +26,7 @@
                                     <button type="submit" class="btn" id="name" name="name"  Value="[[.Name]]">[[.Name]]</button>
                                 </div>
                             </form>[[end]]
-                            [[if (eq .ParentID 0)]] 
+                            [[if (eq .ParentID 0)]]
                             <form id="query_form" class="form-horizontal form-well" role="form" action="/Fund" method="get">
                                 <div>
                                     <button type="submit" class="btn" id="name" name="name"  Value="[[.Name]]">[[.Name]]</button>
@@ -42,6 +43,7 @@
                     <td style="border-color:006A4D;">[[.StartDate.Year]]/[[.StartDate.Month]]</td>
                     <td style="border-color:006A4D;">[[.SalesDate.Year]]/[[.SalesDate.Month]]</td>
                 </tr>
+                [[end]]
                 [[end]]
             </tbody>
         </table>

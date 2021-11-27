@@ -4,11 +4,14 @@ import (
 	"sync"
 )
 
-// PopulateModels - moves data from datastores to Models
+// PopulateModels - moves data from datastores to Models. Calls CreateEntity for each model.
 func PopulateModels() {
-	for _, v := range EntityStore {
+	for _, v := range EntityDataStore {
 		temp := CreateEntity(*v)
-		Entities[v.MasterID] = &temp
+		EntityMap[v.MasterID] = EntityMutex{
+			Mutex:  &sync.Mutex{},
+			Entity: &temp,
+		}
 		if v.Parent != 0 {
 			ModelsList[temp.Name] = temp.MasterID
 			EntitiesList[temp.Name] = temp.MasterID
@@ -105,14 +108,8 @@ func (e *Entity) UpdateEntity(mc bool, v *EntityData) {
 	growthinput := map[string]HModel{}
 	growthinput["CPI"] = v.CPIGrowth
 	growthinput["ERV"] = v.ERVGrowth
-	parent := Entities[v.Parent].MasterID
+	parent := EntityMap[v.Parent].Entity.MasterID
 	childentitiesmap := map[int]*Entity{}
-	// if len(e.ChildEntities) > 0 {
-	// 	childentitiesmap = e.ChildEntities
-	// 	for _, v := range e.ChildEntities {
-	// 		fmt.Println(v.Name)
-	// 	}
-	// }
 	*e = Entity{
 		Mutex:         &sync.Mutex{},
 		MasterID:      v.MasterID,
@@ -121,7 +118,7 @@ func (e *Entity) UpdateEntity(mc bool, v *EntityData) {
 		ChildUnits:    map[int]*Unit{},
 		Metrics:       Metrics{},
 		ParentID:      v.Parent,
-		Parent:        Entities[parent],
+		Parent:        EntityMap[parent].Entity,
 		StartDate:     startdate,
 		HoldPeriod:    v.HoldPeriod,
 		SalesDate:     salesdate,
@@ -162,6 +159,8 @@ func (e *Entity) UpdateEntity(mc bool, v *EntityData) {
 			ERVArea:      0,
 			ERVAmount:    0,
 		},
+		MCSetup: MCSetup{
+			Sims: 100},
 		Tax: Tax{
 			MinValue:        v.WOZpercent,
 			LandValue:       v.Landvalue,
@@ -254,7 +253,7 @@ func (e *Entity) CalculateModel(mc bool) {
 				coas.BondIncome = false
 				coas.BondExpense = false
 			}
-			e.MakeTable(coas, false, false, true)
+			e.MakeTable(coas, false, true)
 		}
 		e.MetricsCalc()
 		if mc {
@@ -337,9 +336,9 @@ func (e *Entity) PopulateUnits() {
 // }
 
 func (e *Entity) PopulateChildEntities() {
-	for _, v := range EntityStore {
+	for _, v := range EntityDataStore {
 		if v.Parent == e.MasterID {
-			e.ChildEntities[v.MasterID] = Entities[v.MasterID]
+			e.ChildEntities[v.MasterID] = EntityMap[v.MasterID].Entity
 		}
 	}
 }

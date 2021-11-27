@@ -99,6 +99,9 @@ func (e *Entity) MonteCarlo() {
 	duration := e.MCDataObjectsCreate(1)
 	wg := sync.WaitGroup{}
 	for i := 1; i <= e.MCSetup.Sims; i++ {
+		if e.MCSetup.Sims < 100 {
+			continue
+		}
 		wg.Add(1)
 		go func(ee *Entity, index int) {
 			defer wg.Done()
@@ -106,20 +109,20 @@ func (e *Entity) MonteCarlo() {
 			mu.Lock()
 			// rand.Seed(uint64(index))
 			temp := *ee
-			tempentitydata := EntityStore[e.MasterID]
-			tempentitydata.ERVGrowth.ShortTermRate = NormalSample(e.GrowthInput["ERV"].ShortTermRate, e.MCSetup.ERV.ShortTermRate, 0.0)
-			tempentitydata.ERVGrowth.ShortTermPeriod = int(NormalSample(float64(e.GrowthInput["ERV"].ShortTermPeriod), float64(e.MCSetup.ERV.ShortTermPeriod), 0.0))
-			tempentitydata.ERVGrowth.TransitionPeriod = int(NormalSample(float64(e.GrowthInput["ERV"].TransitionPeriod), float64(e.MCSetup.ERV.TransitionPeriod), 0.0))
-			tempentitydata.ERVGrowth.LongTermRate = NormalSample(e.GrowthInput["ERV"].LongTermRate, e.MCSetup.ERV.LongTermRate, 0.0)
-			tempentitydata.CPIGrowth.ShortTermRate = NormalSample(e.GrowthInput["CPI"].ShortTermRate, e.MCSetup.CPI.ShortTermRate, 0.0)
-			tempentitydata.CPIGrowth.ShortTermPeriod = int(NormalSample(float64(e.GrowthInput["CPI"].ShortTermPeriod), float64(e.MCSetup.CPI.ShortTermPeriod), 0.0))
-			tempentitydata.CPIGrowth.TransitionPeriod = int(NormalSample(float64(e.GrowthInput["CPI"].TransitionPeriod), float64(e.MCSetup.CPI.TransitionPeriod), 0.0))
-			tempentitydata.CPIGrowth.LongTermRate = NormalSample(e.GrowthInput["CPI"].LongTermRate, e.MCSetup.CPI.LongTermRate, 0.0)
-			tempentitydata.OpExpercent = NormalSample(e.OpEx.PercentOfTRI, e.MCSetup.OpEx, 0.0)
-			tempentitydata.YieldShift = NormalSample(e.Valuation.YieldShift, e.MCSetup.YieldShift, -99.9)
-			tempentitydata.GLA.Void = int(NormalSample(float64(e.GLA.Void), e.MCSetup.Void, 0.0))
-			tempentitydata.GLA.Probability = NormalSample(e.GLA.Probability, e.MCSetup.Probability, 0.0)
-			tempentitydata.GLA.Default.Hazard = NormalSample(float64(e.GLA.Default.Hazard), float64(e.MCSetup.Hazard), 0.0)
+			tempentitydata := EntityDataStore[e.MasterID]
+			tempentitydata.ERVGrowth.ShortTermRate = NormalSample(e.GrowthInput["ERV"].ShortTermRate, e.MCSetup.ERV.ShortTermRate, 0.0, 10.0)
+			tempentitydata.ERVGrowth.ShortTermPeriod = int(NormalSample(float64(e.GrowthInput["ERV"].ShortTermPeriod), float64(e.MCSetup.ERV.ShortTermPeriod), 0.0, 10.0))
+			tempentitydata.ERVGrowth.TransitionPeriod = int(NormalSample(float64(e.GrowthInput["ERV"].TransitionPeriod), float64(e.MCSetup.ERV.TransitionPeriod), 0.0, 10.0))
+			tempentitydata.ERVGrowth.LongTermRate = NormalSample(e.GrowthInput["ERV"].LongTermRate, e.MCSetup.ERV.LongTermRate, 0.0, 10.0)
+			tempentitydata.CPIGrowth.ShortTermRate = NormalSample(e.GrowthInput["CPI"].ShortTermRate, e.MCSetup.CPI.ShortTermRate, 0.0, 10.0)
+			tempentitydata.CPIGrowth.ShortTermPeriod = int(NormalSample(float64(e.GrowthInput["CPI"].ShortTermPeriod), float64(e.MCSetup.CPI.ShortTermPeriod), 0.0, 10.0))
+			tempentitydata.CPIGrowth.TransitionPeriod = int(NormalSample(float64(e.GrowthInput["CPI"].TransitionPeriod), float64(e.MCSetup.CPI.TransitionPeriod), 0.0, 10.0))
+			tempentitydata.CPIGrowth.LongTermRate = NormalSample(e.GrowthInput["CPI"].LongTermRate, e.MCSetup.CPI.LongTermRate, 0.0, 10.0)
+			tempentitydata.OpExpercent = NormalSample(e.OpEx.PercentOfTRI, e.MCSetup.OpEx, 0.0, 100.0)
+			tempentitydata.YieldShift = NormalSample(e.Valuation.YieldShift, e.MCSetup.YieldShift, -99.9, 100.0)
+			tempentitydata.GLA.Void = int(NormalSample(float64(e.GLA.Void), e.MCSetup.Void, 0.0, 100.0))
+			tempentitydata.GLA.Probability = NormalSample(e.GLA.Probability, e.MCSetup.Probability, 0.0, 1.0)
+			tempentitydata.GLA.Default.Hazard = NormalSample(float64(e.GLA.Default.Hazard), float64(e.MCSetup.Hazard), 0.0, 10.0)
 			mu.Unlock()
 			//
 			temp.MC = true
@@ -295,6 +298,9 @@ func (e *Entity) FundMonteCarlo() {
 	for sim := 0; sim < e.MCSetup.Sims; sim++ {
 		// get CPI
 		for _, v := range e.ChildEntities {
+			if v.MCSetup.Sims == 0 {
+				continue
+			}
 			// select one of the simulations
 			samplefloat := rand.Float64()
 			simsfloat := float64(e.MCSetup.Sims)
@@ -350,7 +356,7 @@ func MCStatsCalc(sourceslice *[]float64, sims int) (stats MCStats) {
 		// Sample from normal dist to compare to observed IRR array
 		norm := make([]float64, len(slice))
 		for i := range norm {
-			norm[i] = NormalSample(mean, stdev, -999.9)
+			norm[i] = NormalSample(mean, stdev, -9999.9, 1000.0)
 		}
 		sort.Float64s(norm)
 		sort.Float64s(slice)

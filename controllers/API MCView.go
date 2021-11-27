@@ -21,73 +21,73 @@ func (c *MCDetailsController) Post() {
 	endindex := startindex + 10
 	//
 	// startindex = 0
-	// endindex = Entities[tempkey].MCSetup.Sims
+	// endindex = EntityMap[tempkey].Entity.MCSetup.Sims
 	//
 	temp := make(map[interface{}]interface{})
 	switch order {
 	case "irr":
-		sort.Sort(ByIRR(Entities[tempkey].MCSlice))
+		sort.Sort(ByIRR(EntityMap[tempkey].Entity.MCSlice))
 	case "irr-r":
-		sort.Sort(ByIRRr(Entities[tempkey].MCSlice))
+		sort.Sort(ByIRRr(EntityMap[tempkey].Entity.MCSlice))
 	case "em":
-		sort.Sort(ByEM(Entities[tempkey].MCSlice))
+		sort.Sort(ByEM(EntityMap[tempkey].Entity.MCSlice))
 	case "em-r":
-		sort.Sort(ByEMr(Entities[tempkey].MCSlice))
+		sort.Sort(ByEMr(EntityMap[tempkey].Entity.MCSlice))
 	case "ytm":
-		sort.Sort(ByYTM(Entities[tempkey].MCSlice))
+		sort.Sort(ByYTM(EntityMap[tempkey].Entity.MCSlice))
 	case "ytm-r":
-		sort.Sort(ByYTMr(Entities[tempkey].MCSlice))
+		sort.Sort(ByYTMr(EntityMap[tempkey].Entity.MCSlice))
 	case "duration":
-		sort.Sort(ByDuration(Entities[tempkey].MCSlice))
+		sort.Sort(ByDuration(EntityMap[tempkey].Entity.MCSlice))
 	case "duration-r":
-		sort.Sort(ByDurationr(Entities[tempkey].MCSlice))
+		sort.Sort(ByDurationr(EntityMap[tempkey].Entity.MCSlice))
 	case "void":
-		sort.Sort(ByVoid(Entities[tempkey].MCSlice))
+		sort.Sort(ByVoid(EntityMap[tempkey].Entity.MCSlice))
 	case "void-r":
-		sort.Sort(ByVoidr(Entities[tempkey].MCSlice))
+		sort.Sort(ByVoidr(EntityMap[tempkey].Entity.MCSlice))
 	case "extdur":
-		sort.Sort(ByEXTDUR(Entities[tempkey].MCSlice))
+		sort.Sort(ByEXTDUR(EntityMap[tempkey].Entity.MCSlice))
 	case "extdur-r":
-		sort.Sort(ByEXTDURr(Entities[tempkey].MCSlice))
+		sort.Sort(ByEXTDURr(EntityMap[tempkey].Entity.MCSlice))
 	case "hazard":
-		sort.Sort(ByHazard(Entities[tempkey].MCSlice))
+		sort.Sort(ByHazard(EntityMap[tempkey].Entity.MCSlice))
 	case "hazard-r":
-		sort.Sort(ByHazardr(Entities[tempkey].MCSlice))
+		sort.Sort(ByHazardr(EntityMap[tempkey].Entity.MCSlice))
 	case "opex":
-		sort.Sort(ByOpEx(Entities[tempkey].MCSlice))
+		sort.Sort(ByOpEx(EntityMap[tempkey].Entity.MCSlice))
 	case "opex-r":
-		sort.Sort(ByOpExr(Entities[tempkey].MCSlice))
+		sort.Sort(ByOpExr(EntityMap[tempkey].Entity.MCSlice))
 	case "cpi":
-		sort.Sort(ByCPI(Entities[tempkey].MCSlice))
+		sort.Sort(ByCPI(EntityMap[tempkey].Entity.MCSlice))
 	case "cpi-r":
-		sort.Sort(ByCPIr(Entities[tempkey].MCSlice))
+		sort.Sort(ByCPIr(EntityMap[tempkey].Entity.MCSlice))
 	case "erv":
-		sort.Sort(ByERV(Entities[tempkey].MCSlice))
+		sort.Sort(ByERV(EntityMap[tempkey].Entity.MCSlice))
 	case "erv-r":
-		sort.Sort(ByERVr(Entities[tempkey].MCSlice))
+		sort.Sort(ByERVr(EntityMap[tempkey].Entity.MCSlice))
 	case "yieldshift":
-		sort.Sort(ByYieldShift(Entities[tempkey].MCSlice))
+		sort.Sort(ByYieldShift(EntityMap[tempkey].Entity.MCSlice))
 	case "yieldshift-r":
-		sort.Sort(ByYieldShiftr(Entities[tempkey].MCSlice))
+		sort.Sort(ByYieldShiftr(EntityMap[tempkey].Entity.MCSlice))
 	case "endcash":
-		sort.Sort(ByEndCash(Entities[tempkey].MCSlice))
+		sort.Sort(ByEndCash(EntityMap[tempkey].Entity.MCSlice))
 	case "endcash-r":
-		sort.Sort(ByEndCashr(Entities[tempkey].MCSlice))
+		sort.Sort(ByEndCashr(EntityMap[tempkey].Entity.MCSlice))
 	case "endncf":
-		sort.Sort(ByEndNCF(Entities[tempkey].MCSlice))
+		sort.Sort(ByEndNCF(EntityMap[tempkey].Entity.MCSlice))
 	case "endncf-r":
-		sort.Sort(ByEndNCFr(Entities[tempkey].MCSlice))
+		sort.Sort(ByEndNCFr(EntityMap[tempkey].Entity.MCSlice))
 	case "endmarketvalue":
-		sort.Sort(ByEndMarketValue(Entities[tempkey].MCSlice))
+		sort.Sort(ByEndMarketValue(EntityMap[tempkey].Entity.MCSlice))
 	case "endmarketvalue-r":
-		sort.Sort(ByEndMarketValuer(Entities[tempkey].MCSlice))
+		sort.Sort(ByEndMarketValuer(EntityMap[tempkey].Entity.MCSlice))
 	case "prob":
-		sort.Sort(ByProb(Entities[tempkey].MCSlice))
+		sort.Sort(ByProb(EntityMap[tempkey].Entity.MCSlice))
 	case "prob-r":
-		sort.Sort(ByProbr(Entities[tempkey].MCSlice))
+		sort.Sort(ByProbr(EntityMap[tempkey].Entity.MCSlice))
 	}
-	temp["MCSlice"] = Entities[tempkey].MCSlice[startindex:endindex]
-	temp["Strategy"] = Entities[tempkey].Strategy
+	temp["MCSlice"] = EntityMap[tempkey].Entity.MCSlice[startindex:endindex]
+	temp["Strategy"] = EntityMap[tempkey].Entity.Strategy
 	temp["baseURL"] = BaseURL
 	c.TplName = "MCDetails.tpl"
 	c.Data = temp
@@ -125,61 +125,52 @@ func (c *MCTabsController) Post() {
 	tab := c.Data["tab"].(string)
 	switch tab {
 	case "cf":
-		temp["entity"] = Entities[tempkey]
+		temp["entity"] = EntityMap[tempkey].Entity
 		c.TplName = "CFTable.tpl"
 	case "endcash":
-		temp["data"] = Entities[tempkey].MCResults.EndCash
-		temp["varp"] = Entities[tempkey].MCResults.CashBalanceVaR
+		temp["data"] = EntityMap[tempkey].Entity.MCResults.EndCash
+		temp["varp"] = EntityMap[tempkey].Entity.MCResults.CashBalanceVaR
 		c.TplName = "MCHist.tpl"
 	case "cashbalance":
-		temp["data"] = Entities[tempkey].MCResults.CashBalance
+		temp["data"] = EntityMap[tempkey].Entity.MCResults.CashBalance
 		c.TplName = "3dchart.tpl"
 	case "endncf":
-		temp["data"] = Entities[tempkey].MCResults.EndNCF
-		temp["varp"] = Entities[tempkey].MCResults.NCFVaR
+		temp["data"] = EntityMap[tempkey].Entity.MCResults.EndNCF
+		temp["varp"] = EntityMap[tempkey].Entity.MCResults.NCFVaR
 		c.TplName = "MCHist.tpl"
 	case "ncf":
-		temp["data"] = Entities[tempkey].MCResults.NCF
+		temp["data"] = EntityMap[tempkey].Entity.MCResults.NCF
 		c.TplName = "3dchart.tpl"
 	case "endmarketvalue":
-		temp["data"] = Entities[tempkey].MCResults.EndMarketValue
-		temp["varp"] = Entities[tempkey].MCResults.MarketValueVaR
+		temp["data"] = EntityMap[tempkey].Entity.MCResults.EndMarketValue
+		temp["varp"] = EntityMap[tempkey].Entity.MCResults.MarketValueVaR
 		c.TplName = "MCHist.tpl"
 	case "marketvalue":
-		temp["data"] = Entities[tempkey].MCResults.MarketValue
+		temp["data"] = EntityMap[tempkey].Entity.MCResults.MarketValue
 		c.TplName = "3dchart.tpl"
 	case "irr":
-		temp["data"] = Entities[tempkey].MCResults.IRR
+		temp["data"] = EntityMap[tempkey].Entity.MCResults.IRR
 		c.TplName = "MCHist.tpl"
 	case "em":
-		temp["data"] = Entities[tempkey].MCResults.EM
+		temp["data"] = EntityMap[tempkey].Entity.MCResults.EM
 		c.TplName = "MCHist.tpl"
 	case "ytm":
-		temp["data"] = Entities[tempkey].MCResults.YTM
+		temp["data"] = EntityMap[tempkey].Entity.MCResults.YTM
 		c.TplName = "MCHist.tpl"
 	case "duration":
-		temp["data"] = Entities[tempkey].MCResults.Duration
+		temp["data"] = EntityMap[tempkey].Entity.MCResults.Duration
 		c.TplName = "MCHist.tpl"
 	case "ytmdur":
-		temp["data"] = Entities[tempkey].MCResults.YTMDUR
+		temp["data"] = EntityMap[tempkey].Entity.MCResults.YTMDUR
 		c.TplName = "MCHist.tpl"
 	case "factoranalysis":
-		temp["data"] = Entities[tempkey]
+		temp["data"] = EntityMap[tempkey].Entity
 		c.TplName = "FactorAnalysis.tpl"
-		// for i, v := range Entities[tempkey].FactorAnalysis {
+		// for i, v := range EntityMap[tempkey].Entity.FactorAnalysis {
 		// 	fmt.Println(i)
 		// 	fmt.Printf("%+v\n", v)
 		// }
 
 	}
 	c.Data = temp
-}
-
-type TestController struct {
-	beego.Controller
-}
-
-func (c *TestController) Get() {
-	c.Data["json"] = Entities[1].MCResults
-	c.ServeJSON()
 }

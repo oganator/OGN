@@ -20,7 +20,7 @@
             </form>
             &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp  
             <div>
-                <button hidden type="button" class="btn" data-toggle="modal" data-target="#settingsModal">Settings</button>
+                <button type="button" class="btn" data-toggle="modal" data-target="#settingsModal">Settings</button>
             </div>
         </nav>
     </body>
@@ -29,16 +29,22 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <input type="text" class="form-control" value="[[.baseURL]]" ng-model="baseURL">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" ng-click="updateBaseURL()">Save changes</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <form id="query_form" class="form-horizontal form-well" role="form" action="/AppSettings" method="post">
+
+                        <div class="form-group col-sm-8">
+                            <label for="fees">Show Monthly Cash Flow</label>
+                            <input type="text" class="form-control" id="monthly" name="monthly">
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="submit" class="btn secondary-bg">Submit</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

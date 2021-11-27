@@ -1,7 +1,9 @@
 package controllers
 
+import "sync"
+
 // EntityStore -
-var EntityStore = map[int]*EntityData{}
+var EntityDataStore = map[int]*EntityData{}
 
 // UnitStore -
 var UnitStore = map[int]UnitData{}
@@ -19,7 +21,14 @@ var GrowthItemsStore = make(map[int]map[string]float64)
 // var UnitAssociations = make(map[int][]int)
 
 // Entities - MasterID as key
-var Entities = map[int]*Entity{}
+var EntityMap = EntityMutexMap{}
+
+type EntityMutexMap map[int]EntityMutex
+
+type EntityMutex struct {
+	Mutex  *sync.Mutex
+	Entity *Entity
+}
 
 // EnitiesList - all entities, funds and assets
 var EntitiesList = make(map[string]int)
@@ -40,12 +49,26 @@ func init() {
 	ReadXLSX()
 	PopulateModels()
 	// parent assignment
-	for i, v := range Entities {
-		v.Parent = Entities[EntityStore[i].Parent]
-		v.PopulateChildEntities()
+	for i, v := range EntityMap {
+		v.Entity.Parent = EntityMap[EntityDataStore[i].Parent].Entity
+		v.Entity.PopulateChildEntities()
+	}
+	for _, v := range FundsList {
+		EntityMap[v].Entity.CalculateFund()
+	}
+	for _, v := range ModelsList {
+		EntityMap[v].Entity.MonteCarlo()
+	}
+	for _, v := range FundsList {
+		if EntityMap[v].Entity.MasterID == 0 {
+			continue
+		}
+		EntityMap[v].Entity.FundMonteCarlo()
 	}
 }
 
 var BaseURL = "" //"http://localhost:8080/"
 
 // var BaseURL = "https://oganica.azurewebsites.net/"
+
+var Monthly = false

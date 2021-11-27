@@ -51,14 +51,14 @@ func (c *MCIndexController) Post() {
 		BondIncome:              true,
 		BondExpense:             true,
 	}
-	if Entities[tempkey].Strategy == "Standard" {
+	if EntityMap[tempkey].Entity.Strategy == "Standard" {
 		coas.BPUplift = false
 		coas.BondExpense = false
 		coas.BondIncome = false
 		coas.Debt = true
 	}
-	Entities[tempkey].MCSlice[index].MakeTable(coas, false, false, true)
-	temp["entity"] = Entities[tempkey].MCSlice[index]
+	EntityMap[tempkey].Entity.MCSlice[index].MakeTable(coas, false, true)
+	temp["entity"] = EntityMap[tempkey].Entity.MCSlice[index]
 	temp["baseURL"] = BaseURL
 	c.TplName = "CFTable.tpl"
 	c.Data = temp
