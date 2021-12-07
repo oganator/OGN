@@ -2,37 +2,37 @@ package controllers
 
 // Yield -
 type Yield struct {
-	Entry float64
-	Shift float64 //bps per year
-	Exit  float64
+	Entry float64 `json:"Entry,omitempty"`
+	Shift float64 `json:"Shift,omitempty"` //bps per year
+	Exit  float64 `json:"Exit,omitempty"`
 }
 
 // DebtInput -
 type DebtInput struct {
-	LTV          float64
-	InterestRate float64
+	LTV          float64 `json:"LTV,omitempty"`
+	InterestRate float64 `json:"InterestRate,omitempty"`
 }
 
 // Metrics -
 type Metrics struct {
-	IRR        ReturnType
-	EM         ReturnType
-	CoC        ReturnType
-	TWR        ReturnType
-	BondHolder BondReturnType
+	IRR        ReturnType     `json:"irr,omitempty"`
+	EM         ReturnType     `json:"em,omitempty"`
+	CoC        ReturnType     `json:"coc,omitempty"`
+	TWR        ReturnType     `json:"twr,omitempty"`
+	BondHolder BondReturnType `json:"bondholder,omitempty"`
 }
 
 // ReturnType -
 type ReturnType struct {
-	GrossUnleveredBeforeTax float64
-	NetLeveredAfterTax      float64
+	GrossUnleveredBeforeTax float64 `json:"GrossUnleveredBeforeTax,omitempty"`
+	NetLeveredAfterTax      float64 `json:"NetLeveredAfterTax,omitempty"`
 }
 
 // BondReturnType -
 type BondReturnType struct {
-	Duration float64
-	YTM      float64
-	YTMDUR   float64
+	Duration float64 `json:"Duration,omitempty"`
+	YTM      float64 `json:"YTM,omitempty"`
+	YTMDUR   float64 `json:"YTMDUR,omitempty"`
 }
 
 // Default -

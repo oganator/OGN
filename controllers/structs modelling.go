@@ -30,7 +30,7 @@ type Indexation struct {
 	EndDate      Datetype      `json:"EndDate,omitempty"`
 	Amount       float64       `json:"Amount,omitempty"`
 	Final        float64       `json:"Final,omitempty"`
-	RentSchedule *RentSchedule `json:"Unit,omitempty"`
+	RentSchedule *RentSchedule `json:"-"`
 }
 
 // IndexDetails -
@@ -43,23 +43,22 @@ type IndexDetails struct {
 
 // InitialGrowth -
 type InitialGrowth struct {
-	Area   float64
-	Amount float64
+	Area   float64 `json:"Area,omitempty"`
+	Amount float64 `json:"Amount,omitempty"`
 }
 
 // CostInput -
 type CostInput struct {
-	Amount                float64
-	AmountPerTotalArea    float64
-	AmountPerOccupiedArea float64
-	AmountPerVacantArea   float64
-	// GrowthRateofType      []GrowthRateInput
-	PercentOfERV          float64
-	PercentOfTRI          float64
-	PercentOfContractRent float64
-	PercentOfNAV          float64
-	PercentOfGAV          float64
-	IsCapitalized         bool
-	Duration              int  // number of months
-	IsIndexed             bool // if true, the cost grows with CPI
+	Amount                float64 `json:"Amount,omitempty"`
+	AmountPerTotalArea    float64 `json:"AmountPerTotalArea,omitempty"`
+	AmountPerOccupiedArea float64 `json:"AmountPerOccupiedArea,omitempty"`
+	AmountPerVacantArea   float64 `json:"AmountPerVacantArea,omitempty"`
+	PercentOfERV          float64 `json:"PercentOfERV,omitempty"`
+	PercentOfTRI          float64 `json:"PercentOfTRI,omitempty"`
+	PercentOfContractRent float64 `json:"PercentOfContractRent,omitempty"`
+	PercentOfNAV          float64 `json:"PercentOfNAV,omitempty"`
+	PercentOfGAV          float64 `json:"PercentOfGAV,omitempty"`
+	IsCapitalized         bool    `json:"IsCapitalized,omitempty"`
+	Duration              int     `json:"Duration,omitempty"`  // number of months
+	IsIndexed             bool    `json:"IsIndexed,omitempty"` // if true, the cost grows with CPI
 }

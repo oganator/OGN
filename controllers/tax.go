@@ -6,15 +6,15 @@ import (
 
 // Tax -
 type Tax struct {
-	MinValue        float64             // as a percent
-	LandValue       float64             // as a percent
-	UsablePeriod    int                 // number of years
-	RETT            float64             // as a percent
-	CIT             map[float64]float64 //map[income]rate
-	VAT             float64             //
-	CarryBackYrs    int                 //
-	CarryForwardYrs int                 //
-	DTA             IntFloatMap         //
+	MinValue        float64             `json:"MinValue,omitempty"`        // as a percent
+	LandValue       float64             `json:"LandValue,omitempty"`       // as a percent
+	UsablePeriod    int                 `json:"UsablePeriod,omitempty"`    // number of years
+	RETT            float64             `json:"RETT,omitempty"`            // as a percent
+	CIT             map[float64]float64 `json:"CIT,omitempty"`             //map[income]rate
+	VAT             float64             `json:"VAT,omitempty"`             //
+	CarryBackYrs    int                 `json:"CarryBackYrs,omitempty"`    //
+	CarryForwardYrs int                 `json:"CarryForwardYrs,omitempty"` //
+	DTA             IntFloatMap         `json:"DTA,omitempty"`             //
 }
 
 // CIT - starts in december of the second year, and assesses the tax liability of that year, then inserts the taxes payable into may of the next year. Does not assess capital gain (done in Disposal()). As more items are built out, they need to be added to taxable income, as the inclusion of BPuplift previously skewed the taxable income upwards

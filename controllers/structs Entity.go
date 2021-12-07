@@ -4,7 +4,7 @@ import "sync"
 
 // Entity -
 type Entity struct {
-	Mutex          *sync.Mutex         `json:"MCMutex,omitempty"`         //
+	Mutex          *sync.Mutex         `json:"-"`                         //
 	MasterID       int                 `json:"MasterID,omitempty"`        //
 	Name           string              `json:"Name,omitempty"`            //
 	ChildEntities  map[int]*Entity     `json:"ChildEntities,omitempty"`   // MasterID as key. created by ModelCreate().
@@ -74,38 +74,38 @@ type Unit struct {
 
 // ChildEntities -
 type ChildEntities struct {
-	Keys  map[string]int
-	Array []Entity
+	Keys  map[string]int `json:Keys,omitempty"`
+	Array []Entity       `json:Array,omitempty"`
 }
 
 // ChildUnits -
 type ChildUnits struct {
-	Keys  map[string]int
-	Array []Unit
+	Keys  map[string]int `json:Keys,omitempty"`
+	Array []Unit         `json:Array,omitempty"`
 }
 
 // HeaderType -
 type HeaderType struct {
-	Monthly   []Datetype
-	Quarterly []Datetype
+	Monthly   []Datetype `json:"Monthly,omitempty"`
+	Quarterly []Datetype `json:"Quarterly,omitempty"`
 	Yearly    []Datetype `json:"Yearly,omitempty"`
 }
 
 // Valuation -
 type Valuation struct {
-	EntryYield      float64        //
-	YieldShift      float64        //
-	ExitYield       float64        //
-	DiscountRate    float64        //
-	AcqPrice        float64        //
-	AcqFees         map[string]Fee //
-	DispFees        map[string]Fee //
-	IncomeCapSetup  FloatCOA       //
-	IncomeDeduction FloatCOA       // Deductions to income after it is capped
+	EntryYield      float64        `json:"EntryYield,omitempty"`      //
+	YieldShift      float64        `json:"YieldShift,omitempty"`      //
+	ExitYield       float64        `json:"ExitYield,omitempty"`       //
+	DiscountRate    float64        `json:"DiscountRate,omitempty"`    //
+	AcqPrice        float64        `json:"AcqPrice,omitempty"`        //
+	AcqFees         map[string]Fee `json:"AcqFees,omitempty"`         //
+	DispFees        map[string]Fee `json:"DispFees,omitempty"`        //
+	IncomeCapSetup  FloatCOA       `json:"IncomeCapSetup,omitempty"`  //
+	IncomeDeduction FloatCOA       `json:"IncomeDeduction,omitempty"` // Deductions to income after it is capped
 }
 
 // Fee -
 type Fee struct {
-	Base    string // Can be Yield or Net Price. If Yield is selected, then the value expressed as a decimal + 1 (4% is 1.04) and multiplied into the yield.
-	Percent float64
+	Base    string  `json:"Base,omitempty"` // Can be Yield or Net Price. If Yield is selected, then the value expressed as a decimal + 1 (4% is 1.04) and multiplied into the yield.
+	Percent float64 `json:"Percent,omitempty"`
 }

@@ -72,3 +72,5 @@ var BaseURL = "" //"http://localhost:8080/"
 // var BaseURL = "https://oganica.azurewebsites.net/"
 
 var Monthly = false
+
+var Compute = "Internal" // Internal or Azure

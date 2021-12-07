@@ -79,7 +79,9 @@
     <br>
     <script>
         window.onload = strategyChange();
-        
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
         function strategyChange() {
             var input = document.getElementById("strategy");
             if (input.value == "Standard"){
@@ -120,15 +122,15 @@
         <input hidden id="name" name="name" ng-model="entity" value="[[.entity.Name]]">
         <div class="form-group col-sm-1">
             <label for="portfolio">Asset</label>
-            <input type="text" class="form-control" id="portfolio" name="portfolio" value="[[.entity.Name]]">
+            <input type="text" class="form-control" id="portfolio" name="portfolio" value="[[.entity.Name]]" >
         </div>
         <div class="form-group col-sm-1">
             <label for="holdperiod">Hold Period</label>
-            <input type="text" class="form-control" id="holdperiod" name="holdperiod" value="[[.entity.HoldPeriod]]">
+            <input type="text" class="form-control" id="holdperiod" name="holdperiod" value="[[.entity.HoldPeriod]]" data-toggle="tooltip" data-placement="top" title="Years">
         </div>
         <div class="form-group col-sm-1">
             <label for="fees">Fees (bps)</label>
-            <input type="text" class="form-control" id="fees" name="fees" Value="[[.entity.Fees.PercentOfGAV]]">
+            <input type="text" class="form-control" id="fees" name="fees" Value="[[.entity.Fees.PercentOfGAV]]" data-toggle="tooltip" data-placement="top" title="Percent of Gross Market Value">
         </div>
         <div class="form-group col-sm-1">
             <label for="rate">Strategy</label>
@@ -183,7 +185,7 @@
             </div>
         <div class="form-group col-sm-1">
             <label for="ervshorttermperiod">ERV Short Period</label>
-            <input type="text" class="form-control" id="ervshorttermperiod" name="ervshorttermperiod" Value="[[$erv.ShortTermPeriod]]">
+            <input type="text" class="form-control" id="ervshorttermperiod" name="ervshorttermperiod" Value="[[$erv.ShortTermPeriod]]" data-toggle="tooltip" data-placement="top" title="in Months">
         </div>
         <div class="form-group col-sm-1">
             <label for="ervtransitionperiod">ERV Transition Period</label>
@@ -425,7 +427,7 @@
                     <input readonly type="text" class="form-control" id="dur" name="dur" Value="DUR: [[.entity.Metrics.BondHolder.Duration]]">
                 </div>
                 <div class="form-group col-sm-1">
-                    <input readonly type="text" class="form-control" id="ytmdur" name="ytmdur" Value="YTM/DUR: ">
+                    <input readonly type="text" class="form-control" id="ytmdur" name="ytmdur" Value="YTM/DUR: {{[[.entity.Metrics.BondHolder.YTMDUR]] | number:4}}">
                 </div>
                 [[end]]
             </div>

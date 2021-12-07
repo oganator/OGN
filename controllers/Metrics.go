@@ -6,25 +6,29 @@ import (
 
 // MetricsCalc -
 func (e *Entity) MetricsCalc() {
-	nlatirr := IRR(&e.COA, Dateadd(e.StartDate, -1), e.SalesDate, FloatCOA{NetCashFlow: 1})
-	e.Metrics.IRR.NetLeveredAfterTax = math.Round(nlatirr*10000) / 10000
-	ytm := IRR(&e.COA, Dateadd(e.StartDate, -1), e.SalesDate, FloatCOA{BondExpense: 1})
-	e.Metrics.BondHolder.YTM = math.Round(ytm*100) / 100
-	e.Duration()
-	e.Metrics.BondHolder.YTMDUR = e.Metrics.BondHolder.YTM / e.Metrics.BondHolder.Duration
+	e.Metrics.IRR.NetLeveredAfterTax = math.Round(IRR(&e.COA, Dateadd(e.StartDate, -1), e.SalesDate, FloatCOA{NetCashFlow: 1})*10000) / 10000
+	e.Metrics.BondHolder.YTM = math.Round(IRR(&e.COA, Dateadd(e.StartDate, -1), e.SalesDate, FloatCOA{BondExpense: 1})*10000) / 10000
 	e.Metrics.EM.NetLeveredAfterTax = EquityMultipleCalc(e.StartDate, e.SalesDate, e.COA)
+	bondexpense := ExtractCOALine(e.StartDate, e.SalesDate, FloatCOA{BondExpense: 1}, &e.COA)
+	e.Metrics.BondHolder.Duration = Duration(bondexpense)
+	e.Metrics.BondHolder.YTMDUR = e.Metrics.BondHolder.YTM / e.Metrics.BondHolder.Duration
 }
 
 // IRR -
 func IRR(cf *IntFloatCOAMap, start Datetype, end Datetype, setup FloatCOA) float64 {
+	values := ExtractCOALine(start, end, setup, cf)
+	irr := math.Pow(IRRCalc(values)+1, 12) - 1
+	return irr * 100
+}
+
+func ExtractCOALine(start Datetype, end Datetype, setup FloatCOA, cf *IntFloatCOAMap) []float64 {
 	var values []float64
 	for date := start; date.Dateint <= end.Dateint; date.Add(1) {
 		tempcoa := setup
 		tempcoa.Multiply((*cf)[date.Dateint])
 		values = append(values, SumCOADown(tempcoa))
 	}
-	irr := math.Pow(IRRCalc(values)+1, 12) - 1
-	return irr * 100
+	return values
 }
 
 // IRRCalc -
@@ -52,18 +56,26 @@ func IRRCalc(values []float64) float64 {
 }
 
 // Duration -
-func (e *Entity) Duration() {
-	sum := SumCOALines(FloatCOA{BondExpense: 1}, e.COA, e.StartDate, e.SalesDate)
-	dur := 0.0
-	for date, i := e.StartDate, 1.0; date.Dateint <= e.SalesDate.Dateint; date, i = Dateadd(date, 1), i+1.0 {
-		weight := e.COA[date.Dateint].BondExpense / sum
-		dur = weight*i + dur
+func Duration(values []float64) float64 {
+	sum := 0.0
+	for _, v := range values {
+		// if i == 0 {
+		// 	continue
+		// }
+		sum = sum + v
 	}
-	duration := math.Round((dur/12)*100) / 100
+
+	// sum := SumCOALines(FloatCOA{BondExpense: 1}, e.COA, e.StartDate, e.SalesDate)
+	dur := 0.0
+	for i, v := range values {
+		weight := v / sum
+		dur = weight*float64(i) + dur
+	}
+	duration := math.Round((dur/12)*10000) / 10000
 	if sum == 0.0 {
 		duration = 0.0
 	}
-	e.Metrics.BondHolder.Duration = duration
+	return duration
 }
 
 // EquityMultipleCalc -
