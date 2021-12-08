@@ -33,14 +33,16 @@ func FactorRegression(metric string, mcresults *MCResultSlice, y *[]float64) (fi
 }
 
 func (e *Entity) FactorAnalysisCalc(mcresults *MCResultSlice) {
-	e.FactorAnalysis = make([]FactorIndependant, 6)
+
 	if e.Strategy == "Standard" {
+		e.FactorAnalysis = make([]FactorIndependant, 5)
 		e.FactorAnalysis[0] = FactorRegression("IRR", mcresults, &mcresults.IRR)
 		e.FactorAnalysis[1] = FactorRegression("EM", mcresults, &mcresults.EM)
 		e.FactorAnalysis[2] = FactorRegression("EndCash", mcresults, &mcresults.EndCash)
 		e.FactorAnalysis[3] = FactorRegression("EndNCF", mcresults, &mcresults.EndNCF)
 		e.FactorAnalysis[4] = FactorRegression("EndMV", mcresults, &mcresults.EndMarketValue)
 	} else {
+		e.FactorAnalysis = make([]FactorIndependant, 6)
 		e.FactorAnalysis[0] = FactorRegression("YTM", mcresults, &mcresults.YTM)
 		e.FactorAnalysis[1] = FactorRegression("Duration", mcresults, &mcresults.Duration)
 		e.FactorAnalysis[2] = FactorRegression("YTM/DUR", mcresults, &mcresults.YTMDUR)
