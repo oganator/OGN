@@ -1,4 +1,4 @@
-module OGN
+module Oganator/OGN
 
 go 1.15
 
