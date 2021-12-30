@@ -1,4 +1,4 @@
-module OGN
+module github.com/Oganator/OGN
 
 go 1.15
 

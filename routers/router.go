@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"OGN/controllers"
+	"github.com/Oganator/OGN/controllers"
 
 	beego "github.com/astaxie/beego"
 )

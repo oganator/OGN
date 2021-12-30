@@ -38,32 +38,6 @@ var Key = 1
 
 var SimCounter SimIDType
 
-func init() {
-	ReadXLSX()
-	PopulateModels()
-	// parent assignment
-	for i, v := range EntityMap {
-		v.Entity.Parent = EntityMap[EntityDataStore[i].Parent].Entity
-		v.Entity.PopulateChildEntities()
-	}
-	for _, v := range FundsList {
-		EntityMap[v].Entity.CalculateFund()
-	}
-	for _, v := range ModelsList {
-		EntityMap[v].Entity.MonteCarlo("Internal")
-	}
-	for _, v := range FundsList {
-		if EntityMap[v].Entity.MasterID == 0 {
-			continue
-		}
-		EntityMap[v].Entity.FundMonteCarlo()
-	}
-	SimCounter = SimIDType{
-		Mutex: &sync.Mutex{},
-		ID:    0,
-	}
-}
-
 // var BaseURL = "" //"http://localhost:8080/"
 
 var AzureURL = "http://localhost:8081/Function"
