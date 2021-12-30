@@ -13,6 +13,7 @@ var XLSX, _ = xl.OpenFile("./models/Data.xlsx")
 // EntityData -
 type EntityData struct {
 	Mutex               *sync.Mutex
+	Sims                int
 	MasterID            int
 	Name                string
 	Parent              int // MasterID
@@ -137,6 +138,7 @@ func WriteXLSXEntities(e *Entity) {
 	XLSX.SetCellValue("Entities", "BC"+fmt.Sprint(rows), e.GLA.RentIncentives.Duration)
 	XLSX.SetCellValue("Entities", "BD"+fmt.Sprint(rows), e.GLA.RentIncentives.PercentOfContractRent)
 	XLSX.SetCellValue("Entities", "BF"+fmt.Sprint(rows), e.GLA.FitOutCosts.AmountPerTotalArea)
+	XLSX.SetCellValue("Entities", "BG"+fmt.Sprint(rows), e.MCSetup.Sims)
 	XLSX.Save()
 }
 
@@ -228,6 +230,7 @@ func ReadXLSX() {
 		tempentity.GLA.RentIncentives.Duration, _ = strconv.Atoi(row[54])
 		tempentity.GLA.RentIncentives.PercentOfContractRent, _ = strconv.ParseFloat(row[55], 64)
 		tempentity.GLA.FitOutCosts.AmountPerTotalArea, _ = strconv.ParseFloat(row[57], 64)
+		tempentity.Sims, _ = strconv.Atoi(row[58])
 		EntityDataStore[tempentity.MasterID] = &tempentity
 	}
 
@@ -263,69 +266,4 @@ func ReadXLSX() {
 		// tempunit.PercentSoldRent, _ = strconv.ParseFloat(row[23], 64)
 		UnitStore[tempunit.MasterID] = tempunit
 	}
-
-	// GROWTHITEMSRAW
-	// growth := xlsx.GetRows("Growth Items")
-	// for i, row := range growth {
-	// 	if i < 2 {
-	// 		continue
-	// 	}
-	// 	tempgrowth := GrowthData{}
-	// 	tempgrowth.EntityMasterID, _ = strconv.Atoi(row[1])
-	// 	tempgrowth.Item = row[2]
-	// 	tempgrowth.Amount, _ = strconv.ParseFloat(row[3], 64)
-	// 	GrowthItemsRaw = append(GrowthItemsRaw, tempgrowth)
-	// }
-
-	//GROWTHITEMSSTORE
-	// sort.Sort(GrowthItemsRaw)
-	// for _, v := range EntityStore {
-	// 	GrowthItemsStore[v.MasterID] = make(map[string]float64)
-	// 	for _, vv := range GrowthItemsRaw {
-	// 		if vv.EntityMasterID == v.MasterID {
-	// 			GrowthItemsStore[v.MasterID][vv.Item] = vv.Amount
-	// 		}
-	// 	}
-	// }
-	// for _, v := range units {
-	// 	fmt.Println(v)
-	// }
-
-	// for i, v := range UnitStore {
-	// 	fmt.Println(i, v)
-	// }
-	// fmt.Println(UnitStore[0])
-	// fmt.Println(UnitStore[2])
 }
-
-// Associations -
-// func Associations() {
-// 	for _, v := range EntityStore {
-// 		EntityAssociations[v.Parent] = append(EntityAssociations[v.Parent], v.MasterID)
-// 	}
-// 	fmt.Println(EntityAssociations)
-// 	for _, v := range UnitStore {
-// 		UnitAssociations[v.ParentMasterID] = append(UnitAssociations[v.ParentMasterID], v.MasterID)
-// 	}
-// }
-
-// // GDSlice -
-// type GDSlice []GrowthData
-
-// // Len -
-// func (gds GDSlice) Len() int {
-// 	return len(gds)
-// }
-
-// // Less - return whether the element with index i should sort before the element with index j
-// func (gds GDSlice) Less(i, j int) bool {
-// 	if gds[i].EntityMasterID < gds[j].EntityMasterID {
-// 		return true
-// 	}
-// 	return false
-// }
-
-// // Swap -
-// func (gds GDSlice) Swap(i, j int) {
-// 	gds[i], gds[j] = gds[j], gds[i]
-// }

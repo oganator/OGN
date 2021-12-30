@@ -59,7 +59,7 @@ func (c *MCIndexController) Post() {
 	}
 	EntityMap[tempkey].Entity.MCSlice[index].MakeTable(coas, false, true)
 	temp["entity"] = EntityMap[tempkey].Entity.MCSlice[index]
-	temp["baseURL"] = BaseURL
+	// temp["baseURL"] = BaseURL
 	c.TplName = "CFTable.tpl"
 	c.Data = temp
 }

@@ -25,4 +25,6 @@ func init() {
 	beego.Router("/MCIndex", &controllers.MCIndexController{})
 	// FUND
 	beego.Router("/Fund", &controllers.FundController{})
+	// AZURE
+	beego.Router("/Function", &controllers.FunctionController{})
 }

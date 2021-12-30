@@ -41,7 +41,7 @@ func (c *FundController) Get() {
 	temp["entity"] = EntityMap[key].Entity
 	temp["modelslist"] = ModelsList
 	temp["fundslist"] = FundsList
-	temp["baseURL"] = BaseURL
+	// temp["baseURL"] = BaseURL
 	c.TplName = "EntityView.tpl"
 	c.Data = temp
 }
@@ -58,7 +58,7 @@ func (c *FundController) Post() {
 	temp["entity"] = EntityMap[key].Entity
 	temp["modelslist"] = ModelsList
 	temp["fundslist"] = FundsList
-	temp["baseURL"] = BaseURL
+	// temp["baseURL"] = BaseURL
 	c.TplName = "EntityView.tpl"
 	c.Data = temp
 	go debug.FreeOSMemory()

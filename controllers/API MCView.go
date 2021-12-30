@@ -88,7 +88,7 @@ func (c *MCDetailsController) Post() {
 	}
 	temp["MCSlice"] = EntityMap[tempkey].Entity.MCSlice[startindex:endindex]
 	temp["Strategy"] = EntityMap[tempkey].Entity.Strategy
-	temp["baseURL"] = BaseURL
+	// temp["baseURL"] = BaseURL
 	c.TplName = "MCDetails.tpl"
 	c.Data = temp
 }

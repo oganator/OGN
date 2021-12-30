@@ -2,23 +2,14 @@ package controllers
 
 import "sync"
 
-// EntityStore -
+// EntityStore - Entity MasterID as key
 var EntityDataStore = map[int]*EntityData{}
 
 // UnitStore -
 var UnitStore = map[int]UnitData{}
 
-// // GrowthItemsRaw -
-// var GrowthItemsRaw = GDSlice{}
-
-//GrowthItemsStore -
+// GrowthItemsStore -
 var GrowthItemsStore = make(map[int]map[string]float64)
-
-// // EntityAssociations -
-// var EntityAssociations = make(map[int][]int)
-
-// // UnitAssociations -
-// var UnitAssociations = make(map[int][]int)
 
 // Entities - MasterID as key
 var EntityMap = EntityMutexMap{}
@@ -45,6 +36,8 @@ var Units = map[int]Unit{}
 // Key -
 var Key = 1
 
+var SimCounter SimIDType
+
 func init() {
 	ReadXLSX()
 	PopulateModels()
@@ -57,7 +50,7 @@ func init() {
 		EntityMap[v].Entity.CalculateFund()
 	}
 	for _, v := range ModelsList {
-		EntityMap[v].Entity.MonteCarlo()
+		EntityMap[v].Entity.MonteCarlo("Internal")
 	}
 	for _, v := range FundsList {
 		if EntityMap[v].Entity.MasterID == 0 {
@@ -65,12 +58,21 @@ func init() {
 		}
 		EntityMap[v].Entity.FundMonteCarlo()
 	}
+	SimCounter = SimIDType{
+		Mutex: &sync.Mutex{},
+		ID:    0,
+	}
 }
 
-var BaseURL = "" //"http://localhost:8080/"
+// var BaseURL = "" //"http://localhost:8080/"
 
-// var BaseURL = "https://oganica.azurewebsites.net/"
+var AzureURL = "http://localhost:8081/Function"
 
 var Monthly = false
 
-var Compute = "Internal" // Internal or Azure
+var Compute = "Azure" // Internal or Azure
+
+type SimIDType struct {
+	Mutex *sync.Mutex
+	ID    int
+}

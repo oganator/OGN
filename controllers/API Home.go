@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/astaxie/beego"
@@ -16,7 +15,7 @@ func (c *HomeController) Get() {
 	temp["modelslist"] = ModelsList
 	temp["fundslist"] = FundsList
 	temp["entity"] = EntityMap[0].Entity
-	temp["baseURL"] = BaseURL
+	// temp["baseURL"] = BaseURL
 	c.TplName = "Home.tpl"
 	c.Data = temp
 }
@@ -37,7 +36,7 @@ func (c *SettingsController) Post() {
 	tempkey := EntitiesList[GetStringSettings(c, "entity")]
 	temp["tab"] = GetStringSettings(c, "tab")
 	temp["entity"] = EntityMap[tempkey].Entity
-	temp["baseURL"] = BaseURL
+	// temp["baseURL"] = BaseURL
 	c.TplName = "Settings.tpl"
 	c.Data = temp
 }
@@ -55,12 +54,13 @@ func GetStringAppSettings(c *AppSettingsController, field string) string {
 func (c *AppSettingsController) Post() {
 	tempmonthly := GetStringAppSettings(c, "monthly")
 	Monthly, _ = strconv.ParseBool(tempmonthly)
-	fmt.Println(Monthly)
+	Compute = GetStringAppSettings(c, "compute")
+	AzureURL = GetStringAppSettings(c, "azureurl")
 	temp := make(map[interface{}]interface{})
 	temp["modelslist"] = ModelsList
 	temp["fundslist"] = FundsList
 	temp["entity"] = EntityMap[0].Entity
-	temp["baseURL"] = BaseURL
+	// temp["baseURL"] = BaseURL
 	c.TplName = "Home.tpl"
 	c.Data = temp
 }

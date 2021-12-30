@@ -64,13 +64,13 @@
                     <input readonly type="text" class="form-control" id="em" name="em" Value="EM: [[.entity.Metrics.EM.NetLeveredAfterTax]]">
                 </div>
                 <div class="form-group col-sm-1 offset-sm-5">
-                    <input readonly type="text" class="form-control" id="ytm" name="ytm" Value="YTM: [[.entity.Metrics.BondHolder.YTM]]">
+                    <input readonly type="text" class="form-control" id="ytm" name="ytm" Value="YTM: {{[[.entity.Metrics.BondHolder.YTM]] | number:2}}">
                 </div>
                 <div class="form-group col-sm-1">
-                    <input readonly type="text" class="form-control" id="dur" name="dur" Value="DUR: [[.entity.Metrics.BondHolder.Duration]]">
+                    <input readonly type="text" class="form-control" id="dur" name="dur" Value="DUR: {{[[.entity.Metrics.BondHolder.Duration]] | number:2}}">
                 </div>
                 <div class="form-group col-sm-1">
-                    <input readonly type="text" class="form-control" id="ytmdur" name="ytmdur" Value="YTM/DUR: {{[[.entity.Metrics.BondHolder.YTMDUR]] | number:4}}">
+                    <input readonly type="text" class="form-control" id="ytmdur" name="ytmdur" Value="YTM/DUR: {{[[.entity.Metrics.BondHolder.YTMDUR]] | number:2}}">
                 </div>
             </div>
         </form>
@@ -96,8 +96,8 @@
                 document.getElementById("durationtabletab").style.visibility = 'hidden';
                 document.getElementById("ytmtabletab").style.visibility = 'hidden';
                 document.getElementById("ytmdurtabletab").style.visibility = 'hidden';
-                document.getElementById("irrtabletab").style.visibility = 'visible';
-                document.getElementById("emtabletab").style.visibility = 'visible';
+//                document.getElementById("irrtabletab").style.visibility = 'visible';
+//                document.getElementById("emtabletab").style.visibility = 'visible';
             }else{
                 document.getElementById("ytm").style.visibility = 'visible';
                 document.getElementById("dur").style.visibility = 'visible';
@@ -110,8 +110,8 @@
                 document.getElementById("durationtabletab").style.visibility = 'visible';
                 document.getElementById("ytmtabletab").style.visibility = 'visible';
                 document.getElementById("ytmdurtabletab").style.visibility = 'visible';
-                document.getElementById("irrtabletab").style.visibility = 'hidden';
-                document.getElementById("emtabletab").style.visibility = 'hidden';
+//                document.getElementById("irrtabletab").style.visibility = 'hidden';
+//                document.getElementById("emtabletab").style.visibility = 'hidden';
             }
         };
     </script>

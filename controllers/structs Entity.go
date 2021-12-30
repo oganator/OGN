@@ -6,6 +6,7 @@ import "sync"
 type Entity struct {
 	Mutex          *sync.Mutex         `json:"-"`                         //
 	MasterID       int                 `json:"MasterID,omitempty"`        //
+	EntityData     EntityData          `json:"EntityData,omitempty"`      // used for Azure MC
 	Name           string              `json:"Name,omitempty"`            //
 	ChildEntities  map[int]*Entity     `json:"ChildEntities,omitempty"`   // MasterID as key. created by ModelCreate().
 	ChildUnits     map[int]*Unit       `json:"ChildUnits,omitempty"`      // MasterID as key. created by ModelCreate().

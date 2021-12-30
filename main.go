@@ -11,7 +11,7 @@ import (
 func main() {
 	// rand.Seed(time.Now().UTC().UnixNano())
 	// runtime.GOMAXPROCS(1)
-	debug.SetGCPercent(-1)
+	debug.SetGCPercent(2000)
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins: true,
 		// AllowOrigins:     []string{"*"},

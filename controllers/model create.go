@@ -68,7 +68,7 @@ func CreateEntity(v EntityData) (e Entity) {
 			Void: v.GLA.Void,
 		},
 		MCSetup: MCSetup{
-			Sims:        100,
+			Sims:        v.Sims,
 			ERV:         v.CPISigma,
 			CPI:         v.CPISigma,
 			YieldShift:  v.YieldShiftSigma,
@@ -160,7 +160,7 @@ func (e *Entity) UpdateEntity(mc bool, v *EntityData) {
 			ERVAmount:    0,
 		},
 		MCSetup: MCSetup{
-			Sims: 100},
+			Sims: v.Sims},
 		Tax: Tax{
 			MinValue:        v.WOZpercent,
 			LandValue:       v.Landvalue,

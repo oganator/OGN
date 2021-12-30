@@ -36,7 +36,7 @@ func (c *ViewRentScheduleController) Post() {
 	if indexstring != "" {
 		temp["data"] = EntityMap[key].Entity.MCSlice[index].ChildUnits[unit].RSStore
 	}
-	temp["baseURL"] = BaseURL
+	// temp["baseURL"] = BaseURL
 	c.TplName = "RentSchedule.tpl"
 	c.Data = temp
 }
@@ -88,7 +88,7 @@ func (c *ViewUnitCFController) Post() {
 		NetCashFlow:             true,
 	}, false, true)
 	temp["entity"] = &tempentity
-	temp["baseURL"] = BaseURL
+	// temp["baseURL"] = BaseURL
 	c.TplName = "CFTable.tpl"
 	c.Data = temp
 }
@@ -124,7 +124,7 @@ func (c *ViewUnitTableController) Post() {
 	} else {
 		temp["entity"] = EntityMap[key].Entity.MCSlice[index]
 	}
-	temp["baseURL"] = BaseURL
+	// temp["baseURL"] = BaseURL
 	c.TplName = "UnitTable.tpl"
 	c.Data = temp
 }
@@ -188,6 +188,6 @@ func (c *AddChildUnitController) Post() {
 	temp["entity"] = EntityMap[parentmasterid].Entity
 	temp["modelslist"] = ModelsList
 	temp["fundslist"] = FundsList
-	temp["baseURL"] = BaseURL
+	// temp["baseURL"] = BaseURL
 	c.Data = temp
 }

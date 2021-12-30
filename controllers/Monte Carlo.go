@@ -28,6 +28,7 @@ type MCSetup struct {
 
 // MCResultSlice - Fields with 'Fund' at the end are used by the Asset to store data that is consumed by the Fund MC. It is the same data as the other field, but with the arrays reversed
 type MCResultSlice struct {
+	SimNumber        int         `json:"SimNumber,omitempty"` // used by the Azure function
 	EndCash          []float64   `json:"EndCash,omitempty"`
 	CashBalance      [][]float64 `json:"CashBalance,omitempty"`     // Month, Sim
 	CashBalanceFund  [][]float64 `json:"CashBalanceFund,omitempty"` // Sim, Month
@@ -98,32 +99,28 @@ type Hist struct {
 	Vals []float64 `json:"Vals,omitempty"`
 }
 
-// MonteCarlo -
-func (e *Entity) MonteCarlo() {
+// MonteCarlo - compute can be either "Internal" or "Azure"
+func (e *Entity) MonteCarlo(compute string) {
+	if compute == "Azure" {
+		e.Mutex = &sync.Mutex{}
+	}
 	duration := e.MCDataObjectsCreate(1)
 	wg := sync.WaitGroup{}
 	for i := 1; i <= e.MCSetup.Sims; i++ {
-		if e.MCSetup.Sims < 100 {
+		if e.MCSetup.Sims < 100 && compute == "Internal" {
 			continue
 		}
 		wg.Add(1)
 		go func(ee *Entity, index int) {
 			defer wg.Done()
-			// rand.Seed(uint64(index))
-			temp := *ee
+			temp := CreateShellEntity(ee)
 			tempentitydata := EntityDataStore[e.MasterID]
-			if Compute == "Internal" {
-				mu := sync.Mutex{}
-				mu.Lock()
-				tempentitydata.SampleForEntity(e)
-				mu.Unlock()
-				temp.MC = true
-				temp.UpdateEntity(true, tempentitydata)
-			} else if Compute == "Azure" {
-				temp.COA = IntFloatCOAMap{}
-				e.AzureSim(tempentitydata)
-			}
-			// e.AzureSim(tempentitydata)
+			mu := sync.Mutex{}
+			mu.Lock()
+			tempentitydata.SampleForEntity(e)
+			mu.Unlock()
+			temp.MC = true
+			temp.UpdateEntity(true, tempentitydata)
 			temp.MCResults.EndCash.Mean = temp.COA[temp.SalesDate.Dateint].CashBalance
 			temp.MCResults.EndNCF.Mean = temp.COA[temp.SalesDate.Dateint].NetCashFlow
 			temp.MCResults.EndMarketValue.Mean = temp.COA[temp.SalesDate.Dateint].MarketValue
@@ -138,14 +135,9 @@ func (e *Entity) MonteCarlo() {
 				// fmt.Println(ii, " : ", e.MCResultSlice.BondExpense[ii][index-1])
 				date.Add(1)
 			}
-			// wg2 := sync.WaitGroup{}
-			// wg2.Add(1)
-			// go func() {
-			// 	defer wg.Done()
-			e.MCResultSlice.CashBalanceFund[index-1] = ReturnCOAArray(temp.COA, FloatCOA{CashBalance: 1.0}, temp.StartDate, temp.SalesDate)
-			// }()
-			e.MCResultSlice.NCFFund[index-1] = ReturnCOAArray(temp.COA, FloatCOA{NetCashFlow: 1.0}, temp.StartDate, temp.SalesDate)
-			e.MCResultSlice.MarketValueFund[index-1] = ReturnCOAArray(temp.COA, FloatCOA{MarketValue: 1.0}, temp.StartDate, temp.SalesDate)
+			// e.MCResultSlice.CashBalanceFund[index-1] = ReturnCOAArray(temp.COA, FloatCOA{CashBalance: 1.0}, temp.StartDate, temp.SalesDate)
+			// e.MCResultSlice.NCFFund[index-1] = ReturnCOAArray(temp.COA, FloatCOA{NetCashFlow: 1.0}, temp.StartDate, temp.SalesDate)
+			// e.MCResultSlice.MarketValueFund[index-1] = ReturnCOAArray(temp.COA, FloatCOA{MarketValue: 1.0}, temp.StartDate, temp.SalesDate)
 			if e.Strategy != "Standard" {
 				e.MCResultSlice.BondExpense[index-1] = ReturnCOAArray(temp.COA, FloatCOA{BondExpense: 1.0}, Dateadd(temp.StartDate, -1), temp.SalesDate)
 				e.MCResultSlice.YTM[index-1] = e.MCSlice[index-1].Metrics.BondHolder.YTM
@@ -168,29 +160,34 @@ func (e *Entity) MonteCarlo() {
 			e.MCResultSlice.Hazard[index-1] = e.MCSlice[index-1].GLA.Default.Hazard
 			e.MCResultSlice.YieldShift[index-1] = e.MCSlice[index-1].Valuation.YieldShift
 			//
-			// wg2.Wait()
 			e.Mutex.Unlock()
 			temp.COA = IntFloatCOAMap{}
 			e.MCSlice[index-1].COA = IntFloatCOAMap{}
 			temp.ChildUnits = make(map[int]*Unit)
 			e.MCSlice[index-1].ChildUnits = make(map[int]*Unit)
-			// temp = Entity{}
 		}(e, i)
 	}
 	wg.Wait()
-	//
+	if compute == "Internal" {
+		e.MCCalc(duration)
+	}
+}
+
+func (e *Entity) MCCalc(duration int) {
 	e.MCResults.EndCash = MCStatsCalc(&e.MCResultSlice.EndCash, e.MCSetup.Sims)
 	e.MCResults.CashBalance, e.MCResults.CashBalanceVaR = RibbonPlot(&e.MCResultSlice.CashBalance, duration-2, 100, e.MCSetup.Sims)
 	e.MCResults.EndNCF = MCStatsCalc(&e.MCResultSlice.EndNCF, e.MCSetup.Sims)
 	e.MCResults.NCF, e.MCResults.NCFVaR = RibbonPlot(&e.MCResultSlice.NCF, duration-2, 100, e.MCSetup.Sims)
 	e.MCResults.EndMarketValue = MCStatsCalc(&e.MCResultSlice.EndMarketValue, e.MCSetup.Sims)
 	e.MCResults.MarketValue, e.MCResults.MarketValueVaR = RibbonPlot(&e.MCResultSlice.MarketValue, duration-2, 100, e.MCSetup.Sims)
-	//
+
 	switch e.Strategy {
 	case "Standard":
 		e.MCResults.IRR = MCStatsCalc(&e.MCResultSlice.IRR, e.MCSetup.Sims)
 		e.MCResults.EM = MCStatsCalc(&e.MCResultSlice.EM, e.MCSetup.Sims)
 	case "Balloon", "Pure Discount":
+		e.MCResults.IRR = MCStatsCalc(&e.MCResultSlice.IRR, e.MCSetup.Sims)
+		e.MCResults.EM = MCStatsCalc(&e.MCResultSlice.EM, e.MCSetup.Sims)
 		e.MCResults.YTM = MCStatsCalc(&e.MCResultSlice.YTM, e.MCSetup.Sims)
 		e.MCResults.Duration = MCStatsCalc(&e.MCResultSlice.Duration, e.MCSetup.Sims)
 		e.MCResults.YTMDUR = MCStatsCalc(&e.MCResultSlice.YTMDUR, e.MCSetup.Sims)
@@ -258,6 +255,8 @@ func (e *Entity) FundMonteCarlo() {
 		e.MCResults.IRR = MCStatsCalc(&e.MCResultSlice.IRR, e.MCSetup.Sims)
 		e.MCResults.EM = MCStatsCalc(&e.MCResultSlice.EM, e.MCSetup.Sims)
 	case "Balloon", "Pure Discount":
+		e.MCResults.IRR = MCStatsCalc(&e.MCResultSlice.IRR, e.MCSetup.Sims)
+		e.MCResults.EM = MCStatsCalc(&e.MCResultSlice.EM, e.MCSetup.Sims)
 		e.MCResults.YTM = MCStatsCalc(&e.MCResultSlice.YTM, e.MCSetup.Sims)
 		e.MCResults.Duration = MCStatsCalc(&e.MCResultSlice.Duration, e.MCSetup.Sims)
 		e.MCResults.YTMDUR = MCStatsCalc(&e.MCResultSlice.YTMDUR, e.MCSetup.Sims)
@@ -340,6 +339,10 @@ func (e *Entity) MCDataObjectsCreate(addperiods int) int {
 
 // MCStatsCalc -
 func MCStatsCalc(sourceslice *[]float64, sims int) (stats MCStats) {
+	defer func() {
+		if r := recover(); r != nil {
+		}
+	}()
 	if sims >= 100 {
 		slice := CopyArray(sourceslice)
 		variance := stat.Variance(slice, nil)
@@ -374,13 +377,11 @@ func MCStatsCalc(sourceslice *[]float64, sims int) (stats MCStats) {
 		}
 		histslice := make(plotter.Values, sims)
 		histslice = slice
-		raw := &plotter.Histogram{}
-		if _, err := plotter.NewHist(histslice, 100); err != nil {
-			time.Sleep(10000 * time.Millisecond)
-			// fmt.Println("MCStatsCalc Error")
-			raw, _ = plotter.NewHist(histslice, 100)
-		} else {
-			raw, _ = plotter.NewHist(histslice, 100)
+		// raw := &plotter.Histogram{}
+		raw, err := plotter.NewHist(histslice, 100)
+		if err != nil {
+			recover()
+			return
 		}
 		stats.Hist.Vals = make([]float64, 100)
 		stats.Hist.Keys = make([]float64, 100)
@@ -425,6 +426,10 @@ type XYFloatSlice struct {
 
 // RibbonPlot -
 func RibbonPlot(matrix *[][]float64, duration int, bucketnum int, sims int) (ribbonslice []Ribbon, varpslice VaRPercentile) {
+	defer func() {
+		if r := recover(); r != nil {
+		}
+	}()
 	if sims >= 100 {
 		ribbonslice = make([]Ribbon, duration)
 		varpslice = VaRPercentile{

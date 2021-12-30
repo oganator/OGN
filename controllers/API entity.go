@@ -45,7 +45,7 @@ func (c *ViewEntityController) Get() {
 	temp := make(map[interface{}]interface{})
 	temp["entity"] = EntityMap[key].Entity
 	temp["modelslist"] = ModelsList
-	temp["baseURL"] = BaseURL
+	// temp["baseURL"] = BaseURL
 	c.TplName = "EntityView.tpl"
 	c.Data = temp
 }
@@ -81,6 +81,7 @@ func (c *ViewEntityController) Post() {
 	EntityDataStore[key].OpExpercent = GetFloat(c, "opex") / 100
 	EntityDataStore[key].Fees = GetFloat(c, "fees")
 	EntityDataStore[key].GLA.Default.Hazard = GetFloat(c, "hazard") / 100
+	EntityDataStore[key].Sims = GetInt(c, "sims")
 	mcsetup := MCSetup{
 		Sims: GetInt(c, "sims"),
 		ERV: HModel{
@@ -116,7 +117,11 @@ func (c *ViewEntityController) Post() {
 	EntityMap[key].Entity.MCSetup = mcsetup
 	WriteXLSXEntities(EntityMap[key].Entity)
 	if EntityMap[key].Entity.Parent != EntityMap[key].Entity && EntityMap[key].Entity.MCSetup.Sims >= 100 {
-		EntityMap[key].Entity.MonteCarlo()
+		if Compute == "Internal" {
+			EntityMap[key].Entity.MonteCarlo("Internal")
+		} else if Compute == "Azure" {
+			EntityMap[key].Entity.AzureMonteCarlo()
+		}
 	}
 	temp["entity"] = EntityMap[key].Entity
 	temp["modelslist"] = ModelsList
@@ -190,6 +195,6 @@ func (c *ChangeEntityController) Post() {
 	temp := make(map[interface{}]interface{})
 	temp["entity"] = EntityMap[key].Entity
 	temp["modelslist"] = ModelsList
-	temp["baseURL"] = BaseURL
+	// temp["baseURL"] = BaseURL
 	c.Data = temp
 }

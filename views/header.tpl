@@ -36,9 +36,19 @@
                     <form id="query_form" class="form-horizontal form-well" role="form" action="/AppSettings" method="post">
 
                         <div class="form-group col-sm-8">
-                            <label for="fees">Show Monthly Cash Flow</label>
+                            <label for="monthly">Show Monthly Cash Flow</label>
                             <input type="text" class="form-control" id="monthly" name="monthly">
                         </div>
+
+                        <div class="form-group col-sm-8">
+                            <label for="compute">Compute Method</label>
+                            <input type="text" class="form-control" id="compute" name="compute">
+                        </div>
+
+                        <div class="form-group col-sm-8">
+                            <label for="azureurl">Azure Function URL</label>
+                            <input type="text" class="form-control" id="azureurl" name="azureurl">
+                        </div>                        
 
                         <div class="modal-footer">
                             <button type="submit" class="btn secondary-bg">Submit</button>
