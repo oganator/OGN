@@ -108,7 +108,15 @@ func (e *Entity) UpdateEntity(mc bool, v *EntityData) {
 	growthinput := map[string]HModel{}
 	growthinput["CPI"] = v.CPIGrowth
 	growthinput["ERV"] = v.ERVGrowth
-	parent := EntityMap[v.Parent].Entity.MasterID
+	parent, err := EntityMap[v.Parent] //.Entity.MasterID
+	if err {
+		parent = EntityMutex{
+			Mutex: &sync.Mutex{},
+			Entity: &Entity{
+				MasterID: 0,
+			},
+		}
+	}
 	childentitiesmap := map[int]*Entity{}
 	*e = Entity{
 		Mutex:         &sync.Mutex{},
@@ -118,7 +126,7 @@ func (e *Entity) UpdateEntity(mc bool, v *EntityData) {
 		ChildUnits:    map[int]*Unit{},
 		Metrics:       Metrics{},
 		ParentID:      v.Parent,
-		Parent:        EntityMap[parent].Entity,
+		Parent:        EntityMap[parent.Entity.MasterID].Entity,
 		StartDate:     startdate,
 		HoldPeriod:    v.HoldPeriod,
 		SalesDate:     salesdate,

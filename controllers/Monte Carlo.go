@@ -121,9 +121,9 @@ func (e *Entity) MonteCarlo(compute string) {
 			} else if compute == "Internal" {
 				tempentitydata = EntityDataStore[e.MasterID]
 			}
-			tempentitydata.Mutex.Lock()
+			// tempentitydata.Mutex.Lock()
 			tempentitydata.SampleForEntity(e)
-			tempentitydata.Mutex.Unlock()
+			// tempentitydata.Mutex.Unlock()
 			temp.MC = true
 			temp.UpdateEntity(true, tempentitydata)
 			temp.MCResults.EndCash.Mean = temp.COA[temp.SalesDate.Dateint].CashBalance
