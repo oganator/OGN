@@ -2,6 +2,7 @@ package main
 
 import (
 	"runtime/debug"
+	"sync"
 
 	_ "github.com/Oganator/OGN/routers"
 
@@ -31,10 +32,10 @@ func Init() {
 		}
 		ogn.EntityMap[v].Entity.FundMonteCarlo()
 	}
-	// SimCounter = ogn.SimIDType{
-	// 	Mutex: &sync.Mutex{},
-	// 	ID:    0,
-	// }
+	ogn.SimCounter = ogn.SimIDType{
+		Mutex: &sync.Mutex{},
+		ID:    0,
+	}
 }
 
 func main() {

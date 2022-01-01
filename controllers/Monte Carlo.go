@@ -103,6 +103,7 @@ type Hist struct {
 func (e *Entity) MonteCarlo(compute string) {
 	if compute == "Azure" {
 		e.Mutex = &sync.Mutex{}
+		e.EntityData.Mutex = &sync.Mutex{}
 	}
 	duration := e.MCDataObjectsCreate(1)
 	wg := sync.WaitGroup{}
@@ -114,11 +115,15 @@ func (e *Entity) MonteCarlo(compute string) {
 		go func(ee *Entity, index int) {
 			defer wg.Done()
 			temp := CreateShellEntity(ee)
-			tempentitydata := EntityDataStore[e.MasterID]
-			mu := sync.Mutex{}
-			mu.Lock()
+			tempentitydata := &EntityData{}
+			if compute == "Azure" {
+				tempentitydata = &ee.EntityData
+			} else if compute == "Internal" {
+				tempentitydata = EntityDataStore[e.MasterID]
+			}
+			tempentitydata.Mutex.Lock()
 			tempentitydata.SampleForEntity(e)
-			mu.Unlock()
+			tempentitydata.Mutex.Unlock()
 			temp.MC = true
 			temp.UpdateEntity(true, tempentitydata)
 			temp.MCResults.EndCash.Mean = temp.COA[temp.SalesDate.Dateint].CashBalance
@@ -264,6 +269,7 @@ func (e *Entity) FundMonteCarlo() {
 }
 
 func (tempentitydata *EntityData) SampleForEntity(e *Entity) {
+	// rand.Seed(uint64(time.Nanosecond))
 	tempentitydata.ERVGrowth.ShortTermRate = NormalSample(e.GrowthInput["ERV"].ShortTermRate, e.MCSetup.ERV.ShortTermRate, 0.0, 10.0)
 	tempentitydata.ERVGrowth.ShortTermPeriod = int(NormalSample(float64(e.GrowthInput["ERV"].ShortTermPeriod), float64(e.MCSetup.ERV.ShortTermPeriod), 0.0, 10.0))
 	tempentitydata.ERVGrowth.TransitionPeriod = int(NormalSample(float64(e.GrowthInput["ERV"].TransitionPeriod), float64(e.MCSetup.ERV.TransitionPeriod), 0.0, 10.0))

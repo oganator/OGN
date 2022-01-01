@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"runtime/debug"
 	"sync"
-	"time"
 
 	"github.com/astaxie/beego"
 )
@@ -22,11 +21,10 @@ func (e *Entity) AzureMonteCarlo() {
 	wg := sync.WaitGroup{}
 	for i := 0; i < 100; i++ {
 		wg.Add(1)
-		go func(ee *Entity, index int) {
-			time.Sleep(time.Nanosecond * 3)
+		go func(ee *Entity) {
 			defer wg.Done()
 			AzureSimSend(&temp, EntityDataStore[e.MasterID], AzureChannel)
-		}(e, i)
+		}(e)
 	}
 	wg.Wait()
 	e.MCCalc(duration)
