@@ -125,7 +125,8 @@ func (e *Entity) MonteCarlo(compute string) {
 			tempentitydata.SampleForEntity(e)
 			// tempentitydata.Mutex.Unlock()
 			temp.MC = true
-			temp.UpdateEntity(true, tempentitydata)
+			// ee.ParentID = -1
+			temp.UpdateEntity(true, tempentitydata, compute)
 			temp.MCResults.EndCash.Mean = temp.COA[temp.SalesDate.Dateint].CashBalance
 			temp.MCResults.EndNCF.Mean = temp.COA[temp.SalesDate.Dateint].NetCashFlow
 			temp.MCResults.EndMarketValue.Mean = temp.COA[temp.SalesDate.Dateint].MarketValue

@@ -1,15 +1,11 @@
 package main
 
 import (
-	"runtime/debug"
 	"sync"
 
-	_ "github.com/Oganator/OGN/routers"
+	_ "OGN/routers"
 
-	ogn "github.com/Oganator/OGN/controllers"
-
-	beego "github.com/astaxie/beego"
-	"github.com/astaxie/beego/plugins/cors"
+	ogn "OGN/controllers"
 )
 
 func Init() {
@@ -38,19 +34,19 @@ func Init() {
 	}
 }
 
-func main() {
-	// rand.Seed(time.Now().UTC().UnixNano())
-	// runtime.GOMAXPROCS(1)
-	Init()
-	debug.SetGCPercent(2000)
-	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
-		AllowAllOrigins: true,
-		// AllowOrigins:     []string{"*"},
-		AllowMethods: []string{"PUT", "PATCH", "GET", "POST"},
-		// AllowHeaders:     []string{"Origin"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-	}))
-	// browser.OpenURL("http://localhost:8080/")
-	beego.Run()
-}
+// func main() {
+// 	// rand.Seed(time.Now().UTC().UnixNano())
+// 	// runtime.GOMAXPROCS(1)
+// 	Init()
+// 	debug.SetGCPercent(2000)
+// 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
+// 		AllowAllOrigins: true,
+// 		// AllowOrigins:     []string{"*"},
+// 		AllowMethods: []string{"PUT", "PATCH", "GET", "POST"},
+// 		// AllowHeaders:     []string{"Origin"},
+// 		ExposeHeaders:    []string{"Content-Length"},
+// 		AllowCredentials: true,
+// 	}))
+// 	// browser.OpenURL("http://localhost:8080/")
+// 	beego.Run()
+// }

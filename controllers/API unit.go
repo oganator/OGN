@@ -181,7 +181,7 @@ func (c *AddChildUnitController) Post() {
 	UnitStore[unit.MasterID] = unit
 	unit.WriteXLSXUnits()
 	EntityMap[parentmasterid].Mutex.Lock()
-	EntityMap[parentmasterid].Entity.CalculateModel(false)
+	EntityMap[parentmasterid].Entity.CalculateModel(false, "Internal")
 	EntityMap[parentmasterid].Mutex.Unlock()
 	//
 	c.TplName = "EntityView.tpl"

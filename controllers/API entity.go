@@ -113,7 +113,7 @@ func (c *ViewEntityController) Post() {
 	//
 	temp := make(map[interface{}]interface{})
 	EntityMap[key].Mutex.Lock()
-	EntityMap[key].Entity.UpdateEntity(false, EntityDataStore[EntityMap[key].Entity.MasterID])
+	EntityMap[key].Entity.UpdateEntity(false, EntityDataStore[EntityMap[key].Entity.MasterID], "Internal")
 	EntityMap[key].Entity.MCSetup = mcsetup
 	WriteXLSXEntities(EntityMap[key].Entity)
 	if EntityMap[key].Entity.Parent != EntityMap[key].Entity && EntityMap[key].Entity.MCSetup.Sims >= 100 {

@@ -38,9 +38,8 @@ var Key = 1
 
 var SimCounter SimIDType
 
-// var BaseURL = "" //"http://localhost:8080/"
-
-var AzureURL = "http://localhost:8081/Function"
+// var AzureURL = "http://localhost:8081/Function"
+var AzureURL = "http://localhost:7071/api/OGNTrigger"
 
 var Monthly = false
 

@@ -10,6 +10,7 @@ type Entity struct {
 	Name           string              `json:"Name,omitempty"`            //
 	ChildEntities  map[int]*Entity     `json:"ChildEntities,omitempty"`   // MasterID as key. created by ModelCreate().
 	ChildUnits     map[int]*Unit       `json:"ChildUnits,omitempty"`      // MasterID as key. created by ModelCreate().
+	ChildUnitsMC   map[int]Unit        `json:"ChildUnitsMC,omitempty"`    // Used only for Azure MC. Needed to actually store the unit data when sent over to azure, otherwise azure only receives a memory address, no actual data
 	Metrics        Metrics             `json:"Metrics,omitempty"`         //
 	ParentID       int                 `json:"ParentID,omitempty"`        //
 	Parent         *Entity             `json:"-"`                         //

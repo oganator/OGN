@@ -2,7 +2,7 @@ package controllers
 
 // CalculateFund - need to fix cash balance: if one asset is sold after another, the cash balance of the first will end with its sale
 func (e *Entity) CalculateFund() {
-	e.UpdateEntity(false, EntityDataStore[e.MasterID])
+	e.UpdateEntity(false, EntityDataStore[e.MasterID], "Internal")
 	e.COA = IntFloatCOAMap{}
 	for _, v := range e.ChildEntities {
 		if e.SalesDate.Dateint < v.SalesDate.Dateint { // used to set the sales date to that of the latest asset

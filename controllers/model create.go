@@ -96,26 +96,24 @@ func CreateEntity(v EntityData) (e Entity) {
 		Strategy:       v.Strategy,
 		BalloonPercent: v.BalloonPercent,
 	}
-	e.CalculateModel(false)
+	e.CalculateModel(false, "Internal")
 	return e
 }
 
 // UpdateEntity -
-func (e *Entity) UpdateEntity(mc bool, v *EntityData) {
+func (e *Entity) UpdateEntity(mc bool, v *EntityData, compute string) {
 	startdate := Dateadd(Datetype{Month: v.StartMonth, Year: v.StartYear}, 0)
 	salesdate := Dateadd(startdate, v.HoldPeriod*12-1)
 	enddate := Dateadd(salesdate, 132)
 	growthinput := map[string]HModel{}
 	growthinput["CPI"] = v.CPIGrowth
 	growthinput["ERV"] = v.ERVGrowth
-	parent, err := EntityMap[v.Parent] //.Entity.MasterID
-	if err {
-		parent = EntityMutex{
-			Mutex: &sync.Mutex{},
-			Entity: &Entity{
-				MasterID: 0,
-			},
-		}
+	parentFinal := Entity{}
+	parentID := v.Parent
+	if compute == "Internal" {
+		parentFinal = *EntityMap[v.Parent].Entity
+	} else if compute == "Azure" {
+		parentID = -1
 	}
 	childentitiesmap := map[int]*Entity{}
 	*e = Entity{
@@ -125,8 +123,8 @@ func (e *Entity) UpdateEntity(mc bool, v *EntityData) {
 		ChildEntities: childentitiesmap,
 		ChildUnits:    map[int]*Unit{},
 		Metrics:       Metrics{},
-		ParentID:      v.Parent,
-		Parent:        EntityMap[parent.Entity.MasterID].Entity,
+		ParentID:      parentID,
+		Parent:        &parentFinal,
 		StartDate:     startdate,
 		HoldPeriod:    v.HoldPeriod,
 		SalesDate:     salesdate,
@@ -187,12 +185,12 @@ func (e *Entity) UpdateEntity(mc bool, v *EntityData) {
 		Strategy:       v.Strategy,
 		BalloonPercent: v.BalloonPercent,
 	}
-	e.CalculateModel(mc)
+	e.CalculateModel(mc, compute)
 	e.PopulateChildEntities()
 }
 
 // CalculateModel - mc == MonteCarlo; if true then table is not made
-func (e *Entity) CalculateModel(mc bool) {
+func (e *Entity) CalculateModel(mc bool, compute string) {
 	if e.ParentID != 0 {
 		e.StartDate.Add(0)
 		e.SalesDate.Add(0)
