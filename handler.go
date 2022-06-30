@@ -2,8 +2,7 @@ package main
 
 import (
 	_ "OGN/routers"
-	"log"
-	"os"
+	"sync"
 
 	ogn "OGN/controllers"
 	"encoding/json"
@@ -11,29 +10,48 @@ import (
 	"net/http"
 )
 
-func helloHandler(w http.ResponseWriter, r *http.Request) {
+func azureHandler(w http.ResponseWriter, r *http.Request) {
 	tempentity := ogn.Entity{}
-	// slicebyte, err := r.URL.MarshalBinary()
 	err := json.NewDecoder(r.Body).Decode(&tempentity)
 	if err != nil {
-		fmt.Println("Azure Function Error: NewDecoder/Decode", err)
+		fmt.Println("Azure Function Error: NewDecoder/Decode - ", err)
 	}
 	tempentity.MCSetup.Sims = tempentity.MCSetup.Sims / 100
-	tempentity.MonteCarlo("Azure")
-	fmt.Println("Azure IRR: ", tempentity.MCResultSlice.IRR)
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	go func(t *ogn.Entity) {
+		defer wg.Done()
+		temp := make(map[int]*ogn.Unit)
+		for i, v := range t.ChildUnitsMC {
+			v.Parent = t
+			temp[i] = &v
+			// temp[i].Mutex = &sync.Mutex{}
+		}
+		t.ChildUnits = temp
+		// tempentity.UpdateEntity(false, &tempentity.EntityData, "Azure")
+		// fmt.Println("Azure Handler: ", tempentity.GrowthInput)
+		// ogn.StructPrint("azureHandler - pre Monte Carlo: ", tempentity)
+		// Entity Setup
+		t.Mutex = &sync.Mutex{}
+
+		t.MonteCarlo("Azure")
+	}(&tempentity)
 	response, err := json.Marshal(tempentity.MCResultSlice)
 	if err != nil {
 		fmt.Println("Azure Function Error: Marshal:", err)
+		response, _ = json.Marshal(ogn.Entity{})
 	}
+	fmt.Println("Handler IRR: ", tempentity.Metrics.IRR.NetLeveredAfterTax)
 	fmt.Fprint(w, response)
+	fmt.Println("___________________________________________________________")
 }
 
-func main() {
-	listenAddr := ":8080"
-	if val, ok := os.LookupEnv("FUNCTIONS_CUSTOMHANDLER_PORT"); ok {
-		listenAddr = ":" + val
-	}
-	http.HandleFunc("/api/OGNTrigger", helloHandler)
-	log.Printf("About to listen on %s. Go to https://127.0.0.1%s/", listenAddr, listenAddr)
-	log.Fatal(http.ListenAndServe(listenAddr, nil))
-}
+// func main() {
+// 	listenAddr := ":8080"
+// 	if val, ok := os.LookupEnv("FUNCTIONS_CUSTOMHANDLER_PORT"); ok {
+// 		listenAddr = ":" + val
+// 	}
+// 	http.HandleFunc("/api/OGNTrigger", azureHandler)
+// 	log.Printf("About to listen on %s. Go to https://127.0.0.1%s/", listenAddr, listenAddr)
+// 	log.Fatal(http.ListenAndServe(listenAddr, nil))
+// }

@@ -37,9 +37,9 @@ type BondReturnType struct {
 
 // Default -
 type Default struct {
-	Hazard           float64
-	DefaultEnd       Datetype
-	NumberOfDefaults int
+	Hazard           float64  `json:"Hazard,omitempty"`
+	DefaultEnd       Datetype `json:"DefaultEnd,omitempty"`
+	NumberOfDefaults int      `json:"NumberOfDefaults,omitempty"`
 }
 
 // StringIntFloatMap -

@@ -9,7 +9,7 @@ import (
 )
 
 // AssetRentCalc - Calculates up to NOI. calculates units concurrently, then sums at entity level.
-func (e *Entity) AssetRentCalc(mc bool) {
+func (e *Entity) AssetRentCalc(mc bool, compute string) {
 	e.COA = map[int]FloatCOA{}
 	wg := sync.WaitGroup{}
 	for _, u := range e.ChildUnits {
@@ -27,7 +27,7 @@ func (e *Entity) AssetRentCalc(mc bool) {
 			}
 			bondincome := uu.BondIncome
 			for date := ee.StartDate; date.Dateint <= ee.EndDate.Dateint; date.Add(1) {
-				passingrent, indexation := IndexCalc(uu, date, ee, mcmc)
+				passingrent, indexation := IndexCalc(uu, date, ee, mcmc, compute)
 				// CAPEX - create capex before a pointer to it is sent to vacancy and rent incentives, that way they can both modify it
 				capex := 0.0
 				// VACANCY
@@ -38,6 +38,7 @@ func (e *Entity) AssetRentCalc(mc bool) {
 				var bondexpense float64
 				var interestexpense float64
 				bpuplift, bondexpense, interestexpense, bondincome = BPUplift(passingrent, indexation, uu, void, ee, date, bondincome)
+				// uu.Mutex.Lock()
 				uu.COA[date.Dateint] = FloatCOA{
 					MarketValue:             0,
 					TotalERV:                uu.ERVAmount * uu.ERVArea * ee.Growth["ERV"][date.Dateint] / 12,
@@ -64,6 +65,7 @@ func (e *Entity) AssetRentCalc(mc bool) {
 					BondIncome:              bondincome,
 					BondExpense:             bondexpense,
 				}
+				// uu.Mutex.Unlock()
 			}
 		}(u, e, mc)
 	}
@@ -76,7 +78,9 @@ func (e *Entity) AssetRentCalc(mc bool) {
 	e.GrowthInput["ERV"] = temperv
 	for date := e.StartDate; date.Dateint <= e.EndDate.Dateint; date.Add(1) {
 		for _, u := range e.ChildUnits {
+			// u.Mutex.Lock()
 			e.COA[date.Dateint] = AddCOA(e.COA[date.Dateint], u.COA[date.Dateint])
+			// u.Mutex.Unlock()
 		}
 	}
 }
@@ -102,7 +106,7 @@ func BPUplift(passingrent float64, indexation float64, uu *Unit, void float64, e
 	return bpuplift, bondexpense, interestexpense, bondincome
 }
 
-func IndexCalc(uu *Unit, date Datetype, ee *Entity, mcmc bool) (float64, float64) {
+func IndexCalc(uu *Unit, date Datetype, ee *Entity, mcmc bool, compute string) (float64, float64) {
 	renewrent := uu.RentSchedule.RenewRent
 	rotaterent := uu.RentSchedule.RotateRent
 	isdefault := false
@@ -111,7 +115,7 @@ func IndexCalc(uu *Unit, date Datetype, ee *Entity, mcmc bool) (float64, float64
 	}
 	if date.Dateint == Dateadd(uu.RentSchedule.EndDate, 1).Dateint && !isdefault {
 		uu.RentSchedule.EndContractRent = renewrent*uu.RentSchedule.RenewIndex.Amount + rotaterent*uu.RentSchedule.RotateIndex.Amount
-		uu.RentScheduleCalc(date, mcmc)
+		uu.RentScheduleCalc(date, mcmc, compute)
 	}
 	if date.Dateint == uu.RentSchedule.RenewIndex.EndDate.Dateint {
 		uu.RentSchedule.RenewIndex.IndexationCalc(ee, date, false)
@@ -160,6 +164,10 @@ func FitOutCostsCalc(uu *Unit, date Datetype) float64 {
 }
 
 func VacancyCalc(mcmc bool, uu *Unit, date Datetype, ee *Entity, capex *float64) (vacancy float64, void float64) {
+	defer func() {
+		if r := recover(); r != nil {
+		}
+	}()
 	void = 1.0
 	switch {
 	case mcmc && uu.RSStore[len(uu.RSStore)-1].DefaultDate.Year > 1: // case - tenant has just defaulted
@@ -234,10 +242,11 @@ func (u *Unit) InitialRentScheduleCalc() {
 }
 
 // RentScheduleCalc -
-func (u *Unit) RentScheduleCalc(date Datetype, mc bool) {
+func (u *Unit) RentScheduleCalc(date Datetype, mc bool, compute string) {
 	u.RSStore[len(u.RSStore)-1].EndContractRent = u.RentSchedule.EndContractRent
-	renew := (u.Parent.Growth["ERV"][date.Dateint]*u.ERVAmount*u.ERVArea-u.RentSchedule.EndContractRent*12)*u.RentSchedule.RentRevisionERV + u.RentSchedule.EndContractRent*12
+	// renew := (u.Parent.Growth["ERV"][date.Dateint]*u.ERVAmount*u.ERVArea-u.RentSchedule.EndContractRent*12)*u.RentSchedule.RentRevisionERV + u.RentSchedule.EndContractRent*12
 	rotate := u.Parent.Growth["ERV"][date.Dateint] * u.ERVAmount * u.ERVArea
+	renew := rotate*u.RentSchedule.RentRevisionERV + u.RentSchedule.EndContractRent*(1-u.RentSchedule.RentRevisionERV)
 	indexyear := date.Year
 	indexdate := Datetype{
 		Month: u.LeaseStartDate.Month,
@@ -262,20 +271,26 @@ func (u *Unit) RentScheduleCalc(date Datetype, mc bool) {
 		DefaultDate:             Datetype{},
 		EndDate:                 Dateadd(u.RentSchedule.EndDate, duration),
 		OriginalEndDate:         Dateadd(u.RentSchedule.EndDate, duration),
-		RenewRent:               renew * prob / 12,
-		RotateRent:              rotate * (1 - prob) / 12,
-		PassingRent:             renew*prob/12 + rotate*(1-prob)/12,
-		EndContractRent:         0,
-		RentRevisionERV:         u.RentSchedule.RentRevisionERV,
-		Probability:             u.Probability,
-		ProbabilitySim:          prob,
-		RenewIndex:              Indexation{IndexNumber: 0, StartDate: indexdate, EndDate: Dateadd(indexdate, 12), Amount: 1, RentSchedule: &u.RentSchedule},
-		RotateIndex:             Indexation{IndexNumber: 0, StartDate: Dateadd(indexdate, u.Void), EndDate: Dateadd(indexdate, 12+u.Void), Amount: 1, RentSchedule: &u.RentSchedule},
-		ParentUnit:              u,
+		// RenewRent:               renew * prob / 12,
+		// RotateRent:              rotate * (1 - prob) / 12,
+		RenewRent:       renew / 12,
+		RotateRent:      rotate / 12,
+		PassingRent:     renew*prob/12 + rotate*(1-prob)/12,
+		EndContractRent: 0,
+		RentRevisionERV: u.RentSchedule.RentRevisionERV,
+		Probability:     u.Probability,
+		ProbabilitySim:  prob,
+		RenewIndex:      Indexation{IndexNumber: 0, StartDate: indexdate, EndDate: Dateadd(indexdate, 12), Amount: 1, RentSchedule: &u.RentSchedule},
+		RotateIndex:     Indexation{IndexNumber: 0, StartDate: Dateadd(indexdate, u.Void), EndDate: Dateadd(indexdate, 12+u.Void), Amount: 1, RentSchedule: &u.RentSchedule},
+		ParentUnit:      u,
 	}
+
 	u.RentSchedule = temp
-	temp.RenewRent = temp.RenewRent / prob
-	temp.RotateRent = temp.RotateRent / (1 - prob)
+
+	// temp.RenewRent = temp.RenewRent / prob
+
+	// temp.RotateRent = temp.RotateRent / (1 - prob)
+	// fmt.Println("RentScheduleCalc: parent.growth: ", u.Parent.Growth["ERV"][date.Dateint], "ERVAmount", u.ERVAmount, "ERVArea", u.ERVArea, "prob", prob)
 	u.RSStore = append(u.RSStore, temp)
 }
 

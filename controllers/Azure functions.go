@@ -15,24 +15,33 @@ import (
 // MonteCarlo -
 func (e *Entity) AzureMonteCarlo() {
 	duration := e.MCDataObjectsCreate(1)
-	temp := CreateShellEntity(e)
+	temp := CreateShellEntity(e, "Azure")
+	tempChildUnitsMC := make(map[int]Unit)
+	for i, v := range e.ChildUnits {
+		v.COA = IntFloatCOAMap{}
+		tempChildUnitsMC[i] = *v
+	}
+	temp.ChildUnitsMC = tempChildUnitsMC
 	AzureChannel := make(chan MCResultSlice)
 	go e.AzureSimReceive(AzureChannel, duration) //receives http responses from Azure function
-	wg := sync.WaitGroup{}
-	for i := 0; i < 100; i++ {
-		wg.Add(1)
-		go func(ee *Entity) {
-			defer wg.Done()
-			AzureSimSend(&temp, EntityDataStore[e.MasterID], AzureChannel)
-		}(e)
-	}
-	wg.Wait()
+	// wg := sync.WaitGroup{}
+	// for i := 0; i < 100; i++ {
+	// 	wg.Add(1)
+	// 	go func(ee *Entity) {
+	// 		defer wg.Done()
+	AzureSimSend(&temp, EntityDataStore[e.MasterID], AzureChannel)
+	// 	}(e)
+	// }
+	// wg.Wait()
 	e.MCCalc(duration)
 }
 
 func AzureSimSend(e *Entity, tempdata *EntityData, ch chan MCResultSlice) {
 	e.EntityData = *tempdata
+	// StructPrint("AzureSimSend: ", e)
 	postBody, err := json.Marshal(e)
+	// fmt.Println(e)
+	// fmt.Printf("%+v\r", e)
 	if err != nil {
 		fmt.Println("AzureSimSend Error 1: ", err)
 	}
@@ -55,6 +64,10 @@ func AzureSimSend(e *Entity, tempdata *EntityData, ch chan MCResultSlice) {
 }
 
 func (e *Entity) AzureSimReceive(ch chan MCResultSlice, duration int) {
+	defer func() {
+		if r := recover(); r != nil {
+		}
+	}()
 	instance := 0
 	eIndex := 0
 	vSize := e.MCSetup.Sims / 100
@@ -148,13 +161,18 @@ func (e *Entity) AzureSimReceive(ch chan MCResultSlice, duration int) {
 	} // range channel
 } // AzureSimReceive
 
-func CreateShellEntity(e *Entity) Entity {
+// returns a new entity based on the input e. Removes ChildEntities, Metrics, Growth, MCResults/slice, table
+func CreateShellEntity(e *Entity, compute string) Entity {
+	childunits := make(map[int]*Unit)
+	if compute == "Azure" {
+		childunits = e.ChildUnits
+	}
 	temp := Entity{
 		Mutex:         &sync.Mutex{},
 		MasterID:      e.MasterID,
 		Name:          e.Name,
 		ChildEntities: map[int]*Entity{},
-		ChildUnits:    map[int]*Unit{},
+		ChildUnits:    childunits,
 		Metrics:       Metrics{},
 		ParentID:      e.ParentID,
 		Parent:        e.Parent,
@@ -184,7 +202,9 @@ func CreateShellEntity(e *Entity) Entity {
 		UOM:            "",
 		BalloonPercent: e.BalloonPercent,
 	}
-	temp.PopulateUnits()
+	if compute == "Internal" {
+		temp.PopulateUnits()
+	}
 	return temp
 }
 

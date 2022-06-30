@@ -47,32 +47,47 @@
                     [[template "EntitySettingsTax" .]]
                 </div>
             </div>
-            <div class="form-row"> 
-                <div>
-                    <div class="form-group col-md-4 d-flex align-items-end">
-                        <button type="submit" class="btn secondary-bg">Submit</button>
-                    </div>
-                </div>
-                <div class="form-group col-sm-1">
-                    <label for="fees">Simulations</label>
-                    <input type="text" class="form-control" id="sims" name="sims" Value="[[.entity.MCSetup.Sims]]">
-                </div>
-                <div class="form-group col-sm-1">
-                    <input readonly type="text" class="form-control" id="irr" name="irr" Value="IRR: [[.entity.Metrics.IRR.NetLeveredAfterTax]]">
-                </div>
-                <div class="form-group col-sm-1">
-                    <input readonly type="text" class="form-control" id="em" name="em" Value="EM: [[.entity.Metrics.EM.NetLeveredAfterTax]]">
-                </div>
-                <div class="form-group col-sm-1 offset-sm-5">
-                    <input readonly type="text" class="form-control" id="ytm" name="ytm" Value="YTM: {{[[.entity.Metrics.BondHolder.YTM]] | number:2}}">
-                </div>
-                <div class="form-group col-sm-1">
-                    <input readonly type="text" class="form-control" id="dur" name="dur" Value="DUR: {{[[.entity.Metrics.BondHolder.Duration]] | number:2}}">
-                </div>
-                <div class="form-group col-sm-1">
-                    <input readonly type="text" class="form-control" id="ytmdur" name="ytmdur" Value="YTM/DUR: {{[[.entity.Metrics.BondHolder.YTMDUR]] | number:2}}">
-                </div>
-            </div>
+
+            <table class="grid" cellspacing="0">
+                <tbody>
+                    <tr>
+                        <td colspan="2">
+                            <div>
+                                <div class="form-group col-md-4 d-flex align-items-end">
+                                    <button type="submit" class="btn secondary-bg">Submit</button>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-2">
+                                <label for="fees">Simulations</label>
+                                <input type="text" class="form-control" id="sims" name="sims" Value="[[.entity.MCSetup.Sims]]">
+                            </div>
+                        </td>
+                        <td colspan="10">
+                            <table class="table tableFixHead rounded">
+                                <thead>
+                                    <tr>
+                                        <th scope="col" style="width: 12.5%">IRR</th>
+                                        <th scope="col" style="width: 12.5%">EM</th>
+                                        <th scope="col" style="width: 12.5%">YTM</th>
+                                        <th scope="col" style="width: 12.5%">DUR</th>
+                                        <th scope="col" style="width: 12.5%">YTM/DUR</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{{[[.entity.Metrics.IRR.NetLeveredAfterTax]] | number:2}}</td>
+                                        <td>{{[[.entity.Metrics.EM.NetLeveredAfterTax]] | number:2}}</td>
+                                        <td>{{[[.entity.Metrics.BondHolder.YTM]] | number:2}}</td>
+                                        <td>{{[[.entity.Metrics.BondHolder.Duration]] | number:2}}</td>
+                                        <td>{{[[.entity.Metrics.BondHolder.YTMDUR]] | number:2}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
         </form>
     </div>
     <br>

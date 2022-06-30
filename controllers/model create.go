@@ -110,18 +110,24 @@ func (e *Entity) UpdateEntity(mc bool, v *EntityData, compute string) {
 	growthinput["ERV"] = v.ERVGrowth
 	parentFinal := Entity{}
 	parentID := v.Parent
+	childunits := make(map[int]*Unit)
+	childunitsMC := make(map[int]Unit)
 	if compute == "Internal" {
 		parentFinal = *EntityMap[v.Parent].Entity
 	} else if compute == "Azure" {
 		parentID = -1
+		childunits = e.ChildUnits
+		childunitsMC = e.ChildUnitsMC
 	}
+	// StructPrint("UpdateEntity - ", e.ChildUnits)
 	childentitiesmap := map[int]*Entity{}
 	*e = Entity{
 		Mutex:         &sync.Mutex{},
 		MasterID:      v.MasterID,
 		Name:          v.Name,
 		ChildEntities: childentitiesmap,
-		ChildUnits:    map[int]*Unit{},
+		ChildUnits:    childunits,
+		ChildUnitsMC:  childunitsMC,
 		Metrics:       Metrics{},
 		ParentID:      parentID,
 		Parent:        &parentFinal,
@@ -187,6 +193,7 @@ func (e *Entity) UpdateEntity(mc bool, v *EntityData, compute string) {
 	}
 	e.CalculateModel(mc, compute)
 	e.PopulateChildEntities()
+	// fmt.Println("UpdateEntity IRR: ", e.Metrics.IRR.NetLeveredAfterTax)
 }
 
 // CalculateModel - mc == MonteCarlo; if true then table is not made
@@ -197,9 +204,13 @@ func (e *Entity) CalculateModel(mc bool, compute string) {
 		e.EndDate.Add(0)
 		e.Growth = make(map[string]map[int]float64)
 		e.GrowthCalc(mc)
-		e.PopulateUnits()
+		if compute == "Internal" {
+			e.PopulateUnits()
+		}
 		// e.CalculateUnits()
-		e.AssetRentCalc(mc)
+		// fmt.Println("Calculate Model: ", e.Growth)
+		e.AssetRentCalc(mc, compute)
+		// StructPrint("CalculateModel: ", e.COA[202101])
 		e.DirectCapCalc()
 		// e.DCFCalc()
 		e.Acquisition()
@@ -262,12 +273,40 @@ func (e *Entity) CalculateModel(mc bool, compute string) {
 			e.MakeTable(coas, false, true)
 		}
 		e.MetricsCalc()
+		// for _, v := range e.ChildUnits {
+		// 	fmt.Println("\n", "Unit: ", &v)
+		// 	for _, vv := range v.RSStore {
+		// 		fmt.Println("________________________________________________________________________")
+		// 		fmt.Println("EXTNumber", vv.EXTNumber)
+		// 		fmt.Println("StartDate", vv.StartDate)
+		// 		fmt.Println("VacancyEnd", vv.VacancyEnd)
+		// 		fmt.Println("VacancyAmount", vv.VacancyAmount)
+		// 		fmt.Println("RentIncentivesEndRenew", vv.RentIncentivesEndRenew)
+		// 		fmt.Println("RentIncentivesEndRotate", vv.RentIncentivesEndRotate)
+		// 		fmt.Println("DefaultDate", vv.DefaultDate)
+		// 		fmt.Println("EndDate", vv.EndDate)
+		// 		fmt.Println("OriginalEndDate", vv.OriginalEndDate)
+		// 		fmt.Println("RenewRent", vv.RenewRent)
+		// 		fmt.Println("RotateRent", vv.RotateRent)
+		// 		fmt.Println("PassingRent", vv.PassingRent)
+		// 		fmt.Println("EndContractRent", vv.EndContractRent)
+		// 		fmt.Println("RentRevisionERV", vv.RentRevisionERV)
+		// 		fmt.Println("Probability", vv.Probability)
+		// 		fmt.Println("ProbabilitySim", vv.ProbabilitySim)
+		// 		fmt.Println("RenewIndex", vv.RenewIndex)
+		// 		fmt.Println("RotateIndex", vv.RotateIndex)
+		// 		fmt.Println("ParentUnit", &vv.ParentUnit)
+		// 	}
+		// }
 		if mc {
 			for _, v := range e.ChildUnits {
 				*v = Unit{}
 			}
 		}
 	}
+	// for date := e.StartDate.Year; date <= e.SalesDate.Year; date++ {
+	// 	fmt.Println(date, ": ", e.COA[date].PassingRent)
+	// }
 }
 
 // PopulateUnits -
@@ -295,6 +334,7 @@ func (e *Entity) PopulateUnits() {
 			}
 			// from UnitStore
 			temp := Unit{
+				// Mutex:           &sync.Mutex{},
 				MasterID:        v.MasterID,
 				Name:            v.Name,
 				LeaseStartDate:  startdate,
@@ -328,18 +368,9 @@ func (e *Entity) PopulateUnits() {
 			temp.LeaseExpiryDate.Add(0)
 			e.ChildUnits[v.MasterID] = &temp
 		}
+		// fmt.Println("PopulateUnits - ", v.LeaseStartYear)
 	}
 }
-
-// // CalculateUnits -
-// func (e *Entity) CalculateUnits() {
-// 	for _, u := range e.ChildUnits {
-// 		u.LeaseStartDate.Add(0)
-// 		u.LeaseExpiryDate.Add(0)
-// 		// u.RentScheduleCalc()
-// 		// fmt.Printf("%+v\n", u)
-// 	}
-// }
 
 func (e *Entity) PopulateChildEntities() {
 	for _, v := range EntityDataStore {

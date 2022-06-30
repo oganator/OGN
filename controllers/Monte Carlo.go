@@ -104,6 +104,11 @@ func (e *Entity) MonteCarlo(compute string) {
 	if compute == "Azure" {
 		e.Mutex = &sync.Mutex{}
 		e.EntityData.Mutex = &sync.Mutex{}
+		for index, key := range e.ChildUnitsMC {
+			key.Parent = e
+			e.ChildUnits[index] = &key
+			// e.ChildUnits[index].Mutex = &sync.Mutex{}
+		}
 	}
 	duration := e.MCDataObjectsCreate(1)
 	wg := sync.WaitGroup{}
@@ -114,19 +119,17 @@ func (e *Entity) MonteCarlo(compute string) {
 		wg.Add(1)
 		go func(ee *Entity, index int) {
 			defer wg.Done()
-			temp := CreateShellEntity(ee)
+			temp := CreateShellEntity(ee, compute)
 			tempentitydata := &EntityData{}
 			if compute == "Azure" {
 				tempentitydata = &ee.EntityData
 			} else if compute == "Internal" {
 				tempentitydata = EntityDataStore[e.MasterID]
 			}
-			// tempentitydata.Mutex.Lock()
-			tempentitydata.SampleForEntity(e)
-			// tempentitydata.Mutex.Unlock()
+			tempentitydata.SampleForEntity(&temp)
 			temp.MC = true
-			// ee.ParentID = -1
 			temp.UpdateEntity(true, tempentitydata, compute)
+			// StructPrint("MonteCarlo - ", temp)
 			temp.MCResults.EndCash.Mean = temp.COA[temp.SalesDate.Dateint].CashBalance
 			temp.MCResults.EndNCF.Mean = temp.COA[temp.SalesDate.Dateint].NetCashFlow
 			temp.MCResults.EndMarketValue.Mean = temp.COA[temp.SalesDate.Dateint].MarketValue

@@ -7,6 +7,7 @@ import (
 // RandomDefault -
 func (u *Unit) RandomDefault(date Datetype, endrent float64) (isdefault bool) {
 	randomdefault := rand.Float64()
+	// u.Mutex.Lock()
 	if randomdefault < u.Default.Hazard {
 		isdefault = true
 		u.RentSchedule.DefaultDate = Dateadd(date, 0)
@@ -23,6 +24,7 @@ func (u *Unit) RandomDefault(date Datetype, endrent float64) (isdefault bool) {
 		u.RentScheduleDefaultCalc(date)
 		u.Default.NumberOfDefaults++
 		u.Parent.GLA.Default.NumberOfDefaults++
+		// u.Mutex.Unlock()
 		return isdefault
 	}
 	return isdefault

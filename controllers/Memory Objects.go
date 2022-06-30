@@ -1,6 +1,10 @@
 package controllers
 
-import "sync"
+import (
+	"encoding/json"
+	"fmt"
+	"sync"
+)
 
 // EntityStore - Entity MasterID as key
 var EntityDataStore = map[int]*EntityData{}
@@ -43,9 +47,17 @@ var AzureURL = "http://localhost:7071/api/OGNTrigger"
 
 var Monthly = false
 
-var Compute = "Azure" // Internal or Azure
+var Compute = "Internal" // Internal or Azure
 
 type SimIDType struct {
 	Mutex *sync.Mutex
 	ID    int
+}
+
+func StructPrint(name string, temp interface{}) {
+	empJSON, err := json.MarshalIndent(temp, "", "	")
+	if err != nil {
+		fmt.Println("StructPrint Error: ", err)
+	}
+	fmt.Printf(name+"%s\n", string(empJSON))
 }
