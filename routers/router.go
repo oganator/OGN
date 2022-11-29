@@ -27,4 +27,6 @@ func init() {
 	beego.Router("/Fund", &controllers.FundController{})
 	// AZURE
 	beego.Router("/Function", &controllers.FunctionController{})
+	// FLUTTER
+	beego.Router("/test", &controllers.TestController{})
 }

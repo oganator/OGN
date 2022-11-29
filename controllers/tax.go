@@ -17,8 +17,10 @@ type Tax struct {
 	DTA             IntFloatMap         `json:"DTA,omitempty"`             //
 }
 
-// CIT - starts in december of the second year, and assesses the tax liability of that year, then inserts the taxes payable into may of the next year. Does not assess capital gain (done in Disposal()). As more items are built out, they need to be added to taxable income, as the inclusion of BPuplift previously skewed the taxable income upwards
-func (e *Entity) CIT() {
+// CIT - starts in december of the second year, and assesses the tax liability of that year, then inserts the taxes payable into may of the next year.
+// Does not assess capital gain - done in Disposal().
+// As more items are built out, they need to be added to taxable income, as the inclusion of BPuplift previously skewed the taxable income upwards
+func (e *EntityModel) CIT() {
 	startdate := Dateadd(Datetype{Month: 5, Year: e.StartDate.Year}, 0)
 	taxyear := e.StartDate.Year - 1
 	depr := Depreciation(e)
@@ -71,12 +73,12 @@ func (e *Entity) CIT() {
 }
 
 // Depreciation -
-func Depreciation(e *Entity) float64 {
+func Depreciation(e *EntityModel) float64 {
 	// return (-e.Valuation.AcqPrice - (-e.Valuation.AcqPrice * e.Tax.MinValue) - (-e.Valuation.AcqPrice * e.Tax.LandValue)) / float64(e.Tax.UsablePeriod)
 	return (-e.Valuation.AcqPrice * (1 - e.Tax.MinValue) * (1 - e.Tax.LandValue)) / float64(e.Tax.UsablePeriod)
 }
 
-func CarryBack(startincome float64, e *Entity, date Datetype) (refund float64) {
+func CarryBack(startincome float64, e *EntityModel, date Datetype) (refund float64) {
 	// fmt.Println("tax year: ", date.Year)
 	for prevdate := Dateadd(date, e.Tax.CarryBackYrs*-12); prevdate.Dateint < date.Dateint; prevdate.Add(12) {
 		if e.COA[prevdate.Dateint].TaxableIncomeCarryBack <= 0.0 {
@@ -101,7 +103,7 @@ func CarryBack(startincome float64, e *Entity, date Datetype) (refund float64) {
 	return -refund
 }
 
-func CarryForward(startincome float64, e *Entity, date Datetype) (resultincome float64) {
+func CarryForward(startincome float64, e *EntityModel, date Datetype) (resultincome float64) {
 	// fmt.Println("tax year: ", date.Year)
 	resultincome = startincome
 	tempincome := resultincome

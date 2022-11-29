@@ -26,68 +26,68 @@ func (c *MCDetailsController) Post() {
 	temp := make(map[interface{}]interface{})
 	switch order {
 	case "irr":
-		sort.Sort(ByIRR(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByIRR(EntityMap[tempkey].EntityModel.MCSlice))
 	case "irr-r":
-		sort.Sort(ByIRRr(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByIRRr(EntityMap[tempkey].EntityModel.MCSlice))
 	case "em":
-		sort.Sort(ByEM(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByEM(EntityMap[tempkey].EntityModel.MCSlice))
 	case "em-r":
-		sort.Sort(ByEMr(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByEMr(EntityMap[tempkey].EntityModel.MCSlice))
 	case "ytm":
-		sort.Sort(ByYTM(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByYTM(EntityMap[tempkey].EntityModel.MCSlice))
 	case "ytm-r":
-		sort.Sort(ByYTMr(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByYTMr(EntityMap[tempkey].EntityModel.MCSlice))
 	case "duration":
-		sort.Sort(ByDuration(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByDuration(EntityMap[tempkey].EntityModel.MCSlice))
 	case "duration-r":
-		sort.Sort(ByDurationr(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByDurationr(EntityMap[tempkey].EntityModel.MCSlice))
 	case "void":
-		sort.Sort(ByVoid(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByVoid(EntityMap[tempkey].EntityModel.MCSlice))
 	case "void-r":
-		sort.Sort(ByVoidr(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByVoidr(EntityMap[tempkey].EntityModel.MCSlice))
 	case "extdur":
-		sort.Sort(ByEXTDUR(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByEXTDUR(EntityMap[tempkey].EntityModel.MCSlice))
 	case "extdur-r":
-		sort.Sort(ByEXTDURr(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByEXTDURr(EntityMap[tempkey].EntityModel.MCSlice))
 	case "hazard":
-		sort.Sort(ByHazard(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByHazard(EntityMap[tempkey].EntityModel.MCSlice))
 	case "hazard-r":
-		sort.Sort(ByHazardr(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByHazardr(EntityMap[tempkey].EntityModel.MCSlice))
 	case "opex":
-		sort.Sort(ByOpEx(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByOpEx(EntityMap[tempkey].EntityModel.MCSlice))
 	case "opex-r":
-		sort.Sort(ByOpExr(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByOpExr(EntityMap[tempkey].EntityModel.MCSlice))
 	case "cpi":
-		sort.Sort(ByCPI(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByCPI(EntityMap[tempkey].EntityModel.MCSlice))
 	case "cpi-r":
-		sort.Sort(ByCPIr(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByCPIr(EntityMap[tempkey].EntityModel.MCSlice))
 	case "erv":
-		sort.Sort(ByERV(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByERV(EntityMap[tempkey].EntityModel.MCSlice))
 	case "erv-r":
-		sort.Sort(ByERVr(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByERVr(EntityMap[tempkey].EntityModel.MCSlice))
 	case "yieldshift":
-		sort.Sort(ByYieldShift(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByYieldShift(EntityMap[tempkey].EntityModel.MCSlice))
 	case "yieldshift-r":
-		sort.Sort(ByYieldShiftr(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByYieldShiftr(EntityMap[tempkey].EntityModel.MCSlice))
 	case "endcash":
-		sort.Sort(ByEndCash(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByEndCash(EntityMap[tempkey].EntityModel.MCSlice))
 	case "endcash-r":
-		sort.Sort(ByEndCashr(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByEndCashr(EntityMap[tempkey].EntityModel.MCSlice))
 	case "endncf":
-		sort.Sort(ByEndNCF(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByEndNCF(EntityMap[tempkey].EntityModel.MCSlice))
 	case "endncf-r":
-		sort.Sort(ByEndNCFr(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByEndNCFr(EntityMap[tempkey].EntityModel.MCSlice))
 	case "endmarketvalue":
-		sort.Sort(ByEndMarketValue(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByEndMarketValue(EntityMap[tempkey].EntityModel.MCSlice))
 	case "endmarketvalue-r":
-		sort.Sort(ByEndMarketValuer(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByEndMarketValuer(EntityMap[tempkey].EntityModel.MCSlice))
 	case "prob":
-		sort.Sort(ByProb(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByProb(EntityMap[tempkey].EntityModel.MCSlice))
 	case "prob-r":
-		sort.Sort(ByProbr(EntityMap[tempkey].Entity.MCSlice))
+		sort.Sort(ByProbr(EntityMap[tempkey].EntityModel.MCSlice))
 	}
-	temp["MCSlice"] = EntityMap[tempkey].Entity.MCSlice[startindex:endindex]
-	temp["Strategy"] = EntityMap[tempkey].Entity.Strategy
+	temp["MCSlice"] = EntityMap[tempkey].EntityModel.MCSlice[startindex:endindex]
+	temp["Strategy"] = EntityMap[tempkey].EntityModel.Strategy
 	// temp["baseURL"] = BaseURL
 	c.TplName = "MCDetails.tpl"
 	c.Data = temp
@@ -125,46 +125,46 @@ func (c *MCTabsController) Post() {
 	tab := c.Data["tab"].(string)
 	switch tab {
 	case "cf":
-		temp["entity"] = EntityMap[tempkey].Entity
+		temp["entity"] = EntityMap[tempkey].EntityModel
 		c.TplName = "CFTable.tpl"
 	case "endcash":
-		temp["data"] = EntityMap[tempkey].Entity.MCResults.EndCash
-		temp["varp"] = EntityMap[tempkey].Entity.MCResults.CashBalanceVaR
+		temp["data"] = EntityMap[tempkey].EntityModel.MCResults.EndCash
+		temp["varp"] = EntityMap[tempkey].EntityModel.MCResults.CashBalanceVaR
 		c.TplName = "MCHist.tpl"
 	case "cashbalance":
-		temp["data"] = EntityMap[tempkey].Entity.MCResults.CashBalance
+		temp["data"] = EntityMap[tempkey].EntityModel.MCResults.CashBalance
 		c.TplName = "3dchart.tpl"
 	case "endncf":
-		temp["data"] = EntityMap[tempkey].Entity.MCResults.EndNCF
-		temp["varp"] = EntityMap[tempkey].Entity.MCResults.NCFVaR
+		temp["data"] = EntityMap[tempkey].EntityModel.MCResults.EndNCF
+		temp["varp"] = EntityMap[tempkey].EntityModel.MCResults.NCFVaR
 		c.TplName = "MCHist.tpl"
 	case "ncf":
-		temp["data"] = EntityMap[tempkey].Entity.MCResults.NCF
+		temp["data"] = EntityMap[tempkey].EntityModel.MCResults.NCF
 		c.TplName = "3dchart.tpl"
 	case "endmarketvalue":
-		temp["data"] = EntityMap[tempkey].Entity.MCResults.EndMarketValue
-		temp["varp"] = EntityMap[tempkey].Entity.MCResults.MarketValueVaR
+		temp["data"] = EntityMap[tempkey].EntityModel.MCResults.EndMarketValue
+		temp["varp"] = EntityMap[tempkey].EntityModel.MCResults.MarketValueVaR
 		c.TplName = "MCHist.tpl"
 	case "marketvalue":
-		temp["data"] = EntityMap[tempkey].Entity.MCResults.MarketValue
+		temp["data"] = EntityMap[tempkey].EntityModel.MCResults.MarketValue
 		c.TplName = "3dchart.tpl"
 	case "irr":
-		temp["data"] = EntityMap[tempkey].Entity.MCResults.IRR
+		temp["data"] = EntityMap[tempkey].EntityModel.MCResults.IRR
 		c.TplName = "MCHist.tpl"
 	case "em":
-		temp["data"] = EntityMap[tempkey].Entity.MCResults.EM
+		temp["data"] = EntityMap[tempkey].EntityModel.MCResults.EM
 		c.TplName = "MCHist.tpl"
 	case "ytm":
-		temp["data"] = EntityMap[tempkey].Entity.MCResults.YTM
+		temp["data"] = EntityMap[tempkey].EntityModel.MCResults.YTM
 		c.TplName = "MCHist.tpl"
 	case "duration":
-		temp["data"] = EntityMap[tempkey].Entity.MCResults.Duration
+		temp["data"] = EntityMap[tempkey].EntityModel.MCResults.Duration
 		c.TplName = "MCHist.tpl"
 	case "ytmdur":
-		temp["data"] = EntityMap[tempkey].Entity.MCResults.YTMDUR
+		temp["data"] = EntityMap[tempkey].EntityModel.MCResults.YTMDUR
 		c.TplName = "MCHist.tpl"
 	case "factoranalysis":
-		temp["data"] = EntityMap[tempkey].Entity
+		temp["data"] = EntityMap[tempkey].EntityModel
 		c.TplName = "FactorAnalysis.tpl"
 		// for i, v := range EntityMap[tempkey].Entity.FactorAnalysis {
 		// 	fmt.Println(i)

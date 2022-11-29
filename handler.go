@@ -11,7 +11,7 @@ import (
 )
 
 func azureHandler(w http.ResponseWriter, r *http.Request) {
-	tempentity := ogn.Entity{}
+	tempentity := ogn.EntityModel{}
 	err := json.NewDecoder(r.Body).Decode(&tempentity)
 	if err != nil {
 		fmt.Println("Azure Function Error: NewDecoder/Decode - ", err)
@@ -19,7 +19,7 @@ func azureHandler(w http.ResponseWriter, r *http.Request) {
 	tempentity.MCSetup.Sims = tempentity.MCSetup.Sims / 100
 	wg := sync.WaitGroup{}
 	wg.Add(1)
-	go func(t *ogn.Entity) {
+	go func(t *ogn.EntityModel) {
 		defer wg.Done()
 		temp := make(map[int]*ogn.Unit)
 		for i, v := range t.ChildUnitsMC {
@@ -39,7 +39,7 @@ func azureHandler(w http.ResponseWriter, r *http.Request) {
 	response, err := json.Marshal(tempentity.MCResultSlice)
 	if err != nil {
 		fmt.Println("Azure Function Error: Marshal:", err)
-		response, _ = json.Marshal(ogn.Entity{})
+		response, _ = json.Marshal(ogn.EntityModel{})
 	}
 	fmt.Println("Handler IRR: ", tempentity.Metrics.IRR.NetLeveredAfterTax)
 	fmt.Fprint(w, response)

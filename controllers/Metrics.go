@@ -5,7 +5,7 @@ import (
 )
 
 // MetricsCalc -
-func (e *Entity) MetricsCalc() {
+func (e *EntityModel) MetricsCalc() {
 	e.Metrics.IRR.NetLeveredAfterTax = math.Round(IRR(&e.COA, Dateadd(e.StartDate, -1), e.SalesDate, FloatCOA{NetCashFlow: 1})*10000) / 10000
 	e.Metrics.BondHolder.YTM = math.Round(IRR(&e.COA, Dateadd(e.StartDate, -1), e.SalesDate, FloatCOA{BondExpense: 1})*10000) / 10000
 	e.Metrics.EM.NetLeveredAfterTax = EquityMultipleCalc(e.StartDate, e.SalesDate, e.COA)

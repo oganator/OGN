@@ -1,7 +1,7 @@
 package controllers
 
 // MakeTable - Date, COA, Amount
-func (e *Entity) MakeTable(coas BoolCOA, quarterly bool, yearly bool) {
+func (e *EntityModel) MakeTable(coas BoolCOA, quarterly bool, yearly bool) {
 	e.CreateTableHeader(Monthly, quarterly, yearly)
 	e.Table = make([]TableJSON, 0)
 	marketvalue := make(map[int]string)
@@ -505,7 +505,7 @@ type FloatCOA struct {
 }
 
 // CreateTableHeader -
-func (e *Entity) CreateTableHeader(month, quarter, year bool) {
+func (e *EntityModel) CreateTableHeader(month, quarter, year bool) {
 	// Month
 	if month {
 		ForecastMonthly := make([]Datetype, 0)

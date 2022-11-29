@@ -88,7 +88,7 @@ type GrowthData struct {
 }
 
 // WriteXLSX -
-func WriteXLSXEntities(e *Entity) {
+func WriteXLSXEntities(e *EntityModel) {
 	row, _ := XLSX.SearchSheet("Entities", e.Name)
 	rows := row[0]
 	rows = rows[1:]

@@ -5,7 +5,7 @@ import (
 )
 
 // PropertyCFCalc -
-func (e *Entity) PropertyCFCalc() {
+func (e *EntityModel) PropertyCFCalc() {
 	for date := e.StartDate; date.Dateint <= e.EndDate.Dateint; date.Add(1) {
 		opex := e.COA[date.Dateint].TheoreticalRentalIncome * -e.OpEx.PercentOfTRI
 		interestexpense := e.DebtInput.InterestRate * e.DebtInput.LTV * e.COA[Dateadd(e.StartDate, -1).Dateint].AcqDispProperty / 12
@@ -25,7 +25,7 @@ func (e *Entity) PropertyCFCalc() {
 }
 
 // Acquisition -
-func (e *Entity) Acquisition() {
+func (e *EntityModel) Acquisition() {
 	soldrent := 0.0
 	e.Mutex.Lock()
 	acq := e.COA[Dateadd(e.StartDate, -1).Dateint].MarketValue
@@ -84,7 +84,7 @@ func (e *Entity) Acquisition() {
 }
 
 // Disposal -
-func (e *Entity) Disposal() {
+func (e *EntityModel) Disposal() {
 	bpuplift := 0.0
 	intexp := 0.0
 	ncf := 0.0

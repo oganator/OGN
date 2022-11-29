@@ -3,42 +3,42 @@ package controllers
 import "sync"
 
 // Entity -
-type Entity struct {
-	Mutex          *sync.Mutex         `json:"-"`                        //
-	MasterID       int                 `json:"MasterID,omitempty"`       //
-	EntityData     EntityData          `json:"EntityData,omitempty"`     // used for Azure MC
-	Name           string              `json:"Name,omitempty"`           //
-	ChildEntities  map[int]*Entity     `json:"ChildEntities,omitempty"`  // MasterID as key. created by ModelCreate().
-	ChildUnits     map[int]*Unit       `json:"ChildUnits,omitempty"`     // MasterID as key. created by ModelCreate().
-	ChildUnitsMC   map[int]Unit        `json:"ChildUnitsMC,omitempty"`   // Used only for Azure MC. Needed to actually store the unit data when sent over to azure, otherwise azure only receives a memory address, no actual data
-	Metrics        Metrics             `json:"Metrics,omitempty"`        //
-	ParentID       int                 `json:"ParentID,omitempty"`       //
-	Parent         *Entity             `json:"-"`                        //
-	StartDate      Datetype            `json:"StartDate,omitempty"`      // used for cash flow calculations
-	HoldPeriod     int                 `json:"HoldPeriod,omitempty"`     //
-	SalesDate      Datetype            `json:"SalesDate,omitempty"`      // used for cash flow calculations
-	EndDate        Datetype            `json:"EndDate,omitempty"`        // pushed out further than sales date due to next buyers analysis
-	GrowthInput    map[string]HModel   `json:"GrowthInput,omitempty"`    // where the master data of GrowthInput is stored. the float value is a yearly growth number. Populated from Growth Items tab
-	Growth         StringIntFloatMap   `json:"Growth,omitempty"`         // where the result of the growth is stored (ERV and CPI). Created by Model.Create()
-	DebtInput      DebtInput           `json:"DebtInput,omitempty"`      // NOT a ptr because that would recreate the debt on each level. N/A for units.
-	OpEx           CostInput           `json:"OpEx,omitempty"`           // yearly input for costs.
-	Fees           CostInput           `json:"Fees,omitempty"`           //
-	Capex          map[int]CostInput   `json:"Capex,omitempty"`          // yearly input for costs.
-	GLA            Unit                `json:"GLA,omitempty"`            //
-	MC             bool                `json:"MC,omitempty"`             //
-	MCSetup        MCSetup             `json:"MCSetup,omitempty"`        // used to store sigmas of the variables - the mean values are all stored elsewhere
-	MCSlice        []*Entity           `json:"MCSlice,omitempty"`        //
-	MCResultSlice  MCResultSlice       `json:"MCResultSlice,omitempty"`  //
-	MCResults      MCResults           `json:"MCResults,omitempty"`      //
-	FactorAnalysis []FactorIndependant `json:"FactorAnalysis,omitempty"` //
-	Tax            Tax                 `json:"Tax,omitempty"`            //
-	COA            IntFloatCOAMap      `json:"COA,omitempty"`            // Contains monthly values, as well as yearly values (rolling or calendar) up to the sales date
-	Valuation      Valuation           `json:"Valuation,omitempty"`      //
-	TableHeader    HeaderType          `json:"TableHeader,omitempty"`    // Years, Months...etc
-	Table          []TableJSON         `json:"Table,omitempty"`          //
-	Strategy       string              `json:"Strategy,omitempty"`       //
-	UOM            string              `json:"UOM,omitempty"`            //
-	BalloonPercent float64             `json:"BalloonPercent,omitempty"` //
+type EntityModel struct {
+	Mutex          *sync.Mutex          `json:"-"`                        //
+	MasterID       int                  `json:"MasterID,omitempty"`       //
+	EntityData     EntityData           `json:"EntityData,omitempty"`     // used for Azure MC
+	Name           string               `json:"Name,omitempty"`           //
+	ChildEntities  map[int]*EntityModel `json:"ChildEntities,omitempty"`  // MasterID as key. created by ModelCreate().
+	ChildUnits     map[int]*Unit        `json:"ChildUnits,omitempty"`     // MasterID as key. created by ModelCreate().
+	ChildUnitsMC   map[int]Unit         `json:"ChildUnitsMC,omitempty"`   // Used only for Azure MC. Needed to actually store the unit data when sent over to azure, otherwise azure only receives a memory address, no actual data
+	Metrics        Metrics              `json:"Metrics,omitempty"`        //
+	ParentID       int                  `json:"ParentID,omitempty"`       //
+	Parent         *EntityModel         `json:"-"`                        //
+	StartDate      Datetype             `json:"StartDate,omitempty"`      // used for cash flow calculations
+	HoldPeriod     int                  `json:"HoldPeriod,omitempty"`     //
+	SalesDate      Datetype             `json:"SalesDate,omitempty"`      // used for cash flow calculations
+	EndDate        Datetype             `json:"EndDate,omitempty"`        // pushed out further than sales date due to next buyers analysis
+	GrowthInput    map[string]HModel    `json:"GrowthInput,omitempty"`    // where the master data of GrowthInput is stored. the float value is a yearly growth number. Populated from Growth Items tab
+	Growth         StringIntFloatMap    `json:"Growth,omitempty"`         // where the result of the growth is stored (ERV and CPI). Created by Model.Create()
+	DebtInput      DebtInput            `json:"DebtInput,omitempty"`      // NOT a ptr because that would recreate the debt on each level. N/A for units.
+	OpEx           CostInput            `json:"OpEx,omitempty"`           // yearly input for costs.
+	Fees           CostInput            `json:"Fees,omitempty"`           //
+	Capex          map[int]CostInput    `json:"Capex,omitempty"`          // yearly input for costs.
+	GLA            Unit                 `json:"GLA,omitempty"`            //
+	MC             bool                 `json:"MC,omitempty"`             //
+	MCSetup        MCSetup              `json:"MCSetup,omitempty"`        // used to store sigmas of the variables - the mean values are all stored elsewhere
+	MCSlice        []*EntityModel       `json:"MCSlice,omitempty"`        //
+	MCResultSlice  MCResultSlice        `json:"MCResultSlice,omitempty"`  //
+	MCResults      MCResults            `json:"MCResults,omitempty"`      //
+	FactorAnalysis []FactorIndependant  `json:"FactorAnalysis,omitempty"` //
+	Tax            Tax                  `json:"Tax,omitempty"`            //
+	COA            IntFloatCOAMap       `json:"COA,omitempty"`            // Contains monthly values, as well as yearly values (rolling or calendar) up to the sales date
+	Valuation      Valuation            `json:"Valuation,omitempty"`      //
+	TableHeader    HeaderType           `json:"TableHeader,omitempty"`    // Years, Months...etc
+	Table          []TableJSON          `json:"Table,omitempty"`          //
+	Strategy       string               `json:"Strategy,omitempty"`       //
+	UOM            string               `json:"UOM,omitempty"`            //
+	BalloonPercent float64              `json:"BalloonPercent,omitempty"` //
 }
 
 // Unit -
@@ -53,7 +53,7 @@ type Unit struct {
 	PassingRent        float64        `json:"PassingRent,omitempty"`        //
 	RentSchedule       RentSchedule   `json:"RentSchedule,omitempty"`       // created by Unit.RentScheduleCalc()
 	RSStore            []RentSchedule `json:"RSStore,omitempty"`            // only used for reference
-	Parent             *Entity        `json:"-"`                            //
+	Parent             *EntityModel   `json:"-"`                            //
 	Probability        float64        `json:"Probability,omitempty"`        //
 	PercentSoldRent    float64        `json:"PercentSoldRent,omitempty"`    //
 	DiscountRate       float64        `json:"DiscountRate,omitempty"`       //
@@ -78,7 +78,7 @@ type Unit struct {
 // ChildEntities -
 type ChildEntities struct {
 	Keys  map[string]int `json:"Keys,omitempty"`
-	Array []Entity       `json:"Array,omitempty"`
+	Array []EntityModel  `json:"Array,omitempty"`
 }
 
 // ChildUnits -

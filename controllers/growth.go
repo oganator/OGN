@@ -13,7 +13,7 @@ type HModel struct {
 }
 
 // GrowthCalc -
-func (e *Entity) GrowthCalc(mc bool) {
+func (e *EntityModel) GrowthCalc(mc bool) {
 	duration := dateintdiff(e.EndDate.Dateint, e.StartDate.Dateint)
 	const tw = 1.0 / 12.0
 	for i, v := range e.GrowthInput {

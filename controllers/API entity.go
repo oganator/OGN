@@ -43,7 +43,7 @@ func GetInt(c *ViewEntityController, field string) (result int) {
 func (c *ViewEntityController) Get() {
 	key := ModelsList[GetString(c, "name")]
 	temp := make(map[interface{}]interface{})
-	temp["entity"] = EntityMap[key].Entity
+	temp["entity"] = EntityMap[key].EntityModel
 	temp["modelslist"] = ModelsList
 	// temp["baseURL"] = BaseURL
 	c.TplName = "EntityView.tpl"
@@ -113,17 +113,17 @@ func (c *ViewEntityController) Post() {
 	//
 	temp := make(map[interface{}]interface{})
 	EntityMap[key].Mutex.Lock()
-	EntityMap[key].Entity.UpdateEntity(false, EntityDataStore[EntityMap[key].Entity.MasterID], "Internal")
-	EntityMap[key].Entity.MCSetup = mcsetup
-	WriteXLSXEntities(EntityMap[key].Entity)
-	if EntityMap[key].Entity.Parent != EntityMap[key].Entity && EntityMap[key].Entity.MCSetup.Sims >= 100 {
+	EntityMap[key].EntityModel.UpdateEntity(false, EntityDataStore[EntityMap[key].EntityModel.MasterID], "Internal")
+	EntityMap[key].EntityModel.MCSetup = mcsetup
+	WriteXLSXEntities(EntityMap[key].EntityModel)
+	if EntityMap[key].EntityModel.Parent != EntityMap[key].EntityModel && EntityMap[key].EntityModel.MCSetup.Sims >= 100 {
 		if Compute == "Internal" {
-			EntityMap[key].Entity.MonteCarlo("Internal")
+			EntityMap[key].EntityModel.MonteCarlo("Internal")
 		} else if Compute == "Azure" {
-			EntityMap[key].Entity.AzureMonteCarlo()
+			EntityMap[key].EntityModel.AzureMonteCarlo()
 		}
 	}
-	temp["entity"] = EntityMap[key].Entity
+	temp["entity"] = EntityMap[key].EntityModel
 	temp["modelslist"] = ModelsList
 	temp["fundslist"] = FundsList
 	c.TplName = "EntityView.tpl"
@@ -193,7 +193,7 @@ func (c *ChangeEntityController) Post() {
 	//
 	c.TplName = "EntityView.tpl"
 	temp := make(map[interface{}]interface{})
-	temp["entity"] = EntityMap[key].Entity
+	temp["entity"] = EntityMap[key].EntityModel
 	temp["modelslist"] = ModelsList
 	// temp["baseURL"] = BaseURL
 	c.Data = temp

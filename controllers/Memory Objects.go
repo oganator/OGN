@@ -21,8 +21,8 @@ var EntityMap = EntityMutexMap{}
 type EntityMutexMap map[int]EntityMutex
 
 type EntityMutex struct {
-	Mutex  *sync.Mutex
-	Entity *Entity
+	Mutex       *sync.Mutex
+	EntityModel *EntityModel
 }
 
 // EnitiesList - all entities, funds and assets

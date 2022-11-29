@@ -10,7 +10,7 @@ func SumCOALines(setup FloatCOA, COA IntFloatCOAMap, start Datetype, end Datetyp
 }
 
 // SumCOA - Yearly sum of COA based on their monthly values. Sums an entities monthly values.
-func (e *Entity) SumCOA() {
+func (e *EntityModel) SumCOA() {
 	x := FloatCOA{}
 	for date := Dateadd(e.StartDate, -1); date.Dateint <= e.SalesDate.Dateint; date = Dateadd(date, 1) {
 		if date.Month == 1 {
@@ -24,7 +24,7 @@ func (e *Entity) SumCOA() {
 }
 
 // SumNCF -
-func (e *Entity) SumNCF() {
+func (e *EntityModel) SumNCF() {
 	cashbalance := e.COA[Dateadd(e.StartDate, -1).Dateint].NetCashFlow
 	for date := e.StartDate; date.Dateint <= e.SalesDate.Dateint; date.Add(1) {
 		ncf := e.COA[date.Dateint].NetOperatingIncome + e.COA[date.Dateint].Capex + e.COA[date.Dateint].AcqDispProperty + e.COA[date.Dateint].AcqDispCosts + e.COA[date.Dateint].InterestExpense + e.COA[date.Dateint].Debt + e.COA[date.Dateint].Tax + e.COA[date.Dateint].Fees

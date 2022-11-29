@@ -9,8 +9,8 @@ func PopulateModels() {
 	for _, v := range EntityDataStore {
 		temp := CreateEntity(*v)
 		EntityMap[v.MasterID] = EntityMutex{
-			Mutex:  &sync.Mutex{},
-			Entity: &temp,
+			Mutex:       &sync.Mutex{},
+			EntityModel: &temp,
 		}
 		if v.Parent != 0 {
 			ModelsList[temp.Name] = temp.MasterID
@@ -23,21 +23,21 @@ func PopulateModels() {
 }
 
 // CreateEntity -
-func CreateEntity(v EntityData) (e Entity) {
+func CreateEntity(v EntityData) (e EntityModel) {
 	startdate := Dateadd(Datetype{Month: v.StartMonth, Year: v.StartYear}, 0)
 	salesdate := Dateadd(Datetype{Month: v.SalesMonth, Year: v.SalesYear}, 0)
 	growth := map[string]HModel{}
 	growth["CPI"] = v.CPIGrowth
 	growth["ERV"] = v.ERVGrowth
-	e = Entity{
+	e = EntityModel{
 		Mutex:         &sync.Mutex{},
 		MasterID:      v.MasterID,
 		Name:          v.Name,
-		ChildEntities: map[int]*Entity{},
+		ChildEntities: map[int]*EntityModel{},
 		ChildUnits:    map[int]*Unit{},
 		Metrics:       Metrics{},
 		ParentID:      v.Parent,
-		Parent:        &Entity{},
+		Parent:        &EntityModel{},
 		StartDate:     startdate,
 		HoldPeriod:    dateintdiff(salesdate.Dateint, startdate.Dateint) / 12,
 		SalesDate:     salesdate,
@@ -77,7 +77,7 @@ func CreateEntity(v EntityData) (e Entity) {
 			OpEx:        v.OpExSigma,
 			Hazard:      v.Hazard,
 		},
-		MCSlice: []*Entity{},
+		MCSlice: []*EntityModel{},
 		Tax: Tax{
 			MinValue:        v.WOZpercent,
 			LandValue:       v.Landvalue,
@@ -101,27 +101,27 @@ func CreateEntity(v EntityData) (e Entity) {
 }
 
 // UpdateEntity -
-func (e *Entity) UpdateEntity(mc bool, v *EntityData, compute string) {
+func (e *EntityModel) UpdateEntity(mc bool, v *EntityData, compute string) {
 	startdate := Dateadd(Datetype{Month: v.StartMonth, Year: v.StartYear}, 0)
 	salesdate := Dateadd(startdate, v.HoldPeriod*12-1)
 	enddate := Dateadd(salesdate, 132)
 	growthinput := map[string]HModel{}
 	growthinput["CPI"] = v.CPIGrowth
 	growthinput["ERV"] = v.ERVGrowth
-	parentFinal := Entity{}
+	parentFinal := EntityModel{}
 	parentID := v.Parent
 	childunits := make(map[int]*Unit)
 	childunitsMC := make(map[int]Unit)
 	if compute == "Internal" {
-		parentFinal = *EntityMap[v.Parent].Entity
+		parentFinal = *EntityMap[v.Parent].EntityModel
 	} else if compute == "Azure" {
 		parentID = -1
 		childunits = e.ChildUnits
 		childunitsMC = e.ChildUnitsMC
 	}
 	// StructPrint("UpdateEntity - ", e.ChildUnits)
-	childentitiesmap := map[int]*Entity{}
-	*e = Entity{
+	childentitiesmap := map[int]*EntityModel{}
+	*e = EntityModel{
 		Mutex:         &sync.Mutex{},
 		MasterID:      v.MasterID,
 		Name:          v.Name,
@@ -151,7 +151,7 @@ func (e *Entity) UpdateEntity(mc bool, v *EntityData, compute string) {
 			PassingRent:     0,
 			RentSchedule:    RentSchedule{},
 			RSStore:         []RentSchedule{},
-			Parent:          &Entity{},
+			Parent:          &EntityModel{},
 			Probability:     v.GLA.Probability,
 			PercentSoldRent: v.GLA.PercentSoldRent,
 			BondIncome:      0,
@@ -197,7 +197,7 @@ func (e *Entity) UpdateEntity(mc bool, v *EntityData, compute string) {
 }
 
 // CalculateModel - mc == MonteCarlo; if true then table is not made
-func (e *Entity) CalculateModel(mc bool, compute string) {
+func (e *EntityModel) CalculateModel(mc bool, compute string) {
 	if e.ParentID != 0 {
 		e.StartDate.Add(0)
 		e.SalesDate.Add(0)
@@ -310,7 +310,7 @@ func (e *Entity) CalculateModel(mc bool, compute string) {
 }
 
 // PopulateUnits -
-func (e *Entity) PopulateUnits() {
+func (e *EntityModel) PopulateUnits() {
 	for _, v := range UnitStore {
 		if v.ParentMasterID == e.MasterID {
 			// VACANCY
@@ -372,10 +372,10 @@ func (e *Entity) PopulateUnits() {
 	}
 }
 
-func (e *Entity) PopulateChildEntities() {
+func (e *EntityModel) PopulateChildEntities() {
 	for _, v := range EntityDataStore {
 		if v.Parent == e.MasterID {
-			e.ChildEntities[v.MasterID] = EntityMap[v.MasterID].Entity
+			e.ChildEntities[v.MasterID] = EntityMap[v.MasterID].EntityModel
 		}
 	}
 }

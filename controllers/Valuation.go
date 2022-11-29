@@ -6,7 +6,7 @@ import (
 )
 
 // DirectCapCalc -
-func (e *Entity) DirectCapCalc() {
+func (e *EntityModel) DirectCapCalc() {
 	// e.Valuation.AcqPrice = e.COA[Dateadd(e.StartDate, -1).Dateint].AcqDispProperty
 	shift := e.Valuation.YieldShift / 120000
 	yield := e.Valuation.EntryYield
@@ -23,7 +23,7 @@ func (e *Entity) DirectCapCalc() {
 }
 
 // MonthlyDCFCalc -
-func MonthlyDCFCalc(e *Entity, start Datetype, ch chan DateFloat) {
+func MonthlyDCFCalc(e *EntityModel, start Datetype, ch chan DateFloat) {
 	e.Mutex.Lock()
 	shift := e.Valuation.YieldShift / 120000
 	yield := e.Valuation.EntryYield
@@ -57,7 +57,7 @@ type DateFloat struct {
 }
 
 // SumDCF -
-func (e *Entity) SumDCF(ch chan DateFloat) {
+func (e *EntityModel) SumDCF(ch chan DateFloat) {
 	for v := range ch {
 
 		e.Mutex.Lock()
@@ -69,13 +69,13 @@ func (e *Entity) SumDCF(ch chan DateFloat) {
 }
 
 // DCFCalc - Look in to oddities with Balloon strategy, and include exit yield for sales period
-func (e *Entity) DCFCalc() {
+func (e *EntityModel) DCFCalc() {
 	wg := sync.WaitGroup{}
 	ch := make(chan DateFloat)
 	go e.SumDCF(ch)
 	for date := Dateadd(e.StartDate, -1); date.Dateint <= e.SalesDate.Dateint; date.Add(1) {
 		wg.Add(1)
-		go func(date2 Datetype, ee *Entity) {
+		go func(date2 Datetype, ee *EntityModel) {
 			defer wg.Done()
 			MonthlyDCFCalc(ee, date2, ch)
 		}(date, e)

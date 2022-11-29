@@ -32,7 +32,7 @@ func FactorRegression(metric string, mcresults *MCResultSlice, y *[]float64) (fi
 	return fi
 }
 
-func (e *Entity) FactorAnalysisCalc(mcresults *MCResultSlice) {
+func (e *EntityModel) FactorAnalysisCalc(mcresults *MCResultSlice) {
 	if e.Strategy == "Standard" {
 		e.FactorAnalysis = make([]FactorIndependant, 5)
 		e.FactorAnalysis[0] = FactorRegression("IRR", mcresults, &mcresults.IRR)

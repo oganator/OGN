@@ -1,7 +1,7 @@
 package controllers
 
 // ByIRR -
-type ByIRR []*Entity
+type ByIRR []*EntityModel
 
 func (a ByIRR) Len() int { return len(a) }
 func (a ByIRR) Less(i, j int) bool {
@@ -9,7 +9,7 @@ func (a ByIRR) Less(i, j int) bool {
 }
 func (a ByIRR) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type ByIRRr []*Entity
+type ByIRRr []*EntityModel
 
 func (a ByIRRr) Len() int { return len(a) }
 func (a ByIRRr) Less(i, j int) bool {
@@ -18,7 +18,7 @@ func (a ByIRRr) Less(i, j int) bool {
 func (a ByIRRr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 // ByEM -
-type ByEM []*Entity
+type ByEM []*EntityModel
 
 func (a ByEM) Len() int { return len(a) }
 func (a ByEM) Less(i, j int) bool {
@@ -26,7 +26,7 @@ func (a ByEM) Less(i, j int) bool {
 }
 func (a ByEM) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type ByEMr []*Entity
+type ByEMr []*EntityModel
 
 func (a ByEMr) Len() int { return len(a) }
 func (a ByEMr) Less(i, j int) bool {
@@ -35,7 +35,7 @@ func (a ByEMr) Less(i, j int) bool {
 func (a ByEMr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 // ByYTM -
-type ByYTM []*Entity
+type ByYTM []*EntityModel
 
 func (a ByYTM) Len() int { return len(a) }
 func (a ByYTM) Less(i, j int) bool {
@@ -43,7 +43,7 @@ func (a ByYTM) Less(i, j int) bool {
 }
 func (a ByYTM) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type ByYTMr []*Entity
+type ByYTMr []*EntityModel
 
 func (a ByYTMr) Len() int { return len(a) }
 func (a ByYTMr) Less(i, j int) bool {
@@ -52,7 +52,7 @@ func (a ByYTMr) Less(i, j int) bool {
 func (a ByYTMr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 // ByDuration -
-type ByDuration []*Entity
+type ByDuration []*EntityModel
 
 func (a ByDuration) Len() int { return len(a) }
 func (a ByDuration) Less(i, j int) bool {
@@ -60,7 +60,7 @@ func (a ByDuration) Less(i, j int) bool {
 }
 func (a ByDuration) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type ByDurationr []*Entity
+type ByDurationr []*EntityModel
 
 func (a ByDurationr) Len() int { return len(a) }
 func (a ByDurationr) Less(i, j int) bool {
@@ -69,7 +69,7 @@ func (a ByDurationr) Less(i, j int) bool {
 func (a ByDurationr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 // ByVoid -
-type ByVoid []*Entity
+type ByVoid []*EntityModel
 
 func (a ByVoid) Len() int { return len(a) }
 func (a ByVoid) Less(i, j int) bool {
@@ -77,7 +77,7 @@ func (a ByVoid) Less(i, j int) bool {
 }
 func (a ByVoid) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type ByVoidr []*Entity
+type ByVoidr []*EntityModel
 
 func (a ByVoidr) Len() int { return len(a) }
 func (a ByVoidr) Less(i, j int) bool {
@@ -86,7 +86,7 @@ func (a ByVoidr) Less(i, j int) bool {
 func (a ByVoidr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 // ByEXTDUR -
-type ByEXTDUR []*Entity
+type ByEXTDUR []*EntityModel
 
 func (a ByEXTDUR) Len() int { return len(a) }
 func (a ByEXTDUR) Less(i, j int) bool {
@@ -94,7 +94,7 @@ func (a ByEXTDUR) Less(i, j int) bool {
 }
 func (a ByEXTDUR) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type ByEXTDURr []*Entity
+type ByEXTDURr []*EntityModel
 
 func (a ByEXTDURr) Len() int { return len(a) }
 func (a ByEXTDURr) Less(i, j int) bool {
@@ -103,7 +103,7 @@ func (a ByEXTDURr) Less(i, j int) bool {
 func (a ByEXTDURr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 // ByHazard -
-type ByHazard []*Entity
+type ByHazard []*EntityModel
 
 func (a ByHazard) Len() int { return len(a) }
 func (a ByHazard) Less(i, j int) bool {
@@ -111,7 +111,7 @@ func (a ByHazard) Less(i, j int) bool {
 }
 func (a ByHazard) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type ByHazardr []*Entity
+type ByHazardr []*EntityModel
 
 func (a ByHazardr) Len() int { return len(a) }
 func (a ByHazardr) Less(i, j int) bool {
@@ -120,7 +120,7 @@ func (a ByHazardr) Less(i, j int) bool {
 func (a ByHazardr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 // ByOpEx -
-type ByOpEx []*Entity
+type ByOpEx []*EntityModel
 
 func (a ByOpEx) Len() int { return len(a) }
 func (a ByOpEx) Less(i, j int) bool {
@@ -128,7 +128,7 @@ func (a ByOpEx) Less(i, j int) bool {
 }
 func (a ByOpEx) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type ByOpExr []*Entity
+type ByOpExr []*EntityModel
 
 func (a ByOpExr) Len() int { return len(a) }
 func (a ByOpExr) Less(i, j int) bool {
@@ -137,7 +137,7 @@ func (a ByOpExr) Less(i, j int) bool {
 func (a ByOpExr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 // ByCPI -
-type ByCPI []*Entity
+type ByCPI []*EntityModel
 
 func (a ByCPI) Len() int { return len(a) }
 func (a ByCPI) Less(i, j int) bool {
@@ -145,7 +145,7 @@ func (a ByCPI) Less(i, j int) bool {
 }
 func (a ByCPI) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type ByCPIr []*Entity
+type ByCPIr []*EntityModel
 
 func (a ByCPIr) Len() int { return len(a) }
 func (a ByCPIr) Less(i, j int) bool {
@@ -154,7 +154,7 @@ func (a ByCPIr) Less(i, j int) bool {
 func (a ByCPIr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 // ByERV -
-type ByERV []*Entity
+type ByERV []*EntityModel
 
 func (a ByERV) Len() int { return len(a) }
 func (a ByERV) Less(i, j int) bool {
@@ -162,7 +162,7 @@ func (a ByERV) Less(i, j int) bool {
 }
 func (a ByERV) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type ByERVr []*Entity
+type ByERVr []*EntityModel
 
 func (a ByERVr) Len() int { return len(a) }
 func (a ByERVr) Less(i, j int) bool {
@@ -171,7 +171,7 @@ func (a ByERVr) Less(i, j int) bool {
 func (a ByERVr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 // ByYieldShift -
-type ByYieldShift []*Entity
+type ByYieldShift []*EntityModel
 
 func (a ByYieldShift) Len() int { return len(a) }
 func (a ByYieldShift) Less(i, j int) bool {
@@ -179,7 +179,7 @@ func (a ByYieldShift) Less(i, j int) bool {
 }
 func (a ByYieldShift) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type ByYieldShiftr []*Entity
+type ByYieldShiftr []*EntityModel
 
 func (a ByYieldShiftr) Len() int { return len(a) }
 func (a ByYieldShiftr) Less(i, j int) bool {
@@ -188,7 +188,7 @@ func (a ByYieldShiftr) Less(i, j int) bool {
 func (a ByYieldShiftr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 // ByYTM -
-type ByEndCash []*Entity
+type ByEndCash []*EntityModel
 
 func (a ByEndCash) Len() int { return len(a) }
 func (a ByEndCash) Less(i, j int) bool {
@@ -196,7 +196,7 @@ func (a ByEndCash) Less(i, j int) bool {
 }
 func (a ByEndCash) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type ByEndCashr []*Entity
+type ByEndCashr []*EntityModel
 
 func (a ByEndCashr) Len() int { return len(a) }
 func (a ByEndCashr) Less(i, j int) bool {
@@ -205,7 +205,7 @@ func (a ByEndCashr) Less(i, j int) bool {
 func (a ByEndCashr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 // ByEndNCF -
-type ByEndNCF []*Entity
+type ByEndNCF []*EntityModel
 
 func (a ByEndNCF) Len() int { return len(a) }
 func (a ByEndNCF) Less(i, j int) bool {
@@ -213,7 +213,7 @@ func (a ByEndNCF) Less(i, j int) bool {
 }
 func (a ByEndNCF) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type ByEndNCFr []*Entity
+type ByEndNCFr []*EntityModel
 
 func (a ByEndNCFr) Len() int { return len(a) }
 func (a ByEndNCFr) Less(i, j int) bool {
@@ -222,7 +222,7 @@ func (a ByEndNCFr) Less(i, j int) bool {
 func (a ByEndNCFr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 // ByEndMarketValue -
-type ByEndMarketValue []*Entity
+type ByEndMarketValue []*EntityModel
 
 func (a ByEndMarketValue) Len() int { return len(a) }
 func (a ByEndMarketValue) Less(i, j int) bool {
@@ -230,7 +230,7 @@ func (a ByEndMarketValue) Less(i, j int) bool {
 }
 func (a ByEndMarketValue) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type ByEndMarketValuer []*Entity
+type ByEndMarketValuer []*EntityModel
 
 func (a ByEndMarketValuer) Len() int { return len(a) }
 func (a ByEndMarketValuer) Less(i, j int) bool {
@@ -239,7 +239,7 @@ func (a ByEndMarketValuer) Less(i, j int) bool {
 func (a ByEndMarketValuer) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 // ByProb -
-type ByProb []*Entity
+type ByProb []*EntityModel
 
 func (a ByProb) Len() int { return len(a) }
 func (a ByProb) Less(i, j int) bool {
@@ -247,7 +247,7 @@ func (a ByProb) Less(i, j int) bool {
 }
 func (a ByProb) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type ByProbr []*Entity
+type ByProbr []*EntityModel
 
 func (a ByProbr) Len() int { return len(a) }
 func (a ByProbr) Less(i, j int) bool {

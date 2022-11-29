@@ -32,9 +32,9 @@ func (c *ViewRentScheduleController) Post() {
 	indexstring := GetStringRentSchedule(c, "index")
 	index, _ := strconv.Atoi(indexstring)
 	unit := GetIntRentSchedule(c, "unit")
-	temp["data"] = EntityMap[key].Entity.ChildUnits[unit].RSStore
+	temp["data"] = EntityMap[key].EntityModel.ChildUnits[unit].RSStore
 	if indexstring != "" {
-		temp["data"] = EntityMap[key].Entity.MCSlice[index].ChildUnits[unit].RSStore
+		temp["data"] = EntityMap[key].EntityModel.MCSlice[index].ChildUnits[unit].RSStore
 	}
 	// temp["baseURL"] = BaseURL
 	c.TplName = "RentSchedule.tpl"
@@ -67,11 +67,11 @@ func (c *ViewUnitCFController) Post() {
 	temp := make(map[interface{}]interface{})
 	modelkey := ModelsList[GetStringUnitCF(c, "name")]
 	unit := GetIntUnitCF(c, "unit")
-	tempentity := Entity{
-		StartDate: EntityMap[modelkey].Entity.StartDate,
-		SalesDate: EntityMap[modelkey].Entity.SalesDate,
-		EndDate:   EntityMap[modelkey].Entity.EndDate,
-		COA:       EntityMap[modelkey].Entity.ChildUnits[unit].COA,
+	tempentity := EntityModel{
+		StartDate: EntityMap[modelkey].EntityModel.StartDate,
+		SalesDate: EntityMap[modelkey].EntityModel.SalesDate,
+		EndDate:   EntityMap[modelkey].EntityModel.EndDate,
+		COA:       EntityMap[modelkey].EntityModel.ChildUnits[unit].COA,
 	}
 	tempentity.SumCOA()
 	tempentity.MakeTable(BoolCOA{
@@ -120,9 +120,9 @@ func (c *ViewUnitTableController) Post() {
 	key := ModelsList[GetStringUnitTable(c, "name")]
 	index := GetIntUnitTable(c, "index")
 	if index == -1 {
-		temp["entity"] = EntityMap[key].Entity
+		temp["entity"] = EntityMap[key].EntityModel
 	} else {
-		temp["entity"] = EntityMap[key].Entity.MCSlice[index]
+		temp["entity"] = EntityMap[key].EntityModel.MCSlice[index]
 	}
 	// temp["baseURL"] = BaseURL
 	c.TplName = "UnitTable.tpl"
@@ -181,11 +181,11 @@ func (c *AddChildUnitController) Post() {
 	UnitStore[unit.MasterID] = unit
 	unit.WriteXLSXUnits()
 	EntityMap[parentmasterid].Mutex.Lock()
-	EntityMap[parentmasterid].Entity.CalculateModel(false, "Internal")
+	EntityMap[parentmasterid].EntityModel.CalculateModel(false, "Internal")
 	EntityMap[parentmasterid].Mutex.Unlock()
 	//
 	c.TplName = "EntityView.tpl"
-	temp["entity"] = EntityMap[parentmasterid].Entity
+	temp["entity"] = EntityMap[parentmasterid].EntityModel
 	temp["modelslist"] = ModelsList
 	temp["fundslist"] = FundsList
 	// temp["baseURL"] = BaseURL

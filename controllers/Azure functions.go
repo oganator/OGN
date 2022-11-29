@@ -13,7 +13,7 @@ import (
 )
 
 // MonteCarlo -
-func (e *Entity) AzureMonteCarlo() {
+func (e *EntityModel) AzureMonteCarlo() {
 	duration := e.MCDataObjectsCreate(1)
 	temp := CreateShellEntity(e, "Azure")
 	tempChildUnitsMC := make(map[int]Unit)
@@ -36,7 +36,7 @@ func (e *Entity) AzureMonteCarlo() {
 	e.MCCalc(duration)
 }
 
-func AzureSimSend(e *Entity, tempdata *EntityData, ch chan MCResultSlice) {
+func AzureSimSend(e *EntityModel, tempdata *EntityData, ch chan MCResultSlice) {
 	e.EntityData = *tempdata
 	// StructPrint("AzureSimSend: ", e)
 	postBody, err := json.Marshal(e)
@@ -63,7 +63,7 @@ func AzureSimSend(e *Entity, tempdata *EntityData, ch chan MCResultSlice) {
 	ch <- tempresults
 }
 
-func (e *Entity) AzureSimReceive(ch chan MCResultSlice, duration int) {
+func (e *EntityModel) AzureSimReceive(ch chan MCResultSlice, duration int) {
 	defer func() {
 		if r := recover(); r != nil {
 		}
@@ -78,7 +78,7 @@ func (e *Entity) AzureSimReceive(ch chan MCResultSlice, duration int) {
 				"CPI": {EndingIndex: v.CPI[vIndex]},
 				"ERV": {EndingIndex: v.ERV[vIndex]},
 			}
-			e.MCSlice[eIndex] = &Entity{
+			e.MCSlice[eIndex] = &EntityModel{
 				Metrics: Metrics{
 					IRR: ReturnType{
 						GrossUnleveredBeforeTax: 0,
@@ -115,7 +115,7 @@ func (e *Entity) AzureSimReceive(ch chan MCResultSlice, duration int) {
 				},
 				MC:             false,
 				MCSetup:        MCSetup{},
-				MCSlice:        []*Entity{},
+				MCSlice:        []*EntityModel{},
 				MCResultSlice:  MCResultSlice{},
 				MCResults:      MCResults{},
 				FactorAnalysis: []FactorIndependant{},
@@ -162,16 +162,16 @@ func (e *Entity) AzureSimReceive(ch chan MCResultSlice, duration int) {
 } // AzureSimReceive
 
 // returns a new entity based on the input e. Removes ChildEntities, Metrics, Growth, MCResults/slice, table
-func CreateShellEntity(e *Entity, compute string) Entity {
+func CreateShellEntity(e *EntityModel, compute string) EntityModel {
 	childunits := make(map[int]*Unit)
 	if compute == "Azure" {
 		childunits = e.ChildUnits
 	}
-	temp := Entity{
+	temp := EntityModel{
 		Mutex:         &sync.Mutex{},
 		MasterID:      e.MasterID,
 		Name:          e.Name,
-		ChildEntities: map[int]*Entity{},
+		ChildEntities: map[int]*EntityModel{},
 		ChildUnits:    childunits,
 		Metrics:       Metrics{},
 		ParentID:      e.ParentID,
@@ -216,7 +216,7 @@ type FunctionController struct {
 }
 
 func (c *FunctionController) Post() {
-	tempentity := Entity{}
+	tempentity := EntityModel{}
 	err := json.Unmarshal(c.Ctx.Input.RequestBody, &tempentity)
 	if err != nil {
 		fmt.Println("Azure Function Controller Error: ", err)
@@ -229,6 +229,6 @@ func (c *FunctionController) Post() {
 	SimCounter.Mutex.Unlock()
 	c.Data["json"] = tempentity.MCResultSlice
 	c.ServeJSON()
-	tempentity = Entity{}
+	tempentity = EntityModel{}
 	go debug.FreeOSMemory()
 }

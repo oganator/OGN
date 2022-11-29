@@ -100,7 +100,7 @@ type Hist struct {
 }
 
 // MonteCarlo - compute can be either "Internal" or "Azure"
-func (e *Entity) MonteCarlo(compute string) {
+func (e *EntityModel) MonteCarlo(compute string) {
 	if compute == "Azure" {
 		e.Mutex = &sync.Mutex{}
 		e.EntityData.Mutex = &sync.Mutex{}
@@ -117,7 +117,7 @@ func (e *Entity) MonteCarlo(compute string) {
 			continue
 		}
 		wg.Add(1)
-		go func(ee *Entity, index int) {
+		go func(ee *EntityModel, index int) {
 			defer wg.Done()
 			temp := CreateShellEntity(ee, compute)
 			tempentitydata := &EntityData{}
@@ -170,6 +170,7 @@ func (e *Entity) MonteCarlo(compute string) {
 			e.MCResultSlice.YieldShift[index-1] = e.MCSlice[index-1].Valuation.YieldShift
 			//
 			e.Mutex.Unlock()
+			// clear unnecessary cash flow and unit data - use for debugging monte carlo issues
 			temp.COA = IntFloatCOAMap{}
 			e.MCSlice[index-1].COA = IntFloatCOAMap{}
 			temp.ChildUnits = make(map[int]*Unit)
@@ -182,7 +183,7 @@ func (e *Entity) MonteCarlo(compute string) {
 	}
 }
 
-func (e *Entity) MCCalc(duration int) {
+func (e *EntityModel) MCCalc(duration int) {
 	e.MCResults.EndCash = MCStatsCalc(&e.MCResultSlice.EndCash, e.MCSetup.Sims)
 	e.MCResults.CashBalance, e.MCResults.CashBalanceVaR = RibbonPlot(&e.MCResultSlice.CashBalance, duration-2, 100, e.MCSetup.Sims)
 	e.MCResults.EndNCF = MCStatsCalc(&e.MCResultSlice.EndNCF, e.MCSetup.Sims)
@@ -205,7 +206,7 @@ func (e *Entity) MCCalc(duration int) {
 }
 
 // FundMonteCarlo - Random sample from the ChildEntities
-func (e *Entity) FundMonteCarlo() {
+func (e *EntityModel) FundMonteCarlo() {
 	// make slices
 	duration := e.MCDataObjectsCreate(1)
 	for sim := 0; sim < e.MCSetup.Sims; sim++ {
@@ -272,7 +273,7 @@ func (e *Entity) FundMonteCarlo() {
 	}
 }
 
-func (tempentitydata *EntityData) SampleForEntity(e *Entity) {
+func (tempentitydata *EntityData) SampleForEntity(e *EntityModel) {
 	// rand.Seed(uint64(time.Nanosecond))
 	tempentitydata.ERVGrowth.ShortTermRate = NormalSample(e.GrowthInput["ERV"].ShortTermRate, e.MCSetup.ERV.ShortTermRate, 0.0, 10.0)
 	tempentitydata.ERVGrowth.ShortTermPeriod = int(NormalSample(float64(e.GrowthInput["ERV"].ShortTermPeriod), float64(e.MCSetup.ERV.ShortTermPeriod), 0.0, 10.0))
@@ -304,8 +305,8 @@ func CopyArray(source *[]float64) []float64 {
 }
 
 // Used in Monte Carlo methods - creates MCResultSlice
-func (e *Entity) MCDataObjectsCreate(addperiods int) int {
-	e.MCSlice = make([]*Entity, e.MCSetup.Sims)
+func (e *EntityModel) MCDataObjectsCreate(addperiods int) int {
+	e.MCSlice = make([]*EntityModel, e.MCSetup.Sims)
 	duration := dateintdiff(e.SalesDate.Dateint, e.StartDate.Dateint) + addperiods
 	e.MCResultSlice = MCResultSlice{
 		EndCash:         make([]float64, e.MCSetup.Sims),

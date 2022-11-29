@@ -38,7 +38,7 @@ func (c *FundController) Get() {
 	name := GetStringFund(c, "name")
 	key := FundsList[name]
 	temp := make(map[interface{}]interface{})
-	temp["entity"] = EntityMap[key].Entity
+	temp["entity"] = EntityMap[key].EntityModel
 	temp["modelslist"] = ModelsList
 	temp["fundslist"] = FundsList
 	// temp["baseURL"] = BaseURL
@@ -50,12 +50,12 @@ func (c *FundController) Get() {
 func (c *FundController) Post() {
 	name := GetStringFund(c, "name")
 	key := FundsList[name]
-	EntityMap[key].Entity.Strategy = GetStringFund(c, "strategy")
-	EntityMap[key].Entity.CalculateFund()
-	EntityMap[key].Entity.MCSetup.Sims = GetIntFund(c, "sims")
-	EntityMap[key].Entity.FundMonteCarlo()
+	EntityMap[key].EntityModel.Strategy = GetStringFund(c, "strategy")
+	EntityMap[key].EntityModel.CalculateFund()
+	EntityMap[key].EntityModel.MCSetup.Sims = GetIntFund(c, "sims")
+	EntityMap[key].EntityModel.FundMonteCarlo()
 	temp := make(map[interface{}]interface{})
-	temp["entity"] = EntityMap[key].Entity
+	temp["entity"] = EntityMap[key].EntityModel
 	temp["modelslist"] = ModelsList
 	temp["fundslist"] = FundsList
 	// temp["baseURL"] = BaseURL
