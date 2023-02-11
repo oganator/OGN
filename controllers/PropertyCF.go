@@ -20,25 +20,27 @@ func (e *EntityModel) PropertyCFCalc() {
 			Fees:               fees,
 		}
 		temp.Add(e.COA[date.Dateint])
+		e.Mutex.Lock()
 		e.COA[date.Dateint] = temp
+		e.Mutex.Unlock()
 	}
 }
 
 // Acquisition -
 func (e *EntityModel) Acquisition() {
 	soldrent := 0.0
-	e.Mutex.Lock()
+	// e.Mutex.Lock()
 	acq := e.COA[Dateadd(e.StartDate, -1).Dateint].MarketValue
-	e.Mutex.Unlock()
+	// e.Mutex.Unlock()
 	e.Valuation.AcqPrice = acq
 	rett := acq * -e.Tax.RETT
 	switch e.Strategy {
 	case "Pure Discount":
 		soldrent = SumCOALines(FloatCOA{BondIncome: 1.0}, e.COA, e.StartDate, e.SalesDate)
 	case "Amortized Coupon", "Balloon":
-		for _, u := range e.ChildUnits {
+		for _, u := range e.ChildUnitModels {
 			leaselength := dateintdiff(u.LeaseExpiryDate.Dateint, e.StartDate.Dateint)
-			monthstosell := math.Min(float64(leaselength), float64(e.HoldPeriod*12))
+			monthstosell := math.Min(float64(leaselength), float64(e.HoldPeriod))
 			soldrent = soldrent + u.PassingRent/12*float64(monthstosell)*u.PercentSoldRent
 		}
 	}

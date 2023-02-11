@@ -24,13 +24,11 @@ func (e *EntityModel) DirectCapCalc() {
 
 // MonthlyDCFCalc -
 func MonthlyDCFCalc(e *EntityModel, start Datetype, ch chan DateFloat) {
-	e.Mutex.Lock()
 	shift := e.Valuation.YieldShift / 120000
 	yield := e.Valuation.EntryYield
-	// discount := e.Valuation.DiscountRate + 1
-	e.Mutex.Unlock()
-	discount := 1.08
-	end := Dateadd(start, 120) //10 year DCF
+	discount := e.Valuation.DiscountRate + 1
+	// discount := 1.08
+	end := Dateadd(start, 120) // 10 year DCF
 	i := 0.0
 	tempvalue := 0.0
 	for date := start; date.Dateint <= end.Dateint; date.Add(1) {
@@ -59,7 +57,6 @@ type DateFloat struct {
 // SumDCF -
 func (e *EntityModel) SumDCF(ch chan DateFloat) {
 	for v := range ch {
-
 		e.Mutex.Lock()
 		temp := FloatCOA{MarketValue: v.Float}
 		temp.Add(e.COA[v.Date.Dateint])

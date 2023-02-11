@@ -1,6 +1,6 @@
 [[define "EntitySettings"]]
     <div class="container-fluid shadow-lg rounded" style="width: 95%" id="settingsTable">
-        <form class="form-horizontal form-well" role="form" method="post" action="/ViewEntity">
+        <form class="form-horizontal form-well" role="form" >
             <div class="tabs-wrapper">
                 <ul class="nav nav-tabs tabPinned" role="tablist">
                     <li class="nav-item">
@@ -47,14 +47,14 @@
                     [[template "EntitySettingsTax" .]]
                 </div>
             </div>
-
+            
             <table class="grid" cellspacing="0">
                 <tbody>
                     <tr>
                         <td colspan="2">
                             <div>
                                 <div class="form-group col-md-4 d-flex align-items-end">
-                                    <button type="submit" class="btn secondary-bg">Submit</button>
+                                    <button ng-click="updateEntity('[[.entity.Name]]')" class="btn secondary-bg">Submit</button>
                                 </div>
                             </div>
                             <div class="form-group col-sm-2">
@@ -93,10 +93,10 @@
     <br>
     <br>
     <script>
-        window.onload = strategyChange();
-        $(function () {
-            $('[data-toggle="tooltip"]').tooltip()
-        })
+//        window.onload = strategyChange();
+//        $(function () {
+//            $('[data-toggle="tooltip"]').tooltip()
+//        })
         function strategyChange() {
             var input = document.getElementById("strategy");
             if (input.value == "Standard"){
@@ -133,15 +133,55 @@
 [[end]]
 
 [[define "EntitySettingsDefault"]]
+
     <div class="form-row">
         <input hidden id="name" name="name" ng-model="entity" value="[[.entity.Name]]">
-        <div class="form-group col-sm-1">
-            <label for="portfolio">Asset</label>
-            <input type="text" class="form-control" id="portfolio" name="portfolio" value="[[.entity.Name]]" >
+        <div hidden class="form-group col-sm-1">
+            <label hidden for="portfolio">Asset</label>
+            <input hidden type="text" class="form-control" id="portfolio" name="portfolio" value="[[.entity.Name]]" >
         </div>
-        <div class="form-group col-sm-1">
+<!--    <div class="form-group col-sm-1">
             <label for="holdperiod">Hold Period</label>
             <input type="text" class="form-control" id="holdperiod" name="holdperiod" value="[[.entity.HoldPeriod]]" data-toggle="tooltip" data-placement="top" title="Years">
+        </div>
+-->
+        <div class="form-group col-sm-1">
+            <label for="startdate">Start Date</label>
+            <select type="text" class="form-control" id="startmonth" value="[[.entity.StartDate.MonthName]]">
+                <option hidden>[[.entity.StartDate.MonthName]]</option>
+                <option>Jan</option>
+                <option>Feb</option>
+                <option>Mar</option>
+                <option>Apr</option>
+                <option>May</option>
+                <option>Jun</option>
+                <option>Jul</option>
+                <option>Aug</option>
+                <option>Sep</option>
+                <option>Oct</option>
+                <option>Nov</option>
+                <option>Dec</option>
+            </select>
+            <input type="number" class="form-control" id="startyear" value="[[.entity.StartDate.Year]]" >
+        </div>
+        <div class="form-group col-sm-1">
+            <label for="salesdate">Sales Date</label>
+            <select type="text" class="form-control" id="salesmonth" value="[[.entity.SalesDate.MonthName]]">
+                <option hidden>[[.entity.SalesDate.MonthName]]</option>
+                <option>Jan</option>
+                <option>Feb</option>
+                <option>Mar</option>
+                <option>Apr</option>
+                <option>May</option>
+                <option>Jun</option>
+                <option>Jul</option>
+                <option>Aug</option>
+                <option>Sep</option>
+                <option>Oct</option>
+                <option>Nov</option>
+                <option>Dec</option>
+            </select>
+            <input type="number" class="form-control" id="salesyear" value="[[.entity.SalesDate.Year]]" >
         </div>
         <div class="form-group col-sm-1">
             <label for="fees">Fees (bps)</label>
@@ -156,25 +196,25 @@
                 <option>Pure Discount</option>
             </select>
         </div>
-        <div class="form-group col-sm-1" id="ltv">
+        <div class="form-group col-sm-1" >
             <label for="ltv">LTV</label>
-            <input type="text" class="form-control" name="ltv" Value="{{[[.entity.DebtInput.LTV]] * 100 | number:2}}">
+            <input type="text" class="form-control" id="ltv" name="ltv" Value="{{[[.entity.DebtInput.LTV]] * 100 | number:2}}">
         </div>
-        <div class="form-group col-sm-1" id="rate">
+        <div class="form-group col-sm-1" >
             <label for="rate">Loan Rate</label>
-            <input type="text" class="form-control" name="rate" Value="{{[[.entity.DebtInput.InterestRate]] * 100 | number:2}}">
+            <input type="text" class="form-control" id="rate" name="rate" Value="{{[[.entity.DebtInput.InterestRate]] * 100 | number:2}}">
         </div>
-        <div class="form-group col-sm-1" id="discount">
+        <div class="form-group col-sm-1" >
             <label for="discount">Discount Rate</label>
-            <input type="text" class="form-control" name="discount" Value="{{[[.entity.GLA.DiscountRate]] * 100 | number:2}}">
+            <input type="text" class="form-control" id="discount" name="discount" Value="{{[[.entity.GLA.DiscountRate]] * 100 | number:2}}">
         </div>
-        <div class="form-group col-sm-1" id="soldrent">
+        <div class="form-group col-sm-1" >
             <label for="rate">Rent to Sell %</label>
-            <input type="text" class="form-control" name="soldrent" Value="{{[[.entity.GLA.PercentSoldRent]] * 100 | number:2}}">
+            <input type="text" class="form-control" id="soldrent" name="soldrent" Value="{{[[.entity.GLA.PercentSoldRent]] * 100 | number:2}}">
         </div>
-        <div class="form-group col-sm-1" id="balpercent">
+        <div class="form-group col-sm-1" >
             <label for="balpercent">Balloon Percent</label>
-            <input type="text" class="form-control" name="balpercent" Value="{{[[.entity.BalloonPercent]] * 100 | number:2}}">
+            <input type="text" class="form-control" id="balpercent" name="balpercent" Value="{{[[.entity.BalloonPercent]] * 100 | number:2}}">
         </div>
     </div>
     <div class="form-row">

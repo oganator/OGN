@@ -12,9 +12,9 @@ import (
 func (e *EntityModel) AssetRentCalc(mc bool, compute string) {
 	e.COA = map[int]FloatCOA{}
 	wg := sync.WaitGroup{}
-	for _, u := range e.ChildUnits {
+	for _, u := range e.ChildUnitModels {
 		wg.Add(1)
-		go func(uu *Unit, ee *EntityModel, mcmc bool) {
+		go func(uu *UnitModel, ee *EntityModel, mcmc bool) {
 			defer wg.Done()
 			uu.InitialRentScheduleCalc()
 			uu.COA = map[int]FloatCOA{}
@@ -22,7 +22,7 @@ func (e *EntityModel) AssetRentCalc(mc bool, compute string) {
 				uu.BondIndex = Indexation{RentSchedule: &uu.RentSchedule}
 				uu.BondIndex.IndexationCalc(e, uu.RentSchedule.StartDate, false)
 				leaselength := dateintdiff(uu.LeaseExpiryDate.Dateint, ee.StartDate.Dateint)
-				monthstosell := math.Min(float64(leaselength), float64(ee.HoldPeriod*12))
+				monthstosell := math.Min(float64(leaselength), float64(ee.HoldPeriod))
 				uu.BondProceeds = uu.PassingRent / 12 * float64(monthstosell) * uu.PercentSoldRent
 			}
 			bondincome := uu.BondIncome
@@ -77,7 +77,7 @@ func (e *EntityModel) AssetRentCalc(mc bool, compute string) {
 	e.GrowthInput["CPI"] = tempcpi
 	e.GrowthInput["ERV"] = temperv
 	for date := e.StartDate; date.Dateint <= e.EndDate.Dateint; date.Add(1) {
-		for _, u := range e.ChildUnits {
+		for _, u := range e.ChildUnitModels {
 			// u.Mutex.Lock()
 			e.COA[date.Dateint] = AddCOA(e.COA[date.Dateint], u.COA[date.Dateint])
 			// u.Mutex.Unlock()
@@ -85,7 +85,7 @@ func (e *EntityModel) AssetRentCalc(mc bool, compute string) {
 	}
 }
 
-func BPUplift(passingrent float64, indexation float64, uu *Unit, void float64, ee *EntityModel, date Datetype, bondincome float64) (float64, float64, float64, float64) {
+func BPUplift(passingrent float64, indexation float64, uu *UnitModel, void float64, ee *EntityModel, date Datetype, bondincome float64) (float64, float64, float64, float64) {
 	bpuplift := (passingrent + indexation) * -uu.PercentSoldRent * void
 	bondexpense := 0.0
 	interestexpense := 0.0
@@ -96,7 +96,7 @@ func BPUplift(passingrent float64, indexation float64, uu *Unit, void float64, e
 		bondincome = uu.BondIncome / discount
 		bondexpense = -(bondincome * uu.BondIndex.Final)
 	case "Amortized Coupon":
-		interestexpense = bondincome * float64(ee.HoldPeriod) * -uu.DiscountRate * void
+		interestexpense = bondincome * float64(ee.HoldPeriod/12) * -uu.DiscountRate * void
 		bondexpense = -bondincome - interestexpense
 	case "Balloon":
 		interestexpense = (uu.BondProceeds * -uu.DiscountRate / 12) * uu.BondIndex.Amount * void
@@ -106,7 +106,7 @@ func BPUplift(passingrent float64, indexation float64, uu *Unit, void float64, e
 	return bpuplift, bondexpense, interestexpense, bondincome
 }
 
-func IndexCalc(uu *Unit, date Datetype, ee *EntityModel, mcmc bool, compute string) (float64, float64) {
+func IndexCalc(uu *UnitModel, date Datetype, ee *EntityModel, mcmc bool, compute string) (float64, float64) {
 	renewrent := uu.RentSchedule.RenewRent
 	rotaterent := uu.RentSchedule.RotateRent
 	isdefault := false
@@ -131,7 +131,7 @@ func IndexCalc(uu *Unit, date Datetype, ee *EntityModel, mcmc bool, compute stri
 	return passingrent, indexation
 }
 
-func RentIncentivesCalc(date Datetype, uu *Unit, capex *float64) (rentfree float64) {
+func RentIncentivesCalc(date Datetype, uu *UnitModel, capex *float64) (rentfree float64) {
 	// RENEW
 	if date.Dateint <= uu.RentSchedule.RentIncentivesEndRenew.Dateint {
 		if uu.RentIncentives.IsCapitalized {
@@ -151,7 +151,7 @@ func RentIncentivesCalc(date Datetype, uu *Unit, capex *float64) (rentfree float
 	return rentfree
 }
 
-func FitOutCostsCalc(uu *Unit, date Datetype) float64 {
+func FitOutCostsCalc(uu *UnitModel, date Datetype) float64 {
 	endingindex := 1.0
 	// uu.FitOutCosts.AmountPerTotalArea = 15.0
 	uu.FitOutCosts.IsIndexed = true
@@ -163,7 +163,7 @@ func FitOutCostsCalc(uu *Unit, date Datetype) float64 {
 	return uu.FitOutCosts.AmountPerTotalArea * uu.ERVArea * -endingindex / void
 }
 
-func VacancyCalc(mcmc bool, uu *Unit, date Datetype, ee *EntityModel, capex *float64) (vacancy float64, void float64) {
+func VacancyCalc(mcmc bool, uu *UnitModel, date Datetype, ee *EntityModel, capex *float64) (vacancy float64, void float64) {
 	defer func() {
 		if r := recover(); r != nil {
 		}
@@ -194,7 +194,7 @@ func VacancyCalc(mcmc bool, uu *Unit, date Datetype, ee *EntityModel, capex *flo
 }
 
 // InitialRentScheduleCalc -
-func (u *Unit) InitialRentScheduleCalc() {
+func (u *UnitModel) InitialRentScheduleCalc() {
 	u.RSStore = make([]RentSchedule, 0)
 	indexyear := u.Parent.StartDate.Year - 1
 	if u.Parent.StartDate.Month > u.LeaseStartDate.Month {
@@ -242,7 +242,7 @@ func (u *Unit) InitialRentScheduleCalc() {
 }
 
 // RentScheduleCalc -
-func (u *Unit) RentScheduleCalc(date Datetype, mc bool, compute string) {
+func (u *UnitModel) RentScheduleCalc(date Datetype, mc bool, compute string) {
 	u.RSStore[len(u.RSStore)-1].EndContractRent = u.RentSchedule.EndContractRent
 	// renew := (u.Parent.Growth["ERV"][date.Dateint]*u.ERVAmount*u.ERVArea-u.RentSchedule.EndContractRent*12)*u.RentSchedule.RentRevisionERV + u.RentSchedule.EndContractRent*12
 	rotate := u.Parent.Growth["ERV"][date.Dateint] * u.ERVAmount * u.ERVArea
@@ -295,7 +295,7 @@ func (u *Unit) RentScheduleCalc(date Datetype, mc bool, compute string) {
 }
 
 // RentScheduleDefaultCalc -
-func (u *Unit) RentScheduleDefaultCalc(date Datetype) {
+func (u *UnitModel) RentScheduleDefaultCalc(date Datetype) {
 	u.RSStore = append(u.RSStore, u.RentSchedule)
 	rotate := u.Parent.Growth["ERV"][date.Dateint] * u.ERVAmount * u.ERVArea
 	indexyear := date.Year

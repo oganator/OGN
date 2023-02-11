@@ -40,7 +40,7 @@
     overflow-y: scroll;
     overflow-x: scroll;
     height: 100px;
-
+    
 }
 
 .tableFixHead thead th {
@@ -88,6 +88,7 @@ tr {
     border-right: 0mm;
     border-radius: 0mm;
     color: var(--second-bg-color);    
+    background-color: transparent;
 }
 
 label{
@@ -129,3 +130,5 @@ label{
     color: #fff;
     background-color: var(--second-bg-color);
 }
+
+

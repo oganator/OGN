@@ -13,9 +13,11 @@ func init() {
 	beego.Router("/AppSettings", &controllers.AppSettingsController{})
 	// ENTITY
 	beego.Router("/ViewEntity", &controllers.ViewEntityController{})
+	beego.Router("/ViewEntity2", &controllers.ViewEntity2Controller{})
 	beego.Router("/ChangeEntity", &controllers.ChangeEntityController{})
 	// UNIT
 	beego.Router("/ViewUnitCF", &controllers.ViewUnitCFController{})
+	beego.Router("/UpdateUnit", &controllers.UpdateUnitController{})
 	beego.Router("/ViewUnitTable", &controllers.ViewUnitTableController{})
 	beego.Router("/AddChildUnit", &controllers.AddChildUnitController{})
 	beego.Router("/ViewRentSchedule", &controllers.ViewRentScheduleController{})

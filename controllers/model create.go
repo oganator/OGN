@@ -8,100 +8,75 @@ import (
 func PopulateModels() {
 	for _, v := range EntityDataStore {
 		temp := CreateEntity(*v)
-		EntityMap[v.MasterID] = EntityMutex{
+		EntityModelsMap[v.MasterID] = EntityMutex{
 			Mutex:       &sync.Mutex{},
 			EntityModel: &temp,
 		}
+		EntityMap[temp.EntityID].Models = append(EntityMap[temp.EntityID].Models, &temp)
 		if v.Parent != 0 {
-			ModelsList[temp.Name] = temp.MasterID
-			EntitiesList[temp.Name] = temp.MasterID
+			AssetModelsList[temp.Name] = temp.MasterID
+			EntityModelsList[temp.Name] = temp.MasterID
 		} else {
-			FundsList[temp.Name] = temp.MasterID
-			EntitiesList[temp.Name] = temp.MasterID
+			FundModelsList[temp.Name] = temp.MasterID
+			EntityModelsList[temp.Name] = temp.MasterID
 		}
 	}
 }
 
-// CreateEntity -
-func CreateEntity(v EntityData) (e EntityModel) {
+// CreateEntity - creates a new entitymodel
+func CreateEntity(v EntityModelData) (e EntityModel) {
 	startdate := Dateadd(Datetype{Month: v.StartMonth, Year: v.StartYear}, 0)
 	salesdate := Dateadd(Datetype{Month: v.SalesMonth, Year: v.SalesYear}, 0)
 	growth := map[string]HModel{}
 	growth["CPI"] = v.CPIGrowth
 	growth["ERV"] = v.ERVGrowth
 	e = EntityModel{
-		Mutex:         &sync.Mutex{},
-		MasterID:      v.MasterID,
-		Name:          v.Name,
-		ChildEntities: map[int]*EntityModel{},
-		ChildUnits:    map[int]*Unit{},
-		Metrics:       Metrics{},
-		ParentID:      v.Parent,
-		Parent:        &EntityModel{},
-		StartDate:     startdate,
-		HoldPeriod:    dateintdiff(salesdate.Dateint, startdate.Dateint) / 12,
-		SalesDate:     salesdate,
-		EndDate:       Dateadd(Datetype{Month: v.EndMonth, Year: v.EndYear}, 0),
-		GrowthInput:   growth,
-		Growth:        map[string]map[int]float64{},
-		DebtInput:     DebtInput{LTV: v.LTV, InterestRate: v.LoanRate},
-		OpEx:          CostInput{Amount: 0, AmountPerTotalArea: 0, AmountPerOccupiedArea: 0, AmountPerVacantArea: 0, PercentOfERV: v.OpExpercent, PercentOfTRI: v.OpExpercent, PercentOfContractRent: 0},
-		Fees:          CostInput{Amount: 0, AmountPerTotalArea: 0, AmountPerOccupiedArea: 0, AmountPerVacantArea: 0, PercentOfERV: 0, PercentOfTRI: 0, PercentOfContractRent: 0, PercentOfNAV: 0, PercentOfGAV: v.Fees},
-		Capex:         map[int]CostInput{},
-		GLA: Unit{
-			Probability:     v.GLA.Probability,
-			PercentSoldRent: v.percentIncometosell,
-			DiscountRate:    v.GLA.DiscountRate,
-			RentRevisionERV: v.GLA.RentRevisionERV,
-			EXTDuration:     v.GLA.EXTDuration,
-			Default: Default{
-				Hazard: v.GLA.Default.Hazard,
-			},
-			RentIncentives: CostInput{
-				PercentOfContractRent: v.GLA.RentIncentives.PercentOfContractRent,
-				IsCapitalized:         false,
-				Duration:              v.GLA.RentIncentives.Duration,
-			},
-			FitOutCosts: CostInput{
-				AmountPerTotalArea: v.GLA.FitOutCosts.AmountPerTotalArea,
-			},
-			Void: v.GLA.Void,
-		},
-		MCSetup: MCSetup{
-			Sims:        v.Sims,
-			ERV:         v.CPISigma,
-			CPI:         v.CPISigma,
-			YieldShift:  v.YieldShiftSigma,
-			Void:        v.VoidSigma,
-			Probability: v.ProbabilitySigma,
-			OpEx:        v.OpExSigma,
-			Hazard:      v.Hazard,
-		},
-		MCSlice: []*EntityModel{},
-		Tax: Tax{
-			MinValue:        v.WOZpercent,
-			LandValue:       v.Landvalue,
-			UsablePeriod:    v.DeprPeriod,
-			RETT:            v.RETT,
-			CIT:             map[float64]float64{},
-			VAT:             v.VAT,
-			CarryBackYrs:    v.CarryBackYrs,
-			CarryForwardYrs: v.CarryForwardYrs,
-			DTA:             map[int]float64{},
-		},
-		COA:            map[int]FloatCOA{},
-		Valuation:      Valuation{EntryYield: v.EntryYield, YieldShift: v.YieldShift, ExitYield: v.ExitYield, AcqFees: map[string]Fee{}, DispFees: map[string]Fee{}, IncomeCapSetup: FloatCOA{TotalERV: 1}, IncomeDeduction: FloatCOA{}},
-		TableHeader:    HeaderType{},
-		Table:          []TableJSON{},
-		Strategy:       v.Strategy,
-		BalloonPercent: v.BalloonPercent,
+		Mutex:             &sync.Mutex{},
+		MasterID:          v.MasterID,
+		Entity:            EntityMap[v.EntityID],
+		EntityID:          v.EntityID,
+		EntityData:        EntityModelData{},
+		Name:              v.Name,
+		Version:           v.Version,
+		ChildEntityModels: map[int]*EntityModel{},
+		ChildUnitModels:   map[int]*UnitModel{},
+		ChildUnitsMC:      map[int]UnitModel{},
+		Metrics:           Metrics{},
+		ParentID:          v.Parent,
+		Parent:            EntityModelsMap[v.Parent].EntityModel,
+		StartDate:         startdate,
+		HoldPeriod:        dateintdiff(salesdate.Dateint, startdate.Dateint),
+		SalesDate:         salesdate,
+		EndDate:           Dateadd(Datetype{Month: v.EndMonth, Year: v.EndYear}, 0),
+		GrowthInput:       growth,
+		Growth:            map[string]map[int]float64{},
+		DebtInput:         DebtInput{LTV: v.LTV, InterestRate: v.LoanRate},
+		OpEx:              CostInput{Amount: 0, AmountPerTotalArea: 0, AmountPerOccupiedArea: 0, AmountPerVacantArea: 0, PercentOfERV: v.OpExpercent, PercentOfTRI: v.OpExpercent, PercentOfContractRent: 0},
+		Fees:              CostInput{Amount: 0, AmountPerTotalArea: 0, AmountPerOccupiedArea: 0, AmountPerVacantArea: 0, PercentOfERV: 0, PercentOfTRI: 0, PercentOfContractRent: 0, PercentOfNAV: 0, PercentOfGAV: v.Fees},
+		Capex:             map[int]CostInput{},
+		GLA:               UnitModel{Probability: v.GLA.Probability, PercentSoldRent: v.percentIncometosell, DiscountRate: v.GLA.DiscountRate, RentRevisionERV: v.GLA.RentRevisionERV, EXTDuration: v.GLA.EXTDuration, Default: Default{Hazard: v.GLA.Default.Hazard}, RentIncentives: CostInput{PercentOfContractRent: v.GLA.RentIncentives.PercentOfContractRent, IsCapitalized: false, Duration: v.GLA.RentIncentives.Duration}, FitOutCosts: CostInput{AmountPerTotalArea: v.GLA.FitOutCosts.AmountPerTotalArea}, Void: v.GLA.Void},
+		MC:                false,
+		MCSetup:           MCSetup{Sims: v.Sims, ERV: v.CPISigma, CPI: v.CPISigma, YieldShift: v.YieldShiftSigma, Void: v.VoidSigma, Probability: v.ProbabilitySigma, OpEx: v.OpExSigma, Hazard: v.Hazard},
+		MCSlice:           []*EntityModel{},
+		MCResultSlice:     MCResultSlice{},
+		MCResults:         MCResults{},
+		FactorAnalysis:    []FactorIndependant{},
+		Tax:               Tax{MinValue: v.WOZpercent, LandValue: v.Landvalue, UsablePeriod: v.DeprPeriod, RETT: v.RETT, CIT: map[float64]float64{}, VAT: v.VAT, CarryBackYrs: v.CarryBackYrs, CarryForwardYrs: v.CarryForwardYrs, DTA: map[int]float64{}},
+		COA:               map[int]FloatCOA{},
+		Valuation:         Valuation{Method: "DirectCap", EntryYield: v.EntryYield, YieldShift: v.YieldShift, ExitYield: v.ExitYield, AcqFees: map[string]Fee{}, DispFees: map[string]Fee{}, IncomeCapSetup: FloatCOA{TotalERV: 1}, IncomeDeduction: FloatCOA{}},
+		TableHeader:       HeaderType{},
+		Table:             []TableJSON{},
+		Strategy:          v.Strategy,
+		UOM:               "",
+		BalloonPercent:    v.BalloonPercent,
 	}
 	e.CalculateModel(false, "Internal")
+	// e.Entity.Models = append(e.Entity.Models, &e)
 	return e
 }
 
 // UpdateEntity -
-func (e *EntityModel) UpdateEntity(mc bool, v *EntityData, compute string) {
+func (e *EntityModel) UpdateEntity(mc bool, v *EntityModelData, compute string) {
 	startdate := Dateadd(Datetype{Month: v.StartMonth, Year: v.StartYear}, 0)
 	salesdate := Dateadd(startdate, v.HoldPeriod*12-1)
 	enddate := Dateadd(salesdate, 132)
@@ -110,38 +85,42 @@ func (e *EntityModel) UpdateEntity(mc bool, v *EntityData, compute string) {
 	growthinput["ERV"] = v.ERVGrowth
 	parentFinal := EntityModel{}
 	parentID := v.Parent
-	childunits := make(map[int]*Unit)
-	childunitsMC := make(map[int]Unit)
+	childunits := make(map[int]*UnitModel)
+	childunitsMC := make(map[int]UnitModel)
 	if compute == "Internal" {
-		parentFinal = *EntityMap[v.Parent].EntityModel
+		parentFinal = *EntityModelsMap[v.Parent].EntityModel
 	} else if compute == "Azure" {
 		parentID = -1
-		childunits = e.ChildUnits
+		childunits = e.ChildUnitModels
 		childunitsMC = e.ChildUnitsMC
 	}
 	// StructPrint("UpdateEntity - ", e.ChildUnits)
 	childentitiesmap := map[int]*EntityModel{}
 	*e = EntityModel{
-		Mutex:         &sync.Mutex{},
-		MasterID:      v.MasterID,
-		Name:          v.Name,
-		ChildEntities: childentitiesmap,
-		ChildUnits:    childunits,
-		ChildUnitsMC:  childunitsMC,
-		Metrics:       Metrics{},
-		ParentID:      parentID,
-		Parent:        &parentFinal,
-		StartDate:     startdate,
-		HoldPeriod:    v.HoldPeriod,
-		SalesDate:     salesdate,
-		EndDate:       enddate,
-		GrowthInput:   growthinput,
-		Growth:        map[string]map[int]float64{},
-		DebtInput:     DebtInput{LTV: v.LTV, InterestRate: v.LoanRate},
-		OpEx:          CostInput{Amount: 0, AmountPerTotalArea: 0, AmountPerOccupiedArea: 0, AmountPerVacantArea: 0, PercentOfERV: v.OpExpercent, PercentOfTRI: v.OpExpercent, PercentOfContractRent: 0},
-		Fees:          CostInput{Amount: 0, AmountPerTotalArea: 0, AmountPerOccupiedArea: 0, AmountPerVacantArea: 0, PercentOfERV: 0, PercentOfTRI: 0, PercentOfContractRent: 0, PercentOfNAV: 0, PercentOfGAV: v.Fees},
-		Capex:         map[int]CostInput{},
-		GLA: Unit{
+		Mutex:             &sync.Mutex{},
+		MasterID:          v.MasterID,
+		Entity:            EntityMap[v.EntityID],
+		EntityID:          v.EntityID,
+		EntityData:        EntityModelData{},
+		Name:              v.Name,
+		Version:           v.Version,
+		ChildEntityModels: childentitiesmap,
+		ChildUnitModels:   childunits,
+		ChildUnitsMC:      childunitsMC,
+		Metrics:           Metrics{},
+		ParentID:          parentID,
+		Parent:            &parentFinal,
+		StartDate:         startdate,
+		HoldPeriod:        v.HoldPeriod,
+		SalesDate:         salesdate,
+		EndDate:           enddate,
+		GrowthInput:       growthinput,
+		Growth:            map[string]map[int]float64{},
+		DebtInput:         DebtInput{LTV: v.LTV, InterestRate: v.LoanRate},
+		OpEx:              CostInput{Amount: 0, AmountPerTotalArea: 0, AmountPerOccupiedArea: 0, AmountPerVacantArea: 0, PercentOfERV: v.OpExpercent, PercentOfTRI: v.OpExpercent, PercentOfContractRent: 0},
+		Fees:              CostInput{Amount: 0, AmountPerTotalArea: 0, AmountPerOccupiedArea: 0, AmountPerVacantArea: 0, PercentOfERV: 0, PercentOfTRI: 0, PercentOfContractRent: 0, PercentOfNAV: 0, PercentOfGAV: v.Fees},
+		Capex:             map[int]CostInput{},
+		GLA: UnitModel{
 			MasterID:        0,
 			Name:            "",
 			LeaseStartDate:  startdate,
@@ -156,39 +135,49 @@ func (e *EntityModel) UpdateEntity(mc bool, v *EntityData, compute string) {
 			PercentSoldRent: v.GLA.PercentSoldRent,
 			BondIncome:      0,
 			BondExpense:     0,
-			Default:         Default{Hazard: v.GLA.Default.Hazard, DefaultEnd: Datetype{}},
+			Default: Default{
+				Hazard:     v.GLA.Default.Hazard,
+				DefaultEnd: Datetype{},
+			},
 			RentRevisionERV: v.GLA.RentRevisionERV,
 			EXTDuration:     v.GLA.EXTDuration,
-			IndexDetails:    IndexDetails{Frequency: v.GLA.IndexDetails.Frequency, Type: v.GLA.IndexDetails.Type, StartMonth: 0, Anniversary: ""},
+			IndexDetails: IndexDetails{
+				Frequency:  v.GLA.IndexDetails.Frequency,
+				Type:       v.GLA.IndexDetails.Type,
+				StartMonth: 0, Anniversary: "",
+			},
 			RentIncentives: CostInput{
 				PercentOfContractRent: v.GLA.RentIncentives.PercentOfContractRent,
 				IsCapitalized:         false,
 				Duration:              v.GLA.RentIncentives.Duration,
 			},
-			Void:         v.GLA.Void,
-			FitOutCosts:  CostInput{Amount: v.GLA.FitOutCosts.Amount, AmountPerTotalArea: v.GLA.FitOutCosts.AmountPerTotalArea, AmountPerOccupiedArea: v.GLA.FitOutCosts.AmountPerOccupiedArea, AmountPerVacantArea: v.GLA.FitOutCosts.AmountPerVacantArea, PercentOfERV: v.GLA.FitOutCosts.PercentOfERV, PercentOfTRI: v.GLA.FitOutCosts.PercentOfTRI, PercentOfContractRent: v.GLA.FitOutCosts.PercentOfContractRent},
+			Void: v.GLA.Void,
+			FitOutCosts: CostInput{
+				Amount:                v.GLA.FitOutCosts.Amount,
+				AmountPerTotalArea:    v.GLA.FitOutCosts.AmountPerTotalArea,
+				AmountPerOccupiedArea: v.GLA.FitOutCosts.AmountPerOccupiedArea,
+				AmountPerVacantArea:   v.GLA.FitOutCosts.AmountPerVacantArea,
+				PercentOfERV:          v.GLA.FitOutCosts.PercentOfERV,
+				PercentOfTRI:          v.GLA.FitOutCosts.PercentOfTRI,
+				PercentOfContractRent: v.GLA.FitOutCosts.PercentOfContractRent,
+			},
 			DiscountRate: v.GLA.DiscountRate,
 			ERVArea:      0,
 			ERVAmount:    0,
 		},
-		MCSetup: MCSetup{
-			Sims: v.Sims},
-		Tax: Tax{
-			MinValue:        v.WOZpercent,
-			LandValue:       v.Landvalue,
-			UsablePeriod:    v.DeprPeriod,
-			RETT:            v.RETT,
-			CIT:             map[float64]float64{},
-			VAT:             v.VAT,
-			CarryBackYrs:    v.CarryBackYrs,
-			CarryForwardYrs: v.CarryForwardYrs,
-			DTA:             map[int]float64{},
-		},
+		MC:             mc,
+		MCSetup:        MCSetup{Sims: v.Sims},
+		MCSlice:        []*EntityModel{},
+		MCResultSlice:  MCResultSlice{},
+		MCResults:      MCResults{},
+		FactorAnalysis: []FactorIndependant{},
+		Tax:            Tax{MinValue: v.WOZpercent, LandValue: v.Landvalue, UsablePeriod: v.DeprPeriod, RETT: v.RETT, CIT: map[float64]float64{}, VAT: v.VAT, CarryBackYrs: v.CarryBackYrs, CarryForwardYrs: v.CarryForwardYrs, DTA: map[int]float64{}},
 		COA:            map[int]FloatCOA{},
-		Valuation:      Valuation{EntryYield: v.EntryYield, YieldShift: v.YieldShift, ExitYield: v.ExitYield, AcqFees: map[string]Fee{}, DispFees: map[string]Fee{}, IncomeCapSetup: FloatCOA{TotalERV: 1}, IncomeDeduction: FloatCOA{}},
+		Valuation:      Valuation{Method: "DirectCap", EntryYield: v.EntryYield, YieldShift: v.YieldShift, ExitYield: v.ExitYield, AcqFees: map[string]Fee{}, DispFees: map[string]Fee{}, IncomeCapSetup: FloatCOA{TotalERV: 1}, IncomeDeduction: FloatCOA{}},
 		TableHeader:    HeaderType{},
 		Table:          []TableJSON{},
 		Strategy:       v.Strategy,
+		UOM:            "",
 		BalloonPercent: v.BalloonPercent,
 	}
 	e.CalculateModel(mc, compute)
@@ -196,7 +185,8 @@ func (e *EntityModel) UpdateEntity(mc bool, v *EntityData, compute string) {
 	// fmt.Println("UpdateEntity IRR: ", e.Metrics.IRR.NetLeveredAfterTax)
 }
 
-// CalculateModel - mc == MonteCarlo; if true then table is not made
+// CalculateModel - Orchestrates the execution of the calculation modules
+// mc == MonteCarlo; if true then table is not made
 func (e *EntityModel) CalculateModel(mc bool, compute string) {
 	if e.ParentID != 0 {
 		e.StartDate.Add(0)
@@ -207,12 +197,13 @@ func (e *EntityModel) CalculateModel(mc bool, compute string) {
 		if compute == "Internal" {
 			e.PopulateUnits()
 		}
-		// e.CalculateUnits()
-		// fmt.Println("Calculate Model: ", e.Growth)
 		e.AssetRentCalc(mc, compute)
-		// StructPrint("CalculateModel: ", e.COA[202101])
-		e.DirectCapCalc()
-		// e.DCFCalc()
+		switch e.Valuation.Method {
+		case "DirectCap":
+			e.DirectCapCalc()
+		case "DCF":
+			e.DCFCalc()
+		}
 		e.Acquisition()
 		e.PropertyCFCalc()
 		e.Disposal()
@@ -273,40 +264,12 @@ func (e *EntityModel) CalculateModel(mc bool, compute string) {
 			e.MakeTable(coas, false, true)
 		}
 		e.MetricsCalc()
-		// for _, v := range e.ChildUnits {
-		// 	fmt.Println("\n", "Unit: ", &v)
-		// 	for _, vv := range v.RSStore {
-		// 		fmt.Println("________________________________________________________________________")
-		// 		fmt.Println("EXTNumber", vv.EXTNumber)
-		// 		fmt.Println("StartDate", vv.StartDate)
-		// 		fmt.Println("VacancyEnd", vv.VacancyEnd)
-		// 		fmt.Println("VacancyAmount", vv.VacancyAmount)
-		// 		fmt.Println("RentIncentivesEndRenew", vv.RentIncentivesEndRenew)
-		// 		fmt.Println("RentIncentivesEndRotate", vv.RentIncentivesEndRotate)
-		// 		fmt.Println("DefaultDate", vv.DefaultDate)
-		// 		fmt.Println("EndDate", vv.EndDate)
-		// 		fmt.Println("OriginalEndDate", vv.OriginalEndDate)
-		// 		fmt.Println("RenewRent", vv.RenewRent)
-		// 		fmt.Println("RotateRent", vv.RotateRent)
-		// 		fmt.Println("PassingRent", vv.PassingRent)
-		// 		fmt.Println("EndContractRent", vv.EndContractRent)
-		// 		fmt.Println("RentRevisionERV", vv.RentRevisionERV)
-		// 		fmt.Println("Probability", vv.Probability)
-		// 		fmt.Println("ProbabilitySim", vv.ProbabilitySim)
-		// 		fmt.Println("RenewIndex", vv.RenewIndex)
-		// 		fmt.Println("RotateIndex", vv.RotateIndex)
-		// 		fmt.Println("ParentUnit", &vv.ParentUnit)
-		// 	}
-		// }
 		if mc {
-			for _, v := range e.ChildUnits {
-				*v = Unit{}
+			for _, v := range e.ChildUnitModels {
+				*v = UnitModel{}
 			}
 		}
 	}
-	// for date := e.StartDate.Year; date <= e.SalesDate.Year; date++ {
-	// 	fmt.Println(date, ": ", e.COA[date].PassingRent)
-	// }
 }
 
 // PopulateUnits -
@@ -333,7 +296,7 @@ func (e *EntityModel) PopulateUnits() {
 				passingrent = v.ERVAmount * v.ERVArea
 			}
 			// from UnitStore
-			temp := Unit{
+			temp := UnitModel{
 				// Mutex:           &sync.Mutex{},
 				MasterID:        v.MasterID,
 				Name:            v.Name,
@@ -366,7 +329,7 @@ func (e *EntityModel) PopulateUnits() {
 			}
 			temp.LeaseStartDate.Add(0)
 			temp.LeaseExpiryDate.Add(0)
-			e.ChildUnits[v.MasterID] = &temp
+			e.ChildUnitModels[v.MasterID] = &temp
 		}
 		// fmt.Println("PopulateUnits - ", v.LeaseStartYear)
 	}
@@ -375,7 +338,7 @@ func (e *EntityModel) PopulateUnits() {
 func (e *EntityModel) PopulateChildEntities() {
 	for _, v := range EntityDataStore {
 		if v.Parent == e.MasterID {
-			e.ChildEntities[v.MasterID] = EntityMap[v.MasterID].EntityModel
+			e.ChildEntityModels[v.MasterID] = EntityModelsMap[v.MasterID].EntityModel
 		}
 	}
 }

@@ -1,4 +1,4 @@
-[[template "header"]]
+
 
 [[define "UnitSettings"]]
     <div class="container-fluid shadow-lg rounded" style="width: 95%">

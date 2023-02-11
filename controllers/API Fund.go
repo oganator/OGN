@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"runtime/debug"
+	"fmt"
 	"strconv"
 
 	beego "github.com/astaxie/beego"
@@ -36,30 +36,30 @@ func GetFloatFund(c *FundController, field string) (result float64) {
 // Get -
 func (c *FundController) Get() {
 	name := GetStringFund(c, "name")
-	key := FundsList[name]
+	key := FundModelsList[name]
 	temp := make(map[interface{}]interface{})
-	temp["entity"] = EntityMap[key].EntityModel
-	temp["modelslist"] = ModelsList
-	temp["fundslist"] = FundsList
-	// temp["baseURL"] = BaseURL
+	temp["entity"] = EntityModelsMap[key].EntityModel
+	temp["modelslist"] = AssetModelsList
+	temp["fundslist"] = FundModelsList
 	c.TplName = "EntityView.tpl"
+	fmt.Println("Fund Controller - ", EntityModelsMap[key].EntityModel.Name, " - ", EntityModelsMap[key].EntityModel.Metrics.IRR.NetLeveredAfterTax)
 	c.Data = temp
 }
 
 // Post -
 func (c *FundController) Post() {
 	name := GetStringFund(c, "name")
-	key := FundsList[name]
-	EntityMap[key].EntityModel.Strategy = GetStringFund(c, "strategy")
-	EntityMap[key].EntityModel.CalculateFund()
-	EntityMap[key].EntityModel.MCSetup.Sims = GetIntFund(c, "sims")
-	EntityMap[key].EntityModel.FundMonteCarlo()
+	key := FundModelsList[name]
+	EntityModelsMap[key].EntityModel.Strategy = GetStringFund(c, "strategy")
+	EntityModelsMap[key].EntityModel.CalculateFund()
+	EntityModelsMap[key].EntityModel.MCSetup.Sims = GetIntFund(c, "sims")
+	EntityModelsMap[key].EntityModel.FundMonteCarlo()
 	temp := make(map[interface{}]interface{})
-	temp["entity"] = EntityMap[key].EntityModel
-	temp["modelslist"] = ModelsList
-	temp["fundslist"] = FundsList
-	// temp["baseURL"] = BaseURL
+	temp["entity"] = EntityModelsMap[key].EntityModel
+	temp["modelslist"] = AssetModelsList
+	temp["fundslist"] = FundModelsList
 	c.TplName = "EntityView.tpl"
 	c.Data = temp
-	go debug.FreeOSMemory()
+	fmt.Println("Fund Controller - ", EntityModelsMap[key].EntityModel.Name, " - ", EntityModelsMap[key].EntityModel.Metrics.IRR.NetLeveredAfterTax)
+	// go debug.FreeOSMemory()
 }

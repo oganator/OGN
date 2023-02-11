@@ -1,5 +1,5 @@
 # docker build . -t ogn
-FROM golang:1.16
+FROM golang:1.19
 
 WORKDIR /OGN
 COPY . .
@@ -10,7 +10,7 @@ ENV GO111MODULE=on
 RUN go mod download
 RUN go mod verify
 RUN go build -o ogn
-EXPOSE 8080
+EXPOSE 9000
 WORKDIR /OGN
 CMD ["./ogn"]
 # docker build -t ogn .

@@ -1,4 +1,4 @@
-[[template "header"]]
+
 <body>
     <br>
     <br>
@@ -9,4 +9,3 @@
         [[template "CreateEntityModal" .parent]]
     </div>
 </body>
-[[template "footer"]]

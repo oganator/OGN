@@ -1,11 +1,10 @@
 package controllers
 
-// CalculateFund - need to fix cash balance: if one asset is sold after another, the cash balance of the first will end with its sale
-// TODO - include sensitivity analysis (to asset exposure) by implementing a map that stores the memory address of each assets COA array, and a function that loops over them to do calculations, and then storing it all in appropriate place
+// CalculateFund - aggregates the child units of child entities
 func (e *EntityModel) CalculateFund() {
 	e.UpdateEntity(false, EntityDataStore[e.MasterID], "Internal")
 	e.COA = IntFloatCOAMap{}
-	for _, v := range e.ChildEntities {
+	for _, v := range e.ChildEntityModels {
 		// set the sales date to that of the latest asset
 		if e.SalesDate.Dateint < v.SalesDate.Dateint {
 			e.SalesDate = v.SalesDate

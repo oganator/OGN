@@ -16,8 +16,8 @@ import (
 func (e *EntityModel) AzureMonteCarlo() {
 	duration := e.MCDataObjectsCreate(1)
 	temp := CreateShellEntity(e, "Azure")
-	tempChildUnitsMC := make(map[int]Unit)
-	for i, v := range e.ChildUnits {
+	tempChildUnitsMC := make(map[int]UnitModel)
+	for i, v := range e.ChildUnitModels {
 		v.COA = IntFloatCOAMap{}
 		tempChildUnitsMC[i] = *v
 	}
@@ -36,7 +36,7 @@ func (e *EntityModel) AzureMonteCarlo() {
 	e.MCCalc(duration)
 }
 
-func AzureSimSend(e *EntityModel, tempdata *EntityData, ch chan MCResultSlice) {
+func AzureSimSend(e *EntityModel, tempdata *EntityModelData, ch chan MCResultSlice) {
 	e.EntityData = *tempdata
 	// StructPrint("AzureSimSend: ", e)
 	postBody, err := json.Marshal(e)
@@ -105,7 +105,7 @@ func (e *EntityModel) AzureSimReceive(ch chan MCResultSlice, duration int) {
 				OpEx:        CostInput{PercentOfTRI: v.OpEx[vIndex]},
 				Fees:        CostInput{},
 				Capex:       map[int]CostInput{},
-				GLA: Unit{
+				GLA: UnitModel{
 					Probability: v.Probability[vIndex],
 					Void:        int(v.Void[vIndex]),
 					Default: Default{
@@ -163,32 +163,32 @@ func (e *EntityModel) AzureSimReceive(ch chan MCResultSlice, duration int) {
 
 // returns a new entity based on the input e. Removes ChildEntities, Metrics, Growth, MCResults/slice, table
 func CreateShellEntity(e *EntityModel, compute string) EntityModel {
-	childunits := make(map[int]*Unit)
+	childunits := make(map[int]*UnitModel)
 	if compute == "Azure" {
-		childunits = e.ChildUnits
+		childunits = e.ChildUnitModels
 	}
 	temp := EntityModel{
-		Mutex:         &sync.Mutex{},
-		MasterID:      e.MasterID,
-		Name:          e.Name,
-		ChildEntities: map[int]*EntityModel{},
-		ChildUnits:    childunits,
-		Metrics:       Metrics{},
-		ParentID:      e.ParentID,
-		Parent:        e.Parent,
-		StartDate:     Dateadd(e.StartDate, 0),
-		HoldPeriod:    e.HoldPeriod,
-		SalesDate:     Dateadd(e.SalesDate, 0),
-		EndDate:       Dateadd(e.EndDate, 0),
-		GrowthInput:   e.GrowthInput,
-		Growth:        map[string]map[int]float64{},
-		DebtInput:     e.DebtInput,
-		OpEx:          e.OpEx,
-		Fees:          e.Fees,
-		Capex:         e.Capex,
-		GLA:           e.GLA,
-		MC:            true,
-		MCSetup:       e.MCSetup,
+		Mutex:             &sync.Mutex{},
+		MasterID:          e.MasterID,
+		Name:              e.Name,
+		ChildEntityModels: map[int]*EntityModel{},
+		ChildUnitModels:   childunits,
+		Metrics:           Metrics{},
+		ParentID:          e.ParentID,
+		Parent:            e.Parent,
+		StartDate:         Dateadd(e.StartDate, 0),
+		HoldPeriod:        e.HoldPeriod,
+		SalesDate:         Dateadd(e.SalesDate, 0),
+		EndDate:           Dateadd(e.EndDate, 0),
+		GrowthInput:       e.GrowthInput,
+		Growth:            map[string]map[int]float64{},
+		DebtInput:         e.DebtInput,
+		OpEx:              e.OpEx,
+		Fees:              e.Fees,
+		Capex:             e.Capex,
+		GLA:               e.GLA,
+		MC:                true,
+		MCSetup:           e.MCSetup,
 		// MCSlice:        []*Entity{},
 		MCResultSlice:  MCResultSlice{},
 		MCResults:      MCResults{},

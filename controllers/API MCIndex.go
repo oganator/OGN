@@ -27,7 +27,7 @@ func GetIntMCIndex(c *MCIndexController, field string) (result int) {
 
 // Post -
 func (c *MCIndexController) Post() {
-	tempkey := ModelsList[GetStringMCIndex(c, "name")]
+	tempkey := AssetModelsList[GetStringMCIndex(c, "name")]
 	index := GetIntMCIndex(c, "index")
 	temp := make(map[interface{}]interface{})
 	coas := BoolCOA{
@@ -51,14 +51,14 @@ func (c *MCIndexController) Post() {
 		BondIncome:              true,
 		BondExpense:             true,
 	}
-	if EntityMap[tempkey].EntityModel.Strategy == "Standard" {
+	if EntityModelsMap[tempkey].EntityModel.Strategy == "Standard" {
 		coas.BPUplift = false
 		coas.BondExpense = false
 		coas.BondIncome = false
 		coas.Debt = true
 	}
-	EntityMap[tempkey].EntityModel.MCSlice[index].MakeTable(coas, false, true)
-	temp["entity"] = EntityMap[tempkey].EntityModel.MCSlice[index]
+	EntityModelsMap[tempkey].EntityModel.MCSlice[index].MakeTable(coas, false, true)
+	temp["entity"] = EntityModelsMap[tempkey].EntityModel.MCSlice[index]
 	// temp["baseURL"] = BaseURL
 	c.TplName = "CFTable.tpl"
 	c.Data = temp

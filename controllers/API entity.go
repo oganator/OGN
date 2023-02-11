@@ -41,10 +41,10 @@ func GetInt(c *ViewEntityController, field string) (result int) {
 
 // Get -
 func (c *ViewEntityController) Get() {
-	key := ModelsList[GetString(c, "name")]
+	key := AssetModelsList[GetString(c, "name")]
 	temp := make(map[interface{}]interface{})
-	temp["entity"] = EntityMap[key].EntityModel
-	temp["modelslist"] = ModelsList
+	temp["entity"] = EntityModelsMap[key].EntityModel
+	temp["modelslist"] = AssetModelsList
 	// temp["baseURL"] = BaseURL
 	c.TplName = "EntityView.tpl"
 	c.Data = temp
@@ -52,7 +52,7 @@ func (c *ViewEntityController) Get() {
 
 // Post -
 func (c *ViewEntityController) Post() {
-	key := ModelsList[GetString(c, "name")]
+	key := AssetModelsList[GetString(c, "name")]
 	EntityDataStore[key].Mutex.Lock()
 	EntityDataStore[key].HoldPeriod = GetInt(c, "holdperiod")
 	EntityDataStore[key].EntryYield = GetFloat(c, "entryyield") / 100
@@ -112,24 +112,24 @@ func (c *ViewEntityController) Post() {
 	EntityDataStore[key].CarryForwardYrs = GetInt(c, "carryforwardyrs")
 	//
 	temp := make(map[interface{}]interface{})
-	EntityMap[key].Mutex.Lock()
-	EntityMap[key].EntityModel.UpdateEntity(false, EntityDataStore[EntityMap[key].EntityModel.MasterID], "Internal")
-	EntityMap[key].EntityModel.MCSetup = mcsetup
-	WriteXLSXEntities(EntityMap[key].EntityModel)
-	if EntityMap[key].EntityModel.Parent != EntityMap[key].EntityModel && EntityMap[key].EntityModel.MCSetup.Sims >= 100 {
+	EntityModelsMap[key].Mutex.Lock()
+	EntityModelsMap[key].EntityModel.UpdateEntity(false, EntityDataStore[EntityModelsMap[key].EntityModel.MasterID], "Internal")
+	EntityModelsMap[key].EntityModel.MCSetup = mcsetup
+	WriteXLSXEntities(EntityModelsMap[key].EntityModel)
+	if EntityModelsMap[key].EntityModel.Parent != EntityModelsMap[key].EntityModel && EntityModelsMap[key].EntityModel.MCSetup.Sims >= 100 {
 		if Compute == "Internal" {
-			EntityMap[key].EntityModel.MonteCarlo("Internal")
+			EntityModelsMap[key].EntityModel.MonteCarlo("Internal")
 		} else if Compute == "Azure" {
-			EntityMap[key].EntityModel.AzureMonteCarlo()
+			EntityModelsMap[key].EntityModel.AzureMonteCarlo()
 		}
 	}
-	temp["entity"] = EntityMap[key].EntityModel
-	temp["modelslist"] = ModelsList
-	temp["fundslist"] = FundsList
+	temp["entity"] = EntityModelsMap[key].EntityModel
+	temp["modelslist"] = AssetModelsList
+	temp["fundslist"] = FundModelsList
 	c.TplName = "EntityView.tpl"
 	c.Data = temp
 	EntityDataStore[key].Mutex.Unlock()
-	EntityMap[key].Mutex.Unlock()
+	EntityModelsMap[key].Mutex.Unlock()
 	go debug.FreeOSMemory()
 }
 
@@ -189,12 +189,12 @@ func (c *ChangeEntityController) Post() {
 	// select model
 	c.Data["modelname"] = c.GetString("modelname")
 	name := c.Data["modelname"].(string)
-	key := ModelsList[name]
+	key := AssetModelsList[name]
 	//
 	c.TplName = "EntityView.tpl"
 	temp := make(map[interface{}]interface{})
-	temp["entity"] = EntityMap[key].EntityModel
-	temp["modelslist"] = ModelsList
+	temp["entity"] = EntityModelsMap[key].EntityModel
+	temp["modelslist"] = AssetModelsList
 	// temp["baseURL"] = BaseURL
 	c.Data = temp
 }

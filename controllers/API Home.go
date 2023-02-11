@@ -10,13 +10,35 @@ type HomeController struct {
 	beego.Controller
 }
 
+func GetStringHome(c *HomeController, field string) string {
+	c.Data[field] = c.GetString(field)
+	return c.Data[field].(string)
+}
+
 func (c *HomeController) Get() {
 	temp := make(map[interface{}]interface{})
-	temp["modelslist"] = ModelsList
-	temp["fundslist"] = FundsList
-	temp["entity"] = EntityMap[0].EntityModel
+	temp["modelslist"] = AssetModelsList
+	temp["fundslist"] = FundModelsList
+	temp["entity"] = EntityModelsMap[0].EntityModel
+	temp["entityMap"] = EntityMap
+	switch InitVersion {
+	case "v1":
+		temp["path"] = "/ViewEntity"
+	case "v2":
+		temp["path"] = "/ViewEntity2"
+	}
 	// temp["baseURL"] = BaseURL
 	c.TplName = "Home.tpl"
+	c.Data = temp
+}
+
+// Post - retrieves entity model table
+func (c *HomeController) Post() {
+	temp := make(map[interface{}]interface{})
+	entity := GetStringHome(c, "entity")
+	entityInt := EntitiesList[entity]
+	temp["models"] = EntityMap[entityInt].Models //GetModels(entityInt)
+	c.TplName = "EntityModelTable.tpl"
 	c.Data = temp
 }
 
@@ -33,9 +55,9 @@ func GetStringSettings(c *SettingsController, field string) string {
 // Post - entity settings
 func (c *SettingsController) Post() {
 	temp := make(map[interface{}]interface{})
-	tempkey := EntitiesList[GetStringSettings(c, "entity")]
+	tempkey := EntityModelsList[GetStringSettings(c, "entity")]
 	temp["tab"] = GetStringSettings(c, "tab")
-	temp["entity"] = EntityMap[tempkey].EntityModel
+	temp["entity"] = EntityModelsMap[tempkey].EntityModel
 	// temp["baseURL"] = BaseURL
 	c.TplName = "Settings.tpl"
 	c.Data = temp
@@ -57,9 +79,9 @@ func (c *AppSettingsController) Post() {
 	Compute = GetStringAppSettings(c, "compute")
 	AzureURL = GetStringAppSettings(c, "azureurl")
 	temp := make(map[interface{}]interface{})
-	temp["modelslist"] = ModelsList
-	temp["fundslist"] = FundsList
-	temp["entity"] = EntityMap[0].EntityModel
+	temp["modelslist"] = AssetModelsList
+	temp["fundslist"] = FundModelsList
+	temp["entity"] = EntityModelsMap[0].EntityModel
 	// temp["baseURL"] = BaseURL
 	c.TplName = "Home.tpl"
 	c.Data = temp

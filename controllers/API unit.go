@@ -28,13 +28,13 @@ func GetIntRentSchedule(c *ViewRentScheduleController, field string) (result int
 // Post -
 func (c *ViewRentScheduleController) Post() {
 	temp := make(map[interface{}]interface{})
-	key := ModelsList[GetStringRentSchedule(c, "name")]
+	key := AssetModelsList[GetStringRentSchedule(c, "name")]
 	indexstring := GetStringRentSchedule(c, "index")
 	index, _ := strconv.Atoi(indexstring)
 	unit := GetIntRentSchedule(c, "unit")
-	temp["data"] = EntityMap[key].EntityModel.ChildUnits[unit].RSStore
+	temp["data"] = EntityModelsMap[key].EntityModel.ChildUnitModels[unit].RSStore
 	if indexstring != "" {
-		temp["data"] = EntityMap[key].EntityModel.MCSlice[index].ChildUnits[unit].RSStore
+		temp["data"] = EntityModelsMap[key].EntityModel.MCSlice[index].ChildUnitModels[unit].RSStore
 	}
 	// temp["baseURL"] = BaseURL
 	c.TplName = "RentSchedule.tpl"
@@ -65,13 +65,13 @@ func GetIntUnitCF(c *ViewUnitCFController, field string) (result int) {
 // Post -
 func (c *ViewUnitCFController) Post() {
 	temp := make(map[interface{}]interface{})
-	modelkey := ModelsList[GetStringUnitCF(c, "name")]
+	modelkey := AssetModelsList[GetStringUnitCF(c, "name")]
 	unit := GetIntUnitCF(c, "unit")
 	tempentity := EntityModel{
-		StartDate: EntityMap[modelkey].EntityModel.StartDate,
-		SalesDate: EntityMap[modelkey].EntityModel.SalesDate,
-		EndDate:   EntityMap[modelkey].EntityModel.EndDate,
-		COA:       EntityMap[modelkey].EntityModel.ChildUnits[unit].COA,
+		StartDate: EntityModelsMap[modelkey].EntityModel.StartDate,
+		SalesDate: EntityModelsMap[modelkey].EntityModel.SalesDate,
+		EndDate:   EntityModelsMap[modelkey].EntityModel.EndDate,
+		COA:       EntityModelsMap[modelkey].EntityModel.ChildUnitModels[unit].COA,
 	}
 	tempentity.SumCOA()
 	tempentity.MakeTable(BoolCOA{
@@ -117,12 +117,12 @@ func GetIntUnitTable(c *ViewUnitTableController, field string) (result int) {
 // Post -
 func (c *ViewUnitTableController) Post() {
 	temp := make(map[interface{}]interface{})
-	key := ModelsList[GetStringUnitTable(c, "name")]
+	key := AssetModelsList[GetStringUnitTable(c, "name")]
 	index := GetIntUnitTable(c, "index")
 	if index == -1 {
-		temp["entity"] = EntityMap[key].EntityModel
+		temp["entity"] = EntityModelsMap[key].EntityModel
 	} else {
-		temp["entity"] = EntityMap[key].EntityModel.MCSlice[index]
+		temp["entity"] = EntityModelsMap[key].EntityModel.MCSlice[index]
 	}
 	// temp["baseURL"] = BaseURL
 	c.TplName = "UnitTable.tpl"
@@ -161,8 +161,8 @@ func GetFloatAddChildUnit(c *AddChildUnitController, field string) (result float
 // Post -
 func (c *AddChildUnitController) Post() {
 	temp := make(map[interface{}]interface{})
-	unit := UnitData{}
-	parentmasterid := ModelsList[GetStringAddChildUnit(c, "parent")]
+	unit := UnitModelData{}
+	parentmasterid := AssetModelsList[GetStringAddChildUnit(c, "parent")]
 	unit.ParentMasterID = parentmasterid
 	unit.Name = GetStringAddChildUnit(c, "unitname")
 	unit.Tenant = GetStringAddChildUnit(c, "tenant")
@@ -180,14 +180,53 @@ func (c *AddChildUnitController) Post() {
 	unit.ERVArea = GetFloatAddChildUnit(c, "area")
 	UnitStore[unit.MasterID] = unit
 	unit.WriteXLSXUnits()
-	EntityMap[parentmasterid].Mutex.Lock()
-	EntityMap[parentmasterid].EntityModel.CalculateModel(false, "Internal")
-	EntityMap[parentmasterid].Mutex.Unlock()
+	EntityModelsMap[parentmasterid].Mutex.Lock()
+	EntityModelsMap[parentmasterid].EntityModel.CalculateModel(false, "Internal")
+	EntityModelsMap[parentmasterid].Mutex.Unlock()
 	//
 	c.TplName = "EntityView.tpl"
-	temp["entity"] = EntityMap[parentmasterid].EntityModel
-	temp["modelslist"] = ModelsList
-	temp["fundslist"] = FundsList
+	temp["entity"] = EntityModelsMap[parentmasterid].EntityModel
+	temp["modelslist"] = AssetModelsList
+	temp["fundslist"] = FundModelsList
 	// temp["baseURL"] = BaseURL
 	c.Data = temp
+}
+
+//////////////////////////////////////////////////////////////////////
+
+// UpdateUnitController -
+type UpdateUnitController struct {
+	beego.Controller
+}
+
+// GetStringAddChildUnit -
+func GetStringUpdateUnit(c *UpdateUnitController, field string) string {
+	c.Data[field] = c.GetString(field)
+	return c.Data[field].(string)
+}
+
+// GetIntAddChildUnit -
+func GetIntUpdateUnit(c *UpdateUnitController, field string) (result int) {
+	c.Data[field] = c.GetString(field)
+	temp := c.Data[field].(string)
+	result, _ = strconv.Atoi(temp)
+	return result
+}
+
+// GetFloat -
+func GetFloatUpdateUnit(c *UpdateUnitController, field string) (result float64) {
+	c.Data[field] = c.GetString(field)
+	temp := c.Data[field].(string)
+	result, _ = strconv.ParseFloat(temp, 64)
+	return result
+}
+
+// Post - updates a single value for a single unit
+func (c *UpdateUnitController) Post() {
+	unit := GetIntUpdateUnit(c, "unit")
+	field := GetStringUpdateUnit(c, "field")
+	value := GetStringUpdateUnit(c, "value")
+	WriteDBUnitModelSingleValue(unit, field, value)
+	EntityModelsMap[Units[unit].Parent.MasterID].EntityModel.UpdateEntityModel()
+	c.TplName = "test.tpl"
 }

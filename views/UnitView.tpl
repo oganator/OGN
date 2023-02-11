@@ -1,4 +1,4 @@
-[[template "header"]]
+
     <body>
         <br>
         <br>
@@ -29,6 +29,5 @@
                 [[template "indexation" .unit.RentSchedule]]
             </div>
         </div>
-[[template "footer"]]
 </body>
 

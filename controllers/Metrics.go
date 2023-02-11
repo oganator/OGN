@@ -9,9 +9,12 @@ func (e *EntityModel) MetricsCalc() {
 	e.Metrics.IRR.NetLeveredAfterTax = math.Round(IRR(&e.COA, Dateadd(e.StartDate, -1), e.SalesDate, FloatCOA{NetCashFlow: 1})*10000) / 10000
 	e.Metrics.BondHolder.YTM = math.Round(IRR(&e.COA, Dateadd(e.StartDate, -1), e.SalesDate, FloatCOA{BondExpense: 1})*10000) / 10000
 	e.Metrics.EM.NetLeveredAfterTax = EquityMultipleCalc(e.StartDate, e.SalesDate, e.COA)
-	bondexpense := ExtractCOALine(e.StartDate, e.SalesDate, FloatCOA{BondExpense: 1}, &e.COA)
-	e.Metrics.BondHolder.Duration = Duration(bondexpense)
-	e.Metrics.BondHolder.YTMDUR = e.Metrics.BondHolder.YTM / e.Metrics.BondHolder.Duration
+	if e.Strategy != "Standard" {
+		bondexpense := ExtractCOALine(e.StartDate, e.SalesDate, FloatCOA{BondExpense: 1}, &e.COA)
+		e.Metrics.BondHolder.Duration = Duration(bondexpense)
+		e.Metrics.BondHolder.YTMDUR = e.Metrics.BondHolder.YTM / e.Metrics.BondHolder.Duration
+	}
+
 }
 
 // IRR -

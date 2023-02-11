@@ -1,6 +1,6 @@
 package controllers
 
-// MakeTable - Date, COA, Amount
+// MakeTable -
 func (e *EntityModel) MakeTable(coas BoolCOA, quarterly bool, yearly bool) {
 	e.CreateTableHeader(Monthly, quarterly, yearly)
 	e.Table = make([]TableJSON, 0)
@@ -88,47 +88,49 @@ func (e *EntityModel) MakeTable(coas BoolCOA, quarterly bool, yearly bool) {
 			bondincome[date.Year] = RenderFloat("#,###.", e.COA[date.Year].BondIncome)
 			bondexpense[date.Year] = RenderFloat("#,###.", e.COA[date.Year].BondExpense)
 		}
-		marketvalue[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].MarketValue)
-		totalerv[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].TotalERV)
-		occupiederv[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].OccupiedERV)
-		vacanterv[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].VacantERV)
-		topslice[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].TopSlice)
-		totalarea[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].TotalArea)
-		occupiedarea[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].OccupiedArea)
-		vacantarea[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].VacantArea)
-		blank[date.Dateint] = ""
-		netoperatingincome[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].NetOperatingIncome)
-		capex[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].Capex)
-		acqdispproperty[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].AcqDispProperty)
-		debt[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].Debt)
-		acqdispcosts[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].AcqDispCosts)
-		tax[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].Tax)
-		taxableincome[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].TaxableIncome)
-		taxableincomecarryback[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].TaxableIncomeCarryBack)
-		dta[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].DTA)
-		depreciation[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].Depreciation)
-		fees[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].Fees)
-		operatingincome[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].OperatingIncome)
-		operatingexpenses[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].OperatingExpenses)
-		contractrent[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].ContractRent)
-		rentfree[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].RentFree)
-		turnoverrent[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].TurnoverRent)
-		mallrent[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].MallRent)
-		parkingincome[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].ParkingIncome)
-		otherincome[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].OtherIncome)
-		theoreticalrentalincome[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].TheoreticalRentalIncome)
-		vacancy[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].Vacancy)
-		passingrent[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].PassingRent)
-		indexation[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].Indexation)
-		bpuplift[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].BPUplift)
-		loanproceeds[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].LoanProceeds)
-		interestexpense[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].InterestExpense)
-		loanbalance[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].LoanBalance)
-		netcashflow[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].NetCashFlow)
-		blank[date.Dateint] = ""
-		cashbalance[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].CashBalance)
-		bondincome[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].BondIncome)
-		bondexpense[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].BondExpense)
+		if Monthly == true {
+			marketvalue[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].MarketValue)
+			totalerv[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].TotalERV)
+			occupiederv[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].OccupiedERV)
+			vacanterv[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].VacantERV)
+			topslice[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].TopSlice)
+			totalarea[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].TotalArea)
+			occupiedarea[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].OccupiedArea)
+			vacantarea[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].VacantArea)
+			blank[date.Dateint] = ""
+			netoperatingincome[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].NetOperatingIncome)
+			capex[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].Capex)
+			acqdispproperty[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].AcqDispProperty)
+			debt[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].Debt)
+			acqdispcosts[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].AcqDispCosts)
+			tax[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].Tax)
+			taxableincome[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].TaxableIncome)
+			taxableincomecarryback[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].TaxableIncomeCarryBack)
+			dta[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].DTA)
+			depreciation[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].Depreciation)
+			fees[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].Fees)
+			operatingincome[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].OperatingIncome)
+			operatingexpenses[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].OperatingExpenses)
+			contractrent[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].ContractRent)
+			rentfree[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].RentFree)
+			turnoverrent[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].TurnoverRent)
+			mallrent[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].MallRent)
+			parkingincome[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].ParkingIncome)
+			otherincome[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].OtherIncome)
+			theoreticalrentalincome[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].TheoreticalRentalIncome)
+			vacancy[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].Vacancy)
+			passingrent[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].PassingRent)
+			indexation[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].Indexation)
+			bpuplift[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].BPUplift)
+			loanproceeds[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].LoanProceeds)
+			interestexpense[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].InterestExpense)
+			loanbalance[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].LoanBalance)
+			netcashflow[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].NetCashFlow)
+			blank[date.Dateint] = ""
+			cashbalance[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].CashBalance)
+			bondincome[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].BondIncome)
+			bondexpense[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].BondExpense)
+		}
 	}
 	// build e.Table based on COA selection
 	if coas.MarketValue == true {
@@ -420,88 +422,88 @@ type IntStringMap map[int]string
 
 // BoolCOA -
 type BoolCOA struct {
-	MarketValue             bool
-	TotalERV                bool
-	OccupiedERV             bool
-	VacantERV               bool
-	TopSlice                bool
-	TotalArea               bool
-	OccupiedArea            bool
-	VacantArea              bool
-	PassingRent             bool
-	Indexation              bool
-	TheoreticalRentalIncome bool
-	BPUplift                bool
-	Vacancy                 bool
-	ContractRent            bool
-	RentFree                bool
-	TurnoverRent            bool
-	MallRent                bool
-	ParkingIncome           bool
-	OtherIncome             bool
-	OperatingIncome         bool
-	OperatingExpenses       bool
-	NetOperatingIncome      bool
-	Capex                   bool
-	AcqDispProperty         bool
-	AcqDispCosts            bool
-	LoanProceeds            bool
-	InterestExpense         bool
-	LoanBalance             bool
-	Debt                    bool
-	Tax                     bool
-	TaxableIncome           bool
-	TaxableIncomeCarryBack  bool
-	DTA                     bool
-	Depreciation            bool
-	Fees                    bool
-	NetCashFlow             bool
-	CashBalance             bool
-	BondIncome              bool
-	BondExpense             bool
+	MarketValue             bool `json:"MarketValue,omitempty"`             //
+	TotalERV                bool `json:"TotalERV,omitempty"`                //
+	OccupiedERV             bool `json:"OccupiedERV,omitempty"`             //
+	VacantERV               bool `json:"VacantERV,omitempty"`               //
+	TopSlice                bool `json:"TopSlice,omitempty"`                //
+	TotalArea               bool `json:"TotalArea,omitempty"`               //
+	OccupiedArea            bool `json:"OccupiedArea,omitempty"`            //
+	VacantArea              bool `json:"VacantArea,omitempty"`              //
+	PassingRent             bool `json:"PassingRent,omitempty"`             //
+	Indexation              bool `json:"Indexation,omitempty"`              //
+	TheoreticalRentalIncome bool `json:"TheoreticalRentalIncome,omitempty"` //
+	BPUplift                bool `json:"BPUplift,omitempty"`                //
+	Vacancy                 bool `json:"Vacancy,omitempty"`                 //
+	ContractRent            bool `json:"ContractRent,omitempty"`            //
+	RentFree                bool `json:"RentFree,omitempty"`                //
+	TurnoverRent            bool `json:"TurnoverRent,omitempty"`            //
+	MallRent                bool `json:"MallRent,omitempty"`                //
+	ParkingIncome           bool `json:"ParkingIncome,omitempty"`           //
+	OtherIncome             bool `json:"OtherIncome,omitempty"`             //
+	OperatingIncome         bool `json:"OperatingIncome,omitempty"`         //
+	OperatingExpenses       bool `json:"OperatingExpenses,omitempty"`       //
+	NetOperatingIncome      bool `json:"NetOperatingIncome,omitempty"`      //
+	Capex                   bool `json:"Capex,omitempty"`                   //
+	AcqDispProperty         bool `json:"AcqDispProperty,omitempty"`         //
+	AcqDispCosts            bool `json:"AcqDispCosts,omitempty"`            //
+	LoanProceeds            bool `json:"LoanProceeds,omitempty"`            //
+	InterestExpense         bool `json:"InterestExpense,omitempty"`         //
+	LoanBalance             bool `json:"LoanBalance,omitempty"`             //
+	Debt                    bool `json:"Debt,omitempty"`                    //
+	Tax                     bool `json:"Tax,omitempty"`                     //
+	TaxableIncome           bool `json:"TaxableIncome,omitempty"`           //
+	TaxableIncomeCarryBack  bool `json:"TaxableIncomeCarryBack,omitempty"`  //
+	DTA                     bool `json:"DTA,omitempty"`                     //
+	Depreciation            bool `json:"Depreciation,omitempty"`            //
+	Fees                    bool `json:"Fees,omitempty"`                    //
+	NetCashFlow             bool `json:"NetCashFlow,omitempty"`             //
+	CashBalance             bool `json:"CashBalance,omitempty"`             //
+	BondIncome              bool `json:"BondIncome,omitempty"`              //
+	BondExpense             bool `json:"BondExpense,omitempty"`             //
 }
 
 // FloatCOA -
 type FloatCOA struct {
-	MarketValue             float64
-	TotalERV                float64
-	OccupiedERV             float64
-	VacantERV               float64
-	TopSlice                float64
-	TotalArea               float64
-	OccupiedArea            float64
-	VacantArea              float64
-	PassingRent             float64
-	Indexation              float64
-	TheoreticalRentalIncome float64
-	BPUplift                float64 // accounts for the effect of sold rent
-	Vacancy                 float64
-	ContractRent            float64
-	RentFree                float64
-	TurnoverRent            float64
-	MallRent                float64
-	ParkingIncome           float64
-	OtherIncome             float64
-	OperatingIncome         float64
-	OperatingExpenses       float64
-	NetOperatingIncome      float64
-	Capex                   float64
-	AcqDispProperty         float64
-	AcqDispCosts            float64
-	LoanProceeds            float64
-	InterestExpense         float64
-	LoanBalance             float64
-	Debt                    float64
-	Tax                     float64
-	TaxableIncome           float64
-	TaxableIncomeCarryBack  float64
-	DTA                     float64
-	Depreciation            float64
-	Fees                    float64
-	NetCashFlow             float64
-	CashBalance             float64
-	BondIncome              float64 // income for me
-	BondExpense             float64 // expense for me, or income for investor
+	MarketValue             float64 `json:"MarketValue,omitempty"`             //
+	TotalERV                float64 `json:"TotalERV,omitempty"`                //
+	OccupiedERV             float64 `json:"OccupiedERV,omitempty"`             //
+	VacantERV               float64 `json:"VacantERV,omitempty"`               //
+	TopSlice                float64 `json:"TopSlice,omitempty"`                //
+	TotalArea               float64 `json:"TotalArea,omitempty"`               //
+	OccupiedArea            float64 `json:"OccupiedArea,omitempty"`            //
+	VacantArea              float64 `json:"VacantArea,omitempty"`              //
+	PassingRent             float64 `json:"PassingRent,omitempty"`             //
+	Indexation              float64 `json:"Indexation,omitempty"`              //
+	TheoreticalRentalIncome float64 `json:"TheoreticalRentalIncome,omitempty"` //
+	BPUplift                float64 `json:"BPUplift,omitempty"`                // // accounts for the effect of sold rent
+	Vacancy                 float64 `json:"Vacancy,omitempty"`                 //
+	ContractRent            float64 `json:"ContractRent,omitempty"`            //
+	RentFree                float64 `json:"RentFree,omitempty"`                //
+	TurnoverRent            float64 `json:"TurnoverRent,omitempty"`            //
+	MallRent                float64 `json:"MallRent,omitempty"`                //
+	ParkingIncome           float64 `json:"ParkingIncome,omitempty"`           //
+	OtherIncome             float64 `json:"OtherIncome,omitempty"`             //
+	OperatingIncome         float64 `json:"OperatingIncome,omitempty"`         //
+	OperatingExpenses       float64 `json:"OperatingExpenses,omitempty"`       //
+	NetOperatingIncome      float64 `json:"NetOperatingIncome,omitempty"`      //
+	Capex                   float64 `json:"Capex,omitempty"`                   //
+	AcqDispProperty         float64 `json:"AcqDispProperty,omitempty"`         //
+	AcqDispCosts            float64 `json:"AcqDispCosts,omitempty"`            //
+	LoanProceeds            float64 `json:"LoanProceeds,omitempty"`            //
+	InterestExpense         float64 `json:"InterestExpense,omitempty"`         //
+	LoanBalance             float64 `json:"LoanBalance,omitempty"`             //
+	Debt                    float64 `json:"Debt,omitempty"`                    //
+	Tax                     float64 `json:"Tax,omitempty"`                     //
+	TaxableIncome           float64 `json:"TaxableIncome,omitempty"`           //
+	TaxableIncomeCarryBack  float64 `json:"TaxableIncomeCarryBack,omitempty"`  //
+	DTA                     float64 `json:"DTA,omitempty"`                     //
+	Depreciation            float64 `json:"Depreciation,omitempty"`            //
+	Fees                    float64 `json:"Fees,omitempty"`                    //
+	NetCashFlow             float64 `json:"NetCashFlow,omitempty"`             //
+	CashBalance             float64 `json:"CashBalance,omitempty"`             //
+	BondIncome              float64 `json:"BondIncome,omitempty"`              //// income for me
+	BondExpense             float64 `json:"BondExpense,omitempty"`             //// expense for me, or income for investor
 }
 
 // CreateTableHeader -
@@ -534,3 +536,13 @@ func (e *EntityModel) CreateTableHeader(month, quarter, year bool) {
 		e.TableHeader.Yearly = ForecastYearly
 	}
 }
+
+// func (e *EntityModel) MakeRetoolTable() {
+// 	e.RetoolTable = make([]interface{}, len(e.Table))
+// 	for i, v := range e.Table {
+// 		temp := make(map[string]interface{})
+// 		temp[v.COA] = v.Value
+// 		e.RetoolTable[i] = temp
+// 	}
+// 	// fmt.Println(e.RetoolTable)
+// }

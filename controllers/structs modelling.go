@@ -20,7 +20,7 @@ type RentSchedule struct {
 	ProbabilitySim          float64    `json:"ProbabilitySim,omitempty"`          // either a 1 or 0 based on random sample
 	RenewIndex              Indexation `json:"RenewIndex,omitempty"`              //
 	RotateIndex             Indexation `json:"RotateIndex,omitempty"`             //
-	ParentUnit              *Unit      `json:"-"`                                 //
+	ParentUnit              *UnitModel `json:"-"`                                 //
 }
 
 // Indexation -

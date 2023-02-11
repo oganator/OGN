@@ -5,7 +5,7 @@ import (
 )
 
 // RandomDefault -
-func (u *Unit) RandomDefault(date Datetype, endrent float64) (isdefault bool) {
+func (u *UnitModel) RandomDefault(date Datetype, endrent float64) (isdefault bool) {
 	randomdefault := rand.Float64()
 	// u.Mutex.Lock()
 	if randomdefault < u.Default.Hazard {

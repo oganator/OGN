@@ -1,32 +1,31 @@
-[[template "header" .]]
-<body ng-controller="assetViewController">
-	<br>
-	<br>
+
+<div id="body-EntityView">
+
 	<div class="container-fluid" style="width: 95%;">
         <ul class="nav nav-pills" id="SettingsSPA">
-            [[if .entity.ChildEntities]]
+            [[if .entity.ChildEntityModels]]
 				<li class="nav-item">
-					<a class="nav-link active" id="[[.entity.Name]]-tab" data-toggle="tab" href="#[[.entity.Name]]" role="tab" aria-controls="[[.entity.Name]]" aria-selected="true" ng-click="getSettings('[[.entity.Name]]')">[[.entity.Name]]</a>
+					<a class="nav-link active" id="[[.entity.Name]]-tab" data-toggle="tab" href="#[[.entity.Name]]" role="tab" aria-controls="[[.entity.Name]]" aria-selected="true" ng-click="changeEntityModel('[[.entity.Name]]')">[[.entity.Name]]</a>
 				</li>
-                [[range .entity.ChildEntities]]
+                [[range .entity.ChildEntityModels]]
                     <li class="nav-item">
-                        <a class="nav-link" id="[[.Name]]-tab" data-toggle="tab" href="#[[.Name]]" role="tab" aria-controls="[[.Name]]" aria-selected="true" ng-click="getSettings('[[.Name]]')">[[.Name]]</a>
+                        <a class="nav-link" id="[[.Name]]-tab" data-toggle="tab" href="#[[.Name]]" role="tab" aria-controls="[[.Name]]" aria-selected="true" ng-click="changeEntityModel('[[.Name]]')">[[.Name]]</a>
                     </li>
                 [[end]]
             [[end]]
-            [[if not .entity.ChildEntities]]
+            [[if not .entity.ChildEntityModels]]
 				<li class="nav-item">
-					<a class="nav-link" id="[[.entity.Parent.Name]]-tab" data-toggle="tab" href="#[[.entity.Parent.Name]]" role="tab" aria-controls="[[.entity.Parent.Name]]" aria-selected="true" ng-click="getSettings('[[.entity.Parent.Name]]')">[[.entity.Parent.Name]]</a>
+					<a class="nav-link" id="[[.entity.Parent.Name]]-tab" data-toggle="tab" href="#[[.entity.Parent.Name]]" role="tab" aria-controls="[[.entity.Parent.Name]]" aria-selected="true" ng-click="changeEntityModel('[[.entity.Parent.Name]]')">[[.entity.Parent.Name]]</a>
 				</li>
 				[[$entityname := .entity.Name]]
-                [[range .entity.Parent.ChildEntities]]
+                [[range .entity.Parent.ChildEntityModels]]
 					[[if eq .Name $entityname]]
 						<li class="nav-item">
-							<a class="nav-link active" id="[[.Name]]-tab" data-toggle="tab" href="#[[.Name]]" role="tab" aria-controls="[[.Name]]" aria-selected="true" ng-click="getSettings('[[.Name]]')">[[.Name]]</a>
+							<a class="nav-link active" id="[[.Name]]-tab" data-toggle="tab" href="#[[.Name]]" role="tab" aria-controls="[[.Name]]" aria-selected="true" ng-click="changeEntityModel('[[.Name]]')">[[.Name]]</a>
 						</li>[[end]]
 					[[if ne .Name $entityname]]
 						<li class="nav-item">
-							<a class="nav-link" id="[[.Name]]-tab" data-toggle="tab" href="#[[.Name]]" role="tab" aria-controls="[[.Name]]" aria-selected="true" ng-click="getSettings('[[.Name]]')">[[.Name]]</a>
+							<a class="nav-link" id="[[.Name]]-tab" data-toggle="tab" href="#[[.Name]]" role="tab" aria-controls="[[.Name]]" aria-selected="true" ng-click="changeEntityModel('[[.Name]]')">[[.Name]]</a>
 						</li>[[end]]
                 [[end]]
             [[end]]			
@@ -34,12 +33,14 @@
     </div>
     <div bind-html-compile = settingsResponse></div>
     </div>
-	
 		<div class="container-fluid" style="width: 95%;">
 			<ul class="nav nav-pills" id="CFtabletabs[[.entity.Name]]">
 				<li class="nav-item">
 					<a class="nav-link active" id="cf-tab" data-toggle="tab" href="#cf" role="tab" aria-controls="cf" aria-selected="true" ng-click="getRequest('cf')">Cash Flow</a>
 				</li>
+				<li class="nav-item">
+					<a class="nav-link" id="units-tab" data-toggle="tab" href="#units" role="tab" aria-controls="units" aria-selected="false" ng-click="getUnitTable(-1)">Units</a>
+				</li>				
 				<li class="nav-item">
 					<a class="nav-link" id="endcash-tab" data-toggle="tab" href="#endcash" role="tab" aria-controls="endcash" aria-selected="false" ng-click="getRequest('endcash')">Cash Balance</a>
 				</li>
@@ -86,9 +87,4 @@
 				<div bind-html-compile = response></div>			
 			</div>
 		</div>
-		<br>
-		<br>
-	
-		<div id="unitTable" bind-html-compile = unittable></div>
-	[[template "footer" .]]
-</body>
+</div>

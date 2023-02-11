@@ -59,5 +59,19 @@
             </div>
         </div>
     </div>
+<!--    
+    <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+        <a href="#">About</a>
+        <a href="#">Services</a>
+        <a href="#">Clients</a>
+        <a href="#">Contact</a>
+    </div>
+
+    <div id="sidebarButton">
+        <button class="openbtn" onclick="openNav()">☰</button>  
+    </div>
+-->
+    <body ng-controller="assetViewController">
 [[end]]
-[[template "footer"]]
+

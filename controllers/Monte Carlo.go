@@ -106,7 +106,7 @@ func (e *EntityModel) MonteCarlo(compute string) {
 		e.EntityData.Mutex = &sync.Mutex{}
 		for index, key := range e.ChildUnitsMC {
 			key.Parent = e
-			e.ChildUnits[index] = &key
+			e.ChildUnitModels[index] = &key
 			// e.ChildUnits[index].Mutex = &sync.Mutex{}
 		}
 	}
@@ -120,7 +120,7 @@ func (e *EntityModel) MonteCarlo(compute string) {
 		go func(ee *EntityModel, index int) {
 			defer wg.Done()
 			temp := CreateShellEntity(ee, compute)
-			tempentitydata := &EntityData{}
+			tempentitydata := &EntityModelData{}
 			if compute == "Azure" {
 				tempentitydata = &ee.EntityData
 			} else if compute == "Internal" {
@@ -173,8 +173,8 @@ func (e *EntityModel) MonteCarlo(compute string) {
 			// clear unnecessary cash flow and unit data - use for debugging monte carlo issues
 			temp.COA = IntFloatCOAMap{}
 			e.MCSlice[index-1].COA = IntFloatCOAMap{}
-			temp.ChildUnits = make(map[int]*Unit)
-			e.MCSlice[index-1].ChildUnits = make(map[int]*Unit)
+			temp.ChildUnitModels = make(map[int]*UnitModel)
+			e.MCSlice[index-1].ChildUnitModels = make(map[int]*UnitModel)
 		}(e, i)
 	}
 	wg.Wait()
@@ -211,7 +211,7 @@ func (e *EntityModel) FundMonteCarlo() {
 	duration := e.MCDataObjectsCreate(1)
 	for sim := 0; sim < e.MCSetup.Sims; sim++ {
 		// get CPI
-		for _, v := range e.ChildEntities {
+		for _, v := range e.ChildEntityModels {
 			if v.MCSetup.Sims == 0 {
 				continue
 			}
@@ -232,7 +232,7 @@ func (e *EntityModel) FundMonteCarlo() {
 			// e.MCResultSlice.YTM[sim] = (math.Pow(IRRCalc(v.MCResultSlice.BondExpense[sampleint])+1, 12) - 1) * 100
 			// e.MCResultSlice.Duration[sim] = v.Metrics.BondHolder.Duration
 			// e.MCResultSlice.YTMDUR[sim] = e.MCResultSlice.YTM[sim] / e.MCResultSlice.Duration[sim]
-			if e.Strategy != "Standard" {
+			if e.Strategy == "Balloon" {
 				for i, v := range v.MCResultSlice.BondExpense[sampleint] {
 					e.MCResultSlice.BondExpense[sim][i] = e.MCResultSlice.BondExpense[sim][i] + v
 				}
@@ -273,7 +273,7 @@ func (e *EntityModel) FundMonteCarlo() {
 	}
 }
 
-func (tempentitydata *EntityData) SampleForEntity(e *EntityModel) {
+func (tempentitydata *EntityModelData) SampleForEntity(e *EntityModel) {
 	// rand.Seed(uint64(time.Nanosecond))
 	tempentitydata.ERVGrowth.ShortTermRate = NormalSample(e.GrowthInput["ERV"].ShortTermRate, e.MCSetup.ERV.ShortTermRate, 0.0, 10.0)
 	tempentitydata.ERVGrowth.ShortTermPeriod = int(NormalSample(float64(e.GrowthInput["ERV"].ShortTermPeriod), float64(e.MCSetup.ERV.ShortTermPeriod), 0.0, 10.0))

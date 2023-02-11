@@ -21,13 +21,13 @@ func azureHandler(w http.ResponseWriter, r *http.Request) {
 	wg.Add(1)
 	go func(t *ogn.EntityModel) {
 		defer wg.Done()
-		temp := make(map[int]*ogn.Unit)
+		temp := make(map[int]*ogn.UnitModel)
 		for i, v := range t.ChildUnitsMC {
 			v.Parent = t
 			temp[i] = &v
 			// temp[i].Mutex = &sync.Mutex{}
 		}
-		t.ChildUnits = temp
+		t.ChildUnitModels = temp
 		// tempentity.UpdateEntity(false, &tempentity.EntityData, "Azure")
 		// fmt.Println("Azure Handler: ", tempentity.GrowthInput)
 		// ogn.StructPrint("azureHandler - pre Monte Carlo: ", tempentity)
