@@ -44,33 +44,36 @@
 				<li class="nav-item">
 					<a class="nav-link" id="endcash-tab" data-toggle="tab" href="#endcash" role="tab" aria-controls="endcash" aria-selected="false" ng-click="getRequest('endcash')">Cash Balance</a>
 				</li>
-<!--			<li class="nav-item">
+				<li class="nav-item">
 					<a class="nav-link" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('cashbalance')">Cash Balance 3d</a>
 				</li>
--->				<li class="nav-item">
+				<li class="nav-item">
 					<a class="nav-link" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('endncf')">Net Cash Flow</a>
 				</li>
-<!--			<li class="nav-item">
+				<li class="nav-item">
 					<a class="nav-link" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('ncf')">Net Cash Flow 3d</a>
 				</li>
--->				<li class="nav-item">
+				<li class="nav-item">
 					<a class="nav-link" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('endmarketvalue')">Market Value</a>
 				</li>
-<!--			<li class="nav-item">
+				<li class="nav-item">
 					<a class="nav-link" id="summary-tab" data-toggle="tab" href="#summary" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('marketvalue')">Market Value 3d</a>
 				</li>
--->				<li class="nav-item">
+				[[if eq .entity.Strategy "Standard"]]
+				<li class="nav-item">
 					<a class="nav-link" id="irrtabletab" data-toggle="tab" href="#irrtabletab" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('irr')">IRR</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" id="emtabletab" data-toggle="tab" href="#emtabletab" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('em')">Equity Multiple</a>
 				</li>
+				[[end]]
 				<li class="nav-item">
 					<a class="nav-link" id="factoranalysistabletab" data-toggle="tab" href="#factoranalysistabletab" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('factoranalysis')">Factor Analysis</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" id="details-tab" data-toggle="tab" href="#details" role="tab" aria-controls="details" aria-selected="false" ng-click="getRequest('details')">Details</a>
 				</li>
+				[[if eq .entity.Strategy "Balloon"]]
 				<li class="nav-item">
 					<a class="nav-link" id="ytmtabletab" data-toggle="tab" href="#ytmtabletab" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('ytm')">YTM</a>
 				</li>
@@ -80,6 +83,7 @@
 				<li class="nav-item">
 					<a class="nav-link" id="ytmdurtabletab" data-toggle="tab" href="#ytmdurtabletab" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('ytmdur')">YTM/DUR</a>
 				</li>
+				[[end]]
 			</ul>
 		</div>
 		<div class="container-fluid shadow-lg rounded" style="width: 95%; overflow-x:scroll;">

@@ -26,6 +26,7 @@ var ognApp = angular.module('ognApp', []);
 		$scope.mcdetailspagestotal = [[.entity.MCSetup.Sims]]/10;
 		$scope.mcdetailsorder = "";
 		$scope.path = [[.path]];
+		$scope.strategy = [[.entity.Strategy]];
 
 		// getModels - gets the fund or asset models of a specified entity (not childEntityModels).
 		$scope.getModels = function(entity) {
@@ -217,42 +218,51 @@ var ognApp = angular.module('ognApp', []);
 			var startyear = document.getElementById("startyear").value;
 			var salesmonth = document.getElementById("salesmonth").value;
 			var salesyear = document.getElementById("salesyear").value;
-			var entryyield = document.getElementById("entryyield").value;
-			var ltv = document.getElementById("ltv").value;
-			var rate = document.getElementById("rate").value;
-			var discount = document.getElementById("discount").value;
-			var soldrent = document.getElementById("soldrent").value;
-			var strategy = document.getElementById("strategy").value;
-			var balpercent = document.getElementById("balpercent").value;
-			var ervshorttermrate = document.getElementById("ervshorttermrate").value;
-			var ervshorttermperiod = document.getElementById("ervshorttermperiod").value;
-			var ervtransitionperiod = document.getElementById("ervtransitionperiod").value;
-			var ervlongtermrate = document.getElementById("ervlongtermrate").value;
-			var cpishorttermrate = document.getElementById("cpishorttermrate").value;
-			var cpishorttermperiod = document.getElementById("cpishorttermperiod").value;
-			var cpitransitionperiod = document.getElementById("cpitransitionperiod").value;
-			var cpilongtermrate = document.getElementById("cpilongtermrate").value;
-			var yieldshift = document.getElementById("yieldshift").value;
-			var void2 = document.getElementById("void").value;
-			var duration = document.getElementById("duration").value;
-			var rentrevision = document.getElementById("rentrevision").value;
-			var probability = document.getElementById("probability").value;
-			var incentivemonths = document.getElementById("incentivemonths").value;
-			var incentivepercent = document.getElementById("incentivepercent").value;
-			var fitoutcosts = document.getElementById("fitoutcosts").value;
-			var opex = document.getElementById("opex").value;
-			var fees = document.getElementById("fees").value;
-			var hazard = document.getElementById("hazard").value;
-			var rett = document.getElementById("rett").value;
-			var landvalue = document.getElementById("landvalue").value;
-			var minvalue = document.getElementById("minvalue").value;
-			var usableperiod = document.getElementById("usableperiod").value;
-			var vat = document.getElementById("vat").value;
-			var carrybackyrs = document.getElementById("carrybackyrs").value;
-			var carryforwardyrs = document.getElementById("carryforwardyrs").value;
+			var entryyield = (document.getElementById("entryyield")) ? document.getElementById("entryyield").value : "0";
+			var ltv = (document.getElementById("settings_ltv")) ? document.getElementById("settings_ltv").value : "0";
+			var rate = (document.getElementById("settings_rate")) ? document.getElementById("settings_rate").value : "0";
+			var discount = (document.getElementById("settings_discount")) ? document.getElementById("settings_discount").value : "0";
+			var soldrent = (document.getElementById("settings_soldrent")) ? document.getElementById("settings_soldrent").value : "0";
+			var strategy = (document.getElementById("strategy")) ? document.getElementById("strategy").value : "0";
+			var balpercent = (document.getElementById("settings_balpercent")) ? document.getElementById("settings_balpercent").value : "0";
+			var ervshorttermrate = (document.getElementById("ervshorttermrate")) ? document.getElementById("ervshorttermrate").value : "0";
+			var ervshorttermratesigma = (document.getElementById("ervshorttermratesigma")) ? document.getElementById("ervshorttermratesigma").value : "0";
+			var ervshorttermperiod = (document.getElementById("ervshorttermperiod")) ? document.getElementById("ervshorttermperiod").value : "0";
+			var ervshorttermperiodsigma = (document.getElementById("ervshorttermperiodsigma")) ? document.getElementById("ervshorttermperiodsigma").value : "0";
+			var ervtransitionperiod = (document.getElementById("ervtransitionperiod")) ? document.getElementById("ervtransitionperiod").value : "0";
+			var ervtransitionperiodsigma = (document.getElementById("ervtransitionperiodsigma")) ? document.getElementById("ervtransitionperiodsigma").value : "0";
+			var ervlongtermrate = (document.getElementById("ervlongtermrate")) ? document.getElementById("ervlongtermrate").value : "0";
+			var ervlongtermratesigma = (document.getElementById("ervlongtermratesigma")) ? document.getElementById("ervlongtermratesigma").value : "0";
+			var cpishorttermrate = (document.getElementById("cpishorttermrate")) ? document.getElementById("cpishorttermrate").value : "0";
+			var cpishorttermratesigma = (document.getElementById("cpishorttermratesigma")) ? document.getElementById("cpishorttermratesigma").value : "0";
+			var cpishorttermperiod = (document.getElementById("cpishorttermperiod")) ? document.getElementById("cpishorttermperiod").value : "0";
+			var cpishorttermperiodsigma = (document.getElementById("cpishorttermperiodsigma")) ? document.getElementById("cpishorttermperiodsigma").value : "0";
+			var cpitransitionperiod = (document.getElementById("cpitransitionperiod")) ? document.getElementById("cpitransitionperiod").value : "0";
+			var cpilongtermrate = (document.getElementById("cpilongtermrate")) ? document.getElementById("cpilongtermrate").value : "0";
+			var yieldshift = (document.getElementById("yieldshift")) ? document.getElementById("yieldshift").value : "0";
+			var valuationmethod = (document.getElementById("valuationmethod")) ? document.getElementById("valuationmethod").value : "0";
+			var discountrate = (document.getElementById("entitydiscountrate")) ? document.getElementById("entitydiscountrate").value : "0";
+			var void2 = (document.getElementById("void")) ? document.getElementById("void").value : "0";
+			var duration = (document.getElementById("duration")) ? document.getElementById("duration").value : "0";
+			var rentrevision = (document.getElementById("rentrevision")) ? document.getElementById("rentrevision").value : "0";
+			var probability = (document.getElementById("probability")) ? document.getElementById("probability").value : "0";
+			var incentivemonths = (document.getElementById("incentivemonths")) ? document.getElementById("incentivemonths").value : "0";
+			var incentivepercent = (document.getElementById("incentivepercent")) ? document.getElementById("incentivepercent").value : "0";
+			var fitoutcosts = (document.getElementById("fitoutcosts")) ? document.getElementById("fitoutcosts").value : "0";
+			var opex = (document.getElementById("settings_opex")) ? document.getElementById("settings_opex").value : "0";
+			var fees = (document.getElementById("settings_fees")) ? document.getElementById("settings_fees").value : "0";
+			var hazard = (document.getElementById("hazard")) ? document.getElementById("hazard").value : "0";
+			var rett = (document.getElementById("rett")) ? document.getElementById("rett").value : "0";
+			var landvalue = (document.getElementById("landvalue")) ? document.getElementById("landvalue").value : "0";
+			var minvalue = (document.getElementById("minvalue")) ? document.getElementById("minvalue").value : "0";
+			var usableperiod = (document.getElementById("usableperiod")) ? document.getElementById("usableperiod").value : "0";
+			var vat = (document.getElementById("vat")) ? document.getElementById("vat").value : "0";
+			var carrybackyrs = (document.getElementById("carrybackyrs")) ? document.getElementById("carrybackyrs").value : "0";
+			var carryforwardyrs = (document.getElementById("carryforwardyrs")) ? document.getElementById("carryforwardyrs").value : "0";
+			var sims = (document.getElementById("sims")) ? document.getElementById("sims").value : "0";
 			var a = "&";
 			var e = "=";
-			var params = a+"startmonth"+e+startmonth+a+"startyear"+e+startyear+a+"salesmonth"+e+salesmonth+a+"salesyear"+e+salesyear+a+"entryyield"+e+entryyield+a+"ltv"+e+ltv+a+"rate"+e+rate+a+"discount"+e+discount+a+"soldrent"+e+soldrent+a+"strategy"+e+strategy+a+"balpercent"+e+balpercent+a+"ervshorttermrate"+e+ervshorttermrate+a+"ervshorttermperiod"+e+ervshorttermperiod+a+"ervtransitionperiod"+e+ervtransitionperiod+a+"ervlongtermrate"+e+ervlongtermrate+a+"cpishorttermrate"+e+cpishorttermrate+a+"cpishorttermperiod"+e+cpishorttermperiod+a+"cpitransitionperiod"+e+cpitransitionperiod+a+"cpilongtermrate"+e+cpilongtermrate+a+"yieldshift"+e+yieldshift+a+"void"+e+void2+a+"duration"+e+duration+a+"rentrevision"+e+rentrevision+a+"probability"+e+probability+a+"incentivemonths"+e+incentivemonths+a+"incentivepercent"+e+incentivepercent+a+"fitoutcosts"+e+fitoutcosts+a+"opex"+e+opex+a+"fees"+e+fees+a+"hazard"+e+hazard+a+"rett"+e+rett+a+"landvalue"+e+landvalue+a+"minvalue"+e+minvalue+a+"usableperiod"+e+usableperiod+a+"vat"+e+vat+a+"carrybackyrs"+e+carrybackyrs+a+"carryforwardyrs"+e+carryforwardyrs
+			var params = a+"startmonth"+e+startmonth+a+"startyear"+e+startyear+a+"salesmonth"+e+salesmonth+a+"salesyear"+e+salesyear+a+"entryyield"+e+entryyield+a+"ltv"+e+ltv+a+"rate"+e+rate+a+"discount"+e+discount+a+"soldrent"+e+soldrent+a+"strategy"+e+strategy+a+"balpercent"+e+balpercent+a+"ervshorttermrate"+e+ervshorttermrate+a+"ervshorttermperiod"+e+ervshorttermperiod+a+"ervtransitionperiod"+e+ervtransitionperiod+a+"ervlongtermrate"+e+ervlongtermrate+a+"cpishorttermrate"+e+cpishorttermrate+a+"cpishorttermperiod"+e+cpishorttermperiod+a+"cpitransitionperiod"+e+cpitransitionperiod+a+"cpilongtermrate"+e+cpilongtermrate+a+"yieldshift"+e+yieldshift+a+"discountrate"+e+discountrate+a+"valuationmethod"+e+valuationmethod+a+"void"+e+void2+a+"duration"+e+duration+a+"rentrevision"+e+rentrevision+a+"probability"+e+probability+a+"incentivemonths"+e+incentivemonths+a+"incentivepercent"+e+incentivepercent+a+"fitoutcosts"+e+fitoutcosts+a+"opex"+e+opex+a+"fees"+e+fees+a+"hazard"+e+hazard+a+"rett"+e+rett+a+"landvalue"+e+landvalue+a+"minvalue"+e+minvalue+a+"usableperiod"+e+usableperiod+a+"vat"+e+vat+a+"carrybackyrs"+e+carrybackyrs+a+"carryforwardyrs"+e+carryforwardyrs+a+"sims"+e+sims
 			await $http.post($scope.baseURL + "ViewEntity2?name="+$scope.entity+params);
 			if ($scope.tableTab == "units"){
 				await $scope.getUnitTable(-1);
@@ -260,6 +270,7 @@ var ognApp = angular.module('ognApp', []);
 				await $scope.getRequest($scope.tableTab);
 			}
 			await $scope.getSettings($scope.entity);
+		
 		}; // /updateEntity
 
 		$scope.updateUnit = async function(unit,field){
@@ -268,6 +279,7 @@ var ognApp = angular.module('ognApp', []);
 			await $http.post(`UpdateUnit?unit=${unit}&field=${field}&value="${value}"`);
 			await $scope.getUnitTable(-1);
 			await $scope.getSettings($scope.entity);
+		
 		};
 
 		init();

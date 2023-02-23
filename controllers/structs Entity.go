@@ -91,6 +91,7 @@ type UnitModel struct {
 	COA                IntFloatCOAMap `json:"COA,omitempty"`                // Contains monthly values, as well as yearly values (rolling or calendar) up to the sales date\
 	CapexQueue         IntFloatMap    `json:"CapexQueue,omitempty"`         //
 	MCSetup            MCSetup        `json:"MCSetup,omitempty"`            // used to store sigmas of the variables - the mean values are all stored elsewhere
+	Override           *UnitModel     `json:"Override,omitempty"`           //
 }
 
 // HeaderType -

@@ -27,18 +27,20 @@ func MonthlyDCFCalc(e *EntityModel, start Datetype, ch chan DateFloat) {
 	shift := e.Valuation.YieldShift / 120000
 	yield := e.Valuation.EntryYield
 	discount := e.Valuation.DiscountRate + 1
-	// discount := 1.08
 	end := Dateadd(start, 120) // 10 year DCF
 	i := 0.0
 	tempvalue := 0.0
 	for date := start; date.Dateint <= end.Dateint; date.Add(1) {
 		yield = yield + shift
 		e.Mutex.Lock()
-		monthincome := SumCOADown(MultiplyCOA(e.Valuation.IncomeCapSetup, e.COA[date.Dateint]))
+		capSetup := e.Valuation.IncomeCapSetup
+		coa := e.COA[date.Dateint]
 		e.Mutex.Unlock()
+		monthincome := SumCOADown(MultiplyCOA(capSetup, coa))
 		if date.Dateint == end.Dateint {
 			e.Mutex.Lock()
-			exitval := SumCOALines(e.Valuation.IncomeCapSetup, e.COA, Dateadd(date, 1), Dateadd(date, 12)) / yield
+			monthcoa := e.COA
+			exitval := SumCOALines(capSetup, monthcoa, Dateadd(date, 1), Dateadd(date, 12)) / yield
 			e.Mutex.Unlock()
 			monthincome = monthincome + exitval
 		}
@@ -57,9 +59,9 @@ type DateFloat struct {
 // SumDCF -
 func (e *EntityModel) SumDCF(ch chan DateFloat) {
 	for v := range ch {
-		e.Mutex.Lock()
 		temp := FloatCOA{MarketValue: v.Float}
 		temp.Add(e.COA[v.Date.Dateint])
+		e.Mutex.Lock()
 		e.COA[v.Date.Dateint] = temp
 		e.Mutex.Unlock()
 	}

@@ -117,7 +117,7 @@ func GetIntUnitTable(c *ViewUnitTableController, field string) (result int) {
 // Post -
 func (c *ViewUnitTableController) Post() {
 	temp := make(map[interface{}]interface{})
-	key := AssetModelsList[GetStringUnitTable(c, "name")]
+	key := EntityModelsList[GetStringUnitTable(c, "name")]
 	index := GetIntUnitTable(c, "index")
 	if index == -1 {
 		temp["entity"] = EntityModelsMap[key].EntityModel

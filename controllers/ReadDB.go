@@ -13,13 +13,13 @@ import (
 func ReadDB() {
 	ReadEntites(DB)
 	CreateEntityModels(DB, 0)
-	CreateUnitModels(DB, 0, 0)
 	DBAssociations(DB)
+	CreateUnitModels(DB, 0, 0)
 }
 
 // ReadEntites - Reads entity table and marshals into EntityMap
 func ReadEntites(db *sql.DB) {
-	entityrows, _ := db.Query(`
+	entityrows, err1 := db.Query(`
 		select 
 			entity.masterID, 
 			entity.name, 
@@ -30,6 +30,9 @@ func ReadEntites(db *sql.DB) {
 			entity.entity_type
 		from entity
 	`)
+	if err1 != nil {
+		fmt.Println(err1)
+	}
 	for entityrows.Next() {
 		tempEntity := Entity{}
 		err := entityrows.Scan(
@@ -134,7 +137,10 @@ func CreateEntityModels(db *sql.DB, entitymodel int) {
 	if entitymodel != 0 {
 		query = query + `where entity_model.masterID = ` + fmt.Sprint(entitymodel)
 	}
-	entityModelRows, _ := db.Query(query)
+	entityModelRows, err1 := db.Query(query)
+	if err1 != nil {
+		fmt.Println("CreateEntityModels: ", err1)
+	}
 	for entityModelRows.Next() {
 		tempModel := &EntityModel{}
 		cpi := HModel{}
@@ -202,7 +208,7 @@ func CreateEntityModels(db *sql.DB, entitymodel int) {
 			&tempModel.GLA.DiscountRate,
 		)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("CreateEntityModels.Rows: ", err)
 		}
 		tempModel.Mutex = &sync.Mutex{}
 		tempModel.StartDate.Add(0)
@@ -279,7 +285,10 @@ func CreateUnitModels(db *sql.DB, entitymodel int, unitmodel int) {
 	if unitmodel != 0 {
 		query = query + `and masterID = ` + fmt.Sprint(entitymodel)
 	}
-	unitmodelrows, _ := db.Query(query)
+	unitmodelrows, err1 := db.Query(query)
+	if err1 != nil {
+		fmt.Println("CreateUnitModels: ", err1)
+	}
 	for unitmodelrows.Next() {
 		tempUnitModel := UnitModel{}
 		entityModelInt := 0
@@ -310,7 +319,7 @@ func CreateUnitModels(db *sql.DB, entitymodel int, unitmodel int) {
 			&tempUnitModel.DiscountRate,
 		)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("CreateUnitModels.Rows: ", err)
 		}
 		parent := EntityModelsMap[entityModelInt].EntityModel
 		tempUnitModel.Parent = parent
@@ -319,15 +328,9 @@ func CreateUnitModels(db *sql.DB, entitymodel int, unitmodel int) {
 			tempUnitModel.LeaseStartDate.Month = parent.StartDate.Month
 			tempUnitModel.LeaseStartDate.Year = parent.StartDate.Year
 			tempUnitModel.LeaseStartDate.Add(-1)
-			tempUnitModel.LeaseExpiryDate = Dateadd(parent.StartDate, parent.GLA.EXTDuration)
 			tempUnitModel.PassingRent = tempUnitModel.ERVArea * tempUnitModel.ERVAmount
-		case "Occupied":
-			tempUnitModel.LeaseStartDate.Add(0)
-			tempUnitModel.LeaseExpiryDate.Add(0)
 		}
 		// Set up values based on parent entity model
-		// 		TODO - add these fields to the unit_models table in the db, and have logic to first
-		// 		put in the parents, then the unit specific values so they override
 		if tempUnitModel.Probability == -1 {
 			tempUnitModel.Probability = parent.GLA.Probability
 		}
@@ -359,20 +362,27 @@ func CreateUnitModels(db *sql.DB, entitymodel int, unitmodel int) {
 		if tempUnitModel.DiscountRate == -1 {
 			tempUnitModel.DiscountRate = parent.GLA.DiscountRate
 		}
+		if tempUnitModel.UnitStatus == "Vacant" {
+			tempUnitModel.LeaseExpiryDate = Dateadd(parent.StartDate, tempUnitModel.EXTDuration)
+		}
 		// create datetypes
 		tempUnitModel.LeaseStartDate.Add(0)
 		tempUnitModel.LeaseExpiryDate.Add(0)
-		// assign to relevant maps
+		// assign to units maps for parent asset and fund
 		Units[tempUnitModel.MasterID] = tempUnitModel
 		parent.ChildUnitModels[tempUnitModel.MasterID] = &tempUnitModel
+		parent.Parent.ChildUnitModels[tempUnitModel.MasterID] = &tempUnitModel
 	}
 }
 
 // DBAssociations - Reads from entity_model_associations table, and then adds relevant entries to EntityModelsMap
 func DBAssociations(db *sql.DB) {
-	associations, _ := db.Query(`
+	associations, err1 := db.Query(`
 	select parent, child, ownership from entity_model_associations
 	`)
+	if err1 != nil {
+		fmt.Println(err1)
+	}
 	for associations.Next() {
 		parent := 0
 		child := 0
@@ -393,18 +403,26 @@ func DBAssociations(db *sql.DB) {
 
 // UpdateEntityModel -
 func (e *EntityModel) UpdateEntityModel() {
-	go e.WriteDBEntityModel(DB)
+	e.WriteDBEntityModel(DB)
 	CreateUnitModels(DB, e.MasterID, 0)
 	e.EntityModelCalc(false, "Internal")
 }
 
 // WriteDBEntityModel - writes changes to the entity_model table for a specific entity model
 func (e *EntityModel) WriteDBEntityModel(db *sql.DB) {
-	query := "update entity_model set start_month = " + fmt.Sprint(e.StartDate.Month) + " , start_year = " + fmt.Sprint(e.StartDate.Year) + " , sales_month = " + fmt.Sprint(e.SalesDate.Month) + " , sales_year = " + fmt.Sprint(e.SalesDate.Year) + " , entry_yield = " + fmt.Sprint(e.Valuation.EntryYield) + " , yield_shift = " + fmt.Sprint(e.Valuation.YieldShift) + " , yield_shift_sigma = " + fmt.Sprint(e.MCSetup.YieldShift) + " , rett = " + fmt.Sprint(e.Tax.RETT) + " , vat = " + fmt.Sprint(e.Tax.VAT) + " , woz = " + fmt.Sprint(e.Tax.MinValue) + " , depr_period = " + fmt.Sprint(e.Tax.UsablePeriod) + " , land_value = " + fmt.Sprint(e.Tax.LandValue) + " , carryback_yrs = " + fmt.Sprint(e.Tax.CarryBackYrs) + " , carryforward_yrs = " + fmt.Sprint(e.Tax.CarryForwardYrs) + " , ltv = " + fmt.Sprint(e.DebtInput.LTV) + " , loan_rate = " + fmt.Sprint(e.DebtInput.InterestRate) + " , opex_percent = " + fmt.Sprint(e.OpEx.PercentOfTRI) + " , opex_sigma = " + fmt.Sprint(e.MCSetup.OpEx) + " , strategy = '" + fmt.Sprint(e.Strategy) + "' , fees = " + fmt.Sprint(e.Fees.PercentOfGAV) + " , balloon = " + fmt.Sprint(e.BalloonPercent) + " , sims = " + fmt.Sprint(e.MCSetup.Sims) + " where masterID = " + fmt.Sprint(e.MasterID)
-	_, err := DB.Exec(query)
+	queryEntityModel := "update entity_model set start_month = " + fmt.Sprint(e.StartDate.Month) + " , start_year = " + fmt.Sprint(e.StartDate.Year) + " , sales_month = " + fmt.Sprint(e.SalesDate.Month) + " , sales_year = " + fmt.Sprint(e.SalesDate.Year) + " , entry_yield = " + fmt.Sprint(e.Valuation.EntryYield) + " , valuation_method = '" + fmt.Sprint(e.Valuation.Method) + "' , yield_shift = " + fmt.Sprint(e.Valuation.YieldShift) + " , yield_shift_sigma = " + fmt.Sprint(e.MCSetup.YieldShift) + " , rett = " + fmt.Sprint(e.Tax.RETT) + " , vat = " + fmt.Sprint(e.Tax.VAT) + " , woz = " + fmt.Sprint(e.Tax.MinValue) + " , depr_period = " + fmt.Sprint(e.Tax.UsablePeriod) + " , land_value = " + fmt.Sprint(e.Tax.LandValue) + " , carryback_yrs = " + fmt.Sprint(e.Tax.CarryBackYrs) + " , carryforward_yrs = " + fmt.Sprint(e.Tax.CarryForwardYrs) + " , ltv = " + fmt.Sprint(e.DebtInput.LTV) + " , loan_rate = " + fmt.Sprint(e.DebtInput.InterestRate) + " , opex_percent = " + fmt.Sprint(e.OpEx.PercentOfTRI) + " , opex_sigma = " + fmt.Sprint(e.MCSetup.OpEx) + " , strategy = '" + fmt.Sprint(e.Strategy) + "' , fees = " + fmt.Sprint(e.Fees.PercentOfGAV) + " , balloon = " + fmt.Sprint(e.BalloonPercent) + " , sims = " + fmt.Sprint(e.MCSetup.Sims) + " where masterID = " + fmt.Sprint(e.MasterID)
+	_, err := DB.Exec(queryEntityModel)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("WriteDBEntityModel.queryEntityModel: ", err)
+		fmt.Println(queryEntityModel)
 	}
+	queryUnitModel := "update unit_models set incomeToSell = " + fmt.Sprint(e.GLA.PercentSoldRent) + " , void = " + fmt.Sprint(e.GLA.Void) + " , void_sigma = " + fmt.Sprint(e.MCSetup.Void) + " , ext_dur = " + fmt.Sprint(e.GLA.EXTDuration) + " , rent_revision_erv = " + fmt.Sprint(e.GLA.RentRevisionERV) + " , probability = " + fmt.Sprint(e.GLA.Probability) + " , probability_sigma = " + fmt.Sprint(e.MCSetup.Probability) + " , hazard = " + fmt.Sprint(e.GLA.Default.Hazard) + " , incentives_months = " + fmt.Sprint(e.GLA.RentIncentives.Duration) + " , incentives_percent = " + fmt.Sprint(e.GLA.RentIncentives.PercentOfContractRent) + " , fitout_costs = " + fmt.Sprint(e.GLA.FitOutCosts.AmountPerTotalArea) + " , discount_rate = " + fmt.Sprint(e.GLA.DiscountRate) + ` where unit_name like "%GLA%" and entity_model_ID = ` + fmt.Sprint(e.MasterID)
+	_, err2 := DB.Exec(queryUnitModel)
+	if err2 != nil {
+		fmt.Println("WriteDBEntityModel.queryUnitModel: ", err)
+		// fmt.Println(queryUnitModel)
+	}
+
 }
 
 // WriteDBUnitModelSingleValue - updates a particular value for a specific unit, then updates the units map
@@ -413,7 +431,7 @@ func WriteDBUnitModelSingleValue(unit int, field string, value string) {
 	query := "update unit_models set " + field + " = " + value + " where masterID = " + unitString
 	_, err := DB.Exec(query)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("WriteDBUnitModelSingleValue: ", err)
 	}
 	CreateUnitModels(DB, 0, unit)
 }

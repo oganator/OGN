@@ -7,6 +7,7 @@ import (
 // PropertyCFCalc -
 func (e *EntityModel) PropertyCFCalc() {
 	for date := e.StartDate; date.Dateint <= e.EndDate.Dateint; date.Add(1) {
+		e.Mutex.Lock()
 		opex := e.COA[date.Dateint].TheoreticalRentalIncome * -e.OpEx.PercentOfTRI
 		interestexpense := e.DebtInput.InterestRate * e.DebtInput.LTV * e.COA[Dateadd(e.StartDate, -1).Dateint].AcqDispProperty / 12
 		fees := e.COA[date.Dateint].MarketValue * -e.Fees.PercentOfGAV / 1200
@@ -20,7 +21,6 @@ func (e *EntityModel) PropertyCFCalc() {
 			Fees:               fees,
 		}
 		temp.Add(e.COA[date.Dateint])
-		e.Mutex.Lock()
 		e.COA[date.Dateint] = temp
 		e.Mutex.Unlock()
 	}
@@ -109,3 +109,8 @@ func (e *EntityModel) Disposal() {
 	temp.Add(e.COA[e.SalesDate.Dateint])
 	e.COA[e.SalesDate.Dateint] = temp
 }
+
+// DebtCalc -
+// func (e *EntityModel) DebtCalc(){
+// 	switch e.
+// }

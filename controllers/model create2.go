@@ -2,10 +2,11 @@ package controllers
 
 // UpdateEntityModel - Updates a model after reading the DB, used with API requests
 func (e *EntityModel) EntityModelCalc(mc bool, compute string) {
-	// e.HoldPeriod = dateintdiff(e.SalesDate.Dateint, e.StartDate.Dateint)
+	e.HoldPeriod = dateintdiff(e.SalesDate.Dateint, e.StartDate.Dateint)
+	e.EndDate = Dateadd(e.SalesDate, 144)
 	e.GrowthCalc(mc)
 	e.AssetRentCalc(mc, compute)
-	e.Valuation.Method = "DCF"
+	// e.Valuation.Method = "DCF"
 	e.Valuation.IncomeCapSetup = FloatCOA{TotalERV: 1}
 	switch e.Valuation.Method {
 	case "DirectCap":
@@ -14,6 +15,7 @@ func (e *EntityModel) EntityModelCalc(mc bool, compute string) {
 		e.DCFCalc()
 	}
 	e.Acquisition()
+	// e.DebtCalc()
 	e.PropertyCFCalc()
 	e.Disposal()
 	e.SumCOA()
@@ -82,14 +84,15 @@ func (e *EntityModel) EntityModelCalc(mc bool, compute string) {
 
 // UpdateFundModel - currently this is hardcoded to use internal compute
 func (e *EntityModel) UpdateFundModel() {
+	e.StartDate.Dateint = 300011
+	e.COA = IntFloatCOAMap{}
 	for _, v := range e.ChildEntityModels {
 		// set the sales date to that of the latest asset
 		if e.SalesDate.Dateint < v.SalesDate.Dateint {
 			e.SalesDate = v.SalesDate
-			e.EndDate = Dateadd(v.SalesDate, 120)
+			e.EndDate = v.SalesDate
 		}
 		// set the start date to that of the earliest asset
-		// DOES THIS EVEN WORK?
 		if e.StartDate.Dateint > v.StartDate.Dateint {
 			e.StartDate = v.StartDate
 		}

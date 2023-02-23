@@ -46,13 +46,15 @@ func (c *ViewEntity2Controller) Get() {
 
 // Post -
 func (c *ViewEntity2Controller) Post() {
-	key := AssetModelsList[GetString2(c, "name")]
+	key := EntityModelsList[GetString2(c, "name")]
 	EntityModelsMap[key].EntityModel.StartDate = Datetype{Month: ReturnMonth(GetString2(c, "startmonth")), Year: GetInt2(c, "startyear")}
 	EntityModelsMap[key].EntityModel.StartDate.Add(0)
 	EntityModelsMap[key].EntityModel.SalesDate = Datetype{Month: ReturnMonth(GetString2(c, "salesmonth")), Year: GetInt2(c, "salesyear")}
 	EntityModelsMap[key].EntityModel.SalesDate.Add(0)
 	EntityModelsMap[key].EntityModel.HoldPeriod = dateintdiff(EntityModelsMap[key].EntityModel.SalesDate.Dateint, EntityModelsMap[key].EntityModel.StartDate.Dateint) - 1
 	EntityModelsMap[key].EntityModel.Valuation.EntryYield = GetFloat2(c, "entryyield") / 100
+	EntityModelsMap[key].EntityModel.Valuation.DiscountRate = GetFloat2(c, "discountrate") / 100
+	EntityModelsMap[key].EntityModel.Valuation.Method = GetString2(c, "valuationmethod")
 	EntityModelsMap[key].EntityModel.DebtInput.LTV = GetFloat2(c, "ltv") / 100
 	EntityModelsMap[key].EntityModel.DebtInput.InterestRate = GetFloat2(c, "rate") / 100
 	EntityModelsMap[key].EntityModel.GLA.DiscountRate = GetFloat2(c, "discount") / 100
@@ -92,30 +94,36 @@ func (c *ViewEntity2Controller) Post() {
 	EntityModelsMap[key].EntityModel.Tax.VAT = GetFloat2(c, "vat") / 100
 	EntityModelsMap[key].EntityModel.Tax.CarryBackYrs = GetInt2(c, "carrybackyrs")
 	EntityModelsMap[key].EntityModel.Tax.CarryForwardYrs = GetInt2(c, "carryforwardyrs")
-	// mcsetup := MCSetup{
-	// 	Sims: GetInt2(c, "sims"),
-	// 	ERV: HModel{
-	// 		ShortTermRate:    GetFloat2(c, "ervshorttermratesigma") / 100,
-	// 		ShortTermPeriod:  GetInt2(c, "ervshorttermperiodsigma"),
-	// 		TransitionPeriod: GetInt2(c, "ervtransitionperiodsigma"),
-	// 		LongTermRate:     GetFloat2(c, "ervlongtermratesigma") / 100,
-	// 	},
-	// 	CPI: HModel{
-	// 		ShortTermRate:    GetFloat2(c, "cpishorttermratesigma") / 100,
-	// 		ShortTermPeriod:  GetInt2(c, "cpishorttermperiodsigma"),
-	// 		TransitionPeriod: GetInt2(c, "cpitransitionperiodsigma"),
-	// 		LongTermRate:     GetFloat2(c, "cpilongtermratesigma") / 100,
-	// 	},
-	// 	YieldShift:  GetFloat2(c, "yieldshiftsigma"),
-	// 	Void:        GetFloat2(c, "voidsigma"),
-	// 	Probability: GetFloat2(c, "probabilitysigma") / 100,
-	// 	OpEx:        GetFloat2(c, "opexsigma") / 100,
-	// 	Hazard:      GetFloat2(c, "hazardsigma") / 100,
-	// }
-	// EntityModelsMap[key].EntityModel.MCSetup = mcsetup
+	mcsetup := MCSetup{
+		Sims: GetInt2(c, "sims"),
+		ERV: HModel{
+			ShortTermRate:    GetFloat2(c, "ervshorttermratesigma") / 100,
+			ShortTermPeriod:  GetInt2(c, "ervshorttermperiodsigma"),
+			TransitionPeriod: GetInt2(c, "ervtransitionperiodsigma"),
+			LongTermRate:     GetFloat2(c, "ervlongtermratesigma") / 100,
+		},
+		CPI: HModel{
+			ShortTermRate:    GetFloat2(c, "cpishorttermratesigma") / 100,
+			ShortTermPeriod:  GetInt2(c, "cpishorttermperiodsigma"),
+			TransitionPeriod: GetInt2(c, "cpitransitionperiodsigma"),
+			LongTermRate:     GetFloat2(c, "cpilongtermratesigma") / 100,
+		},
+		YieldShift:  GetFloat2(c, "yieldshiftsigma"),
+		Void:        GetFloat2(c, "voidsigma"),
+		Probability: GetFloat2(c, "probabilitysigma") / 100,
+		OpEx:        GetFloat2(c, "opexsigma") / 100,
+		Hazard:      GetFloat2(c, "hazardsigma") / 100,
+	}
+	EntityModelsMap[key].EntityModel.MCSetup = mcsetup
 	// TODO: write updated values to DB, Monte Carlo
 	EntityModelsMap[key].EntityModel.SalesDate = Dateadd(EntityModelsMap[key].EntityModel.StartDate, EntityModelsMap[key].EntityModel.HoldPeriod)
-	EntityModelsMap[key].EntityModel.UpdateEntityModel()
+	switch EntityModelsMap[key].EntityModel.Entity.EntityType {
+	case "Asset":
+		EntityModelsMap[key].EntityModel.UpdateEntityModel()
+	case "Fund":
+		EntityModelsMap[key].EntityModel.UpdateFundModel()
+	}
+	// EntityModelsMap[key].EntityModel.MonteCarlo2("Internal")
 	// temp := make(map[interface{}]interface{})
 	// temp["entity"] = EntityModelsMap[key].EntityModel
 	// temp["modelslist"] = AssetModelsList

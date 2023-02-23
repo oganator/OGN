@@ -1,5 +1,4 @@
 [[define "UnitTable"]]
-    [[if ne .ParentID 0]]
         <table class="table table-hover tableFixHead rounded">
             <thead>
                 <tr>
@@ -30,10 +29,15 @@
                             <input ng-keydown="$event.keyCode === 13 && updateUnit([[.MasterID]],'lease_end_month')" type="text" class="form-control" id="unit[[.MasterID]].lease_end_month" value="[[.LeaseExpiryDate.Month]]"></input> &nbsp
                             <input ng-keydown="$event.keyCode === 13 && updateUnit([[.MasterID]],'lease_end_year')"  type="text" class="form-control" id="unit[[.MasterID]].lease_end_year" value="[[.LeaseExpiryDate.Year]]"></input>
                         </div>
-                    </td>
+                    </td>  
                     <td style="border-color:006A4D;" width="6%"><input ng-keydown="$event.keyCode === 13 && updateUnit([[.MasterID]],'erv_area')" type="text" class="form-control" id="unit[[.MasterID]].erv_area" value="{{[[ .ERVArea]] | number:0}}"></input></td>
                     <td style="border-color:006A4D;" width="5%"><input ng-keydown="$event.keyCode === 13 && updateUnit([[.MasterID]],'erv_amount')" type="text" class="form-control" id="unit[[.MasterID]].erv_amount" value="{{[[.ERVAmount]] | number:0}}"></input></td>
-                    <td style="border-color:006A4D;">{{[[printf "%.0f" .PassingRent]] | number:0}}</td>
+                    <td style="border-color:006A4D;" width="9%">
+                        <div class="d-flex flex-row ">
+                            <input ng-keydown="$event.keyCode === 13 && updateUnit([[.MasterID]],'passing_rent')" type="text" class="form-control" id="unit[[.MasterID]].passing_rent" value="{{[[.PassingRent]] | number:0}}"></input>
+                            <input disabled type="text" class="form-control" id="unit[[.MasterID]].passing_rent_monthly" value="{{[[.PassingRent]] / 12 | number:0}}"></input>
+                        </div>                    
+                    </td>
                     <td style="border-color:006A4D;" width="5%"><input ng-keydown="$event.keyCode === 13 && updateUnit([[.MasterID]],'probability')" type="text" class="form-control" id="unit[[.MasterID]].probability" value="{{[[.Probability]]  | number:2}}" [[if ne .Probability .Parent.GLA.Probability]] style="color: red;" [[end]]></input></td>
                     <td style="border-color:006A4D;" width="5%"><input ng-keydown="$event.keyCode === 13 && updateUnit([[.MasterID]],'void')" type="text" class="form-control" id="unit[[.MasterID]].void" value="{{[[.Void]] | number:0}}" [[if ne .Void .Parent.GLA.Void]] style="color: red;" [[end]]></input></td>
                     <td style="border-color:006A4D;" width="5%"><input ng-keydown="$event.keyCode === 13 && updateUnit([[.MasterID]],'ext_dur')" type="text" class="form-control" id="unit[[.MasterID]].ext_dur" value="{{[[.EXTDuration]] | number:0}}" [[if ne .EXTDuration .Parent.GLA.EXTDuration]] style="color: red;" [[end]]></input></td>
@@ -68,6 +72,5 @@
 		<div class="container-fluid">
 			[[template "AddChildUnitModal" .Name]]
 		</div>
-    [[end]]
 [[end]]
 [[template "UnitTable" .entity]]
