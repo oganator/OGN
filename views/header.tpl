@@ -72,6 +72,6 @@
         <button class="openbtn" onclick="openNav()">☰</button>  
     </div>
 -->
-    <body ng-controller="assetViewController">
+    <body ng-controller="assetViewController" id="mainBody">
 [[end]]
 

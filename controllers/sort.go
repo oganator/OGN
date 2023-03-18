@@ -120,21 +120,21 @@ func (a ByHazardr) Less(i, j int) bool {
 func (a ByHazardr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 // ByOpEx -
-type ByOpEx []*EntityModel
+// type ByOpEx []*EntityModel
 
-func (a ByOpEx) Len() int { return len(a) }
-func (a ByOpEx) Less(i, j int) bool {
-	return a[i].OpEx.PercentOfTRI < a[j].OpEx.PercentOfTRI
-}
-func (a ByOpEx) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+// func (a ByOpEx) Len() int { return len(a) }
+// func (a ByOpEx) Less(i, j int) bool {
+// 	return a[i].OpEx.PercentOfTRI < a[j].OpEx.PercentOfTRI
+// }
+// func (a ByOpEx) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type ByOpExr []*EntityModel
+// type ByOpExr []*EntityModel
 
-func (a ByOpExr) Len() int { return len(a) }
-func (a ByOpExr) Less(i, j int) bool {
-	return a[i].OpEx.PercentOfTRI > a[j].OpEx.PercentOfTRI
-}
-func (a ByOpExr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+// func (a ByOpExr) Len() int { return len(a) }
+// func (a ByOpExr) Less(i, j int) bool {
+// 	return a[i].OpEx.PercentOfTRI > a[j].OpEx.PercentOfTRI
+// }
+// func (a ByOpExr) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 // ByCPI -
 type ByCPI []*EntityModel

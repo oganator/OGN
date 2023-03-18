@@ -10,6 +10,10 @@
     --background-color:#393b40;
 }
 
+body{
+    font-size: small;
+}
+
 .first-second {
     background-color: var(--second-bg-color);
     background-image: linear-gradient(to top, var(--second-bg-color) 0%, var(--first-bg-color) 100%);
@@ -34,6 +38,11 @@
 .fourth-bg {
     color:var(--third-bg-color);
     background-color: var(--fourth-bg-color);
+}
+
+.fifth-bg {
+    color: white;
+    background-color: var(--fifth-bg-color);
 }
 
 .tableFixHead {
@@ -77,6 +86,7 @@ td {
 th,
 tr {
     color: var(--first-bg-color);
+    line-height: 14px; 
 }
 /*///////////////////////////////////////////////*/
 
@@ -89,6 +99,7 @@ tr {
     border-radius: 0mm;
     color: var(--second-bg-color);    
     background-color: transparent;
+    font-size: small;
 }
 
 label{
@@ -131,4 +142,47 @@ label{
     background-color: var(--second-bg-color);
 }
 
+.btn-off {
+    background-color: var(--background-color);
+    border-color: white;
+    color: white;
+}
 
+
+
+/*//////////////////////////////////////////////*/
+
+
+
+.jw-modal {
+    /* modals are hidden by default */
+    display: none;
+
+    /* modal container fixed across whole screen */
+    position: fixed;
+    inset: 0;
+
+    /* z-index must be higher than everything else on the page */
+    z-index: 10000;
+    
+    /* semi-transparent black background exposed by padding */
+    background-color: rgba(0, 0, 0, .75);
+    padding: 40px;
+
+    /* enables scrolling for tall modals */
+    overflow: auto;
+}
+
+.jw-modal.open {
+    display: block;
+}
+
+.jw-modal-body {
+    padding: 20px;
+    background: #fff;
+}
+
+body.jw-modal-open {
+    /* body overflow is hidden to hide main scrollbar when modal window is open */
+    overflow: hidden;
+}

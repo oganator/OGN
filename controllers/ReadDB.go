@@ -33,6 +33,7 @@ func ReadEntites(db *sql.DB) {
 	if err1 != nil {
 		fmt.Println(err1)
 	}
+	defer entityrows.Close()
 	for entityrows.Next() {
 		tempEntity := Entity{}
 		err := entityrows.Scan(
@@ -69,70 +70,69 @@ func ReadEntites(db *sql.DB) {
 // otherwise entitymodel will be used in the where clause
 func CreateEntityModels(db *sql.DB, entitymodel int) {
 	query := `		
-	select 
-		entity_model.masterID,
-		entity_model.name,
-		entity_model.entityID,
-		entity_model.version,
-		entity_model.start_month,
-		entity_model.start_year,
-		entity_model.sales_month,
-		entity_model.sales_year,
-		entity_model.cpi_short_rate,
-		entity_model.cpi_short_rate_sigma,
-		entity_model.cpi_short_period,
-		entity_model.cpi_short_period_sigma,
-		entity_model.cpi_transition,
-		entity_model.cpi_transition_sigma,
-		entity_model.cpi_long_rate,
-		entity_model.cpi_long_rate_sigma, 
-		entity_model.erv_short_rate, 
-		entity_model.erv_short_rate_sigma, 
-		entity_model.erv_short_period, 
-		entity_model.erv_short_period_sigma, 
-		entity_model.erv_transtion, 
-		entity_model.erv_transition_sigma, 
-		entity_model.erv_long_rate, 
-		entity_model.erv_long_rate_sigma, 
-		entity_model.entry_yield, 
-		entity_model.yield_shift, 
-		entity_model.yield_shift_sigma, 
-		entity_model.rett, 
-		entity_model.vat, 
-		entity_model.woz, 
-		entity_model.depr_period, 
-		entity_model.land_value, 
-		entity_model.carryback_yrs, 
-		entity_model.carryforward_yrs, 
-		entity_model.ltv, 
-		entity_model.loan_rate, 
-		entity_model.opex_percent, 
-		entity_model.opex_sigma, 
-		entity_model.strategy, 
-		entity_model.fees, 
-		entity_model.balloon,
-		entity_model.uom,
-		entity_model.sims,
-		entity_model.valuation_method,
-		entity_model.discount_rate,
-		entity_model.acq_price,
-		entity.entity_type,
-		unit_models.incomeToSell,
-		unit_models.void,
-		unit_models.void_sigma,
-		unit_models.ext_dur,
-		unit_models.rent_revision_erv,
-		unit_models.probability,
-		unit_models.probability_sigma,
-		unit_models.hazard,
-		unit_models.incentives_months,
-		unit_models.incentives_percent,
-		unit_models.fitout_costs,
-		unit_models.discount_rate
-	from entity_model
-	join entity on entity_model.entityID = entity.masterID
-	join unit_models on entity_model.masterID = unit_models.entity_model_ID
-	where unit_models.unit_name like "%GLA%"
+		select 
+			entity_model.masterID,
+			entity_model.name,
+			entity_model.entityID,
+			entity_model.version,
+			entity_model.start_month,
+			entity_model.start_year,
+			entity_model.sales_month,
+			entity_model.sales_year,
+			entity_model.cpi_short_rate,
+			entity_model.cpi_short_rate_sigma,
+			entity_model.cpi_short_period,
+			entity_model.cpi_short_period_sigma,
+			entity_model.cpi_transition,
+			entity_model.cpi_transition_sigma,
+			entity_model.cpi_long_rate,
+			entity_model.cpi_long_rate_sigma, 
+			entity_model.erv_short_rate, 
+			entity_model.erv_short_rate_sigma, 
+			entity_model.erv_short_period, 
+			entity_model.erv_short_period_sigma, 
+			entity_model.erv_transtion, 
+			entity_model.erv_transition_sigma, 
+			entity_model.erv_long_rate, 
+			entity_model.erv_long_rate_sigma, 
+			entity_model.entry_yield, 
+			entity_model.yield_shift, 
+			entity_model.yield_shift_sigma, 
+			entity_model.rett, 
+			entity_model.vat, 
+			entity_model.woz, 
+			entity_model.depr_period, 
+			entity_model.land_value, 
+			entity_model.carryback_yrs, 
+			entity_model.carryforward_yrs, 
+		/*		entity_model.opex_percent, 
+			entity_model.opex_sigma, 
+		*/		entity_model.strategy, 
+		/*		entity_model.fees, 
+		*/		entity_model.balloon,
+			entity_model.uom,
+			entity_model.sims,
+			entity_model.valuation_method,
+			entity_model.discount_rate,
+			entity_model.acq_price,
+			entity.entity_type,
+			unit_models.incomeToSell,
+			unit_models.masterID,
+			unit_models.void,
+			unit_models.void_sigma,
+			unit_models.ext_dur,
+			unit_models.rent_revision_erv,
+			unit_models.probability,
+			unit_models.probability_sigma,
+			unit_models.hazard,
+		/*		unit_models.incentives_months,
+			unit_models.incentives_percent,
+			unit_models.fitout_costs,
+		*/		unit_models.discount_rate
+		from entity_model
+		left outer join entity on entity_model.entityID = entity.masterID
+		left outer join unit_models on entity_model.masterID = unit_models.entity_model_ID
+		where unit_models.unit_name like "%GLA%"
 	`
 	if entitymodel != 0 {
 		query = query + `where entity_model.masterID = ` + fmt.Sprint(entitymodel)
@@ -141,6 +141,7 @@ func CreateEntityModels(db *sql.DB, entitymodel int) {
 	if err1 != nil {
 		fmt.Println("CreateEntityModels: ", err1)
 	}
+	defer entityModelRows.Close()
 	for entityModelRows.Next() {
 		tempModel := &EntityModel{}
 		cpi := HModel{}
@@ -181,12 +182,10 @@ func CreateEntityModels(db *sql.DB, entitymodel int) {
 			&tempModel.Tax.LandValue,
 			&tempModel.Tax.CarryBackYrs,
 			&tempModel.Tax.CarryForwardYrs,
-			&tempModel.DebtInput.LTV,
-			&tempModel.DebtInput.InterestRate,
-			&tempModel.OpEx.PercentOfTRI,
-			&tempModel.MCSetup.OpEx,
+			// &tempModel.OpEx.PercentOfTRI,
+			// &tempModel.MCSetup.OpEx,
 			&tempModel.Strategy,
-			&tempModel.Fees.PercentOfGAV,
+			// &tempModel.Fees.PercentOfGAV,
 			&tempModel.BalloonPercent,
 			&tempModel.UOM,
 			&tempModel.MCSetup.Sims,
@@ -195,6 +194,7 @@ func CreateEntityModels(db *sql.DB, entitymodel int) {
 			&tempModel.Valuation.AcqPrice,
 			&entityType,
 			&tempModel.GLA.PercentSoldRent,
+			&tempModel.GLA.MasterID,
 			&tempModel.GLA.Void,
 			&tempModel.MCSetup.Void,
 			&tempModel.GLA.EXTDuration,
@@ -202,9 +202,9 @@ func CreateEntityModels(db *sql.DB, entitymodel int) {
 			&tempModel.GLA.Probability,
 			&tempModel.MCSetup.Probability,
 			&tempModel.GLA.Default.Hazard,
-			&tempModel.GLA.RentIncentives.Duration,
-			&tempModel.GLA.RentIncentives.PercentOfContractRent,
-			&tempModel.GLA.FitOutCosts.AmountPerTotalArea,
+			// &tempModel.GLA.RentIncentives.Duration,
+			// &tempModel.GLA.RentIncentives.PercentOfContractRent,
+			// &tempModel.GLA.FitOutCosts.AmountPerTotalArea,
 			&tempModel.GLA.DiscountRate,
 		)
 		if err != nil {
@@ -224,9 +224,13 @@ func CreateEntityModels(db *sql.DB, entitymodel int) {
 		// tempModel.HoldPeriod = dateintdiff(tempModel.SalesDate.Dateint, tempModel.StartDate.Dateint) / 12
 		tempModel.EndDate = Dateadd(tempModel.SalesDate, 60)
 		tempModel.Growth = map[string]map[int]float64{}
-		tempModel.Capex = map[int]CostInput{}
+		tempModel.CostInput = make(map[string]CostInput)
+		tempModel.CostInput = CreateCosts(DB, tempModel.MasterID, "entity")
+		tempModel.GLA.CostInput = make(map[string]CostInput)
+		tempModel.GLA.CostInput = CreateCosts(DB, tempModel.GLA.MasterID, "unit")
 		tempModel.Tax.DTA = map[int]float64{}
 		tempModel.COA = map[int]FloatCOA{}
+		tempModel.DebtInput = CreateLoans(DB, tempModel.MasterID)
 		EntityModelsMap[tempModel.MasterID] = EntityMutex{
 			Mutex:       &sync.Mutex{},
 			EntityModel: tempModel,
@@ -272,12 +276,13 @@ func CreateUnitModels(db *sql.DB, entitymodel int, unitmodel int) {
 		"unit_models"."probability", 
 		"unit_models"."probability_sigma", 
 		"unit_models"."hazard", 
-		"unit_models"."incentives_months", 
+/*		"unit_models"."incentives_months", 
 		"unit_models"."incentives_percent", 
 		"unit_models"."fitout_costs", 
-		"unit_models"."discount_rate"
+*/		"unit_models"."discount_rate"
 	from unit_models 
-	where unit_models.unit_name not like "%GLA%"
+	where unit_models.unit_name not like "%GLA%" 
+	and unit_models.masterID <> 0
 	`
 	if entitymodel != 0 {
 		query = query + `and entity_model_ID = ` + fmt.Sprint(entitymodel)
@@ -289,6 +294,7 @@ func CreateUnitModels(db *sql.DB, entitymodel int, unitmodel int) {
 	if err1 != nil {
 		fmt.Println("CreateUnitModels: ", err1)
 	}
+	defer unitmodelrows.Close()
 	for unitmodelrows.Next() {
 		tempUnitModel := UnitModel{}
 		entityModelInt := 0
@@ -313,9 +319,9 @@ func CreateUnitModels(db *sql.DB, entitymodel int, unitmodel int) {
 			&tempUnitModel.Probability,
 			&tempUnitModel.MCSetup.Probability,
 			&tempUnitModel.Default.Hazard,
-			&tempUnitModel.RentIncentives.Duration,
-			&tempUnitModel.RentIncentives.PercentOfContractRent,
-			&tempUnitModel.FitOutCosts.AmountPerTotalArea,
+			// &tempUnitModel.RentIncentives.Duration,
+			// &tempUnitModel.RentIncentives.PercentOfContractRent,
+			// &tempUnitModel.FitOutCosts.AmountPerTotalArea,
 			&tempUnitModel.DiscountRate,
 		)
 		if err != nil {
@@ -347,24 +353,26 @@ func CreateUnitModels(db *sql.DB, entitymodel int, unitmodel int) {
 			tempUnitModel.EXTDuration = parent.GLA.EXTDuration
 		}
 		tempUnitModel.IndexDetails = parent.GLA.IndexDetails
-		if tempUnitModel.RentIncentives.Duration == -1 {
-			tempUnitModel.RentIncentives.Duration = parent.GLA.RentIncentives.Duration
-		}
-		if tempUnitModel.RentIncentives.PercentOfContractRent == -1 {
-			tempUnitModel.RentIncentives.PercentOfContractRent = parent.GLA.RentIncentives.PercentOfContractRent
-		}
+		// if tempUnitModel.RentIncentives.Duration == -1 {
+		// 	tempUnitModel.RentIncentives.Duration = parent.GLA.RentIncentives.Duration
+		// }
+		// if tempUnitModel.RentIncentives.PercentOfContractRent == -1 {
+		// 	tempUnitModel.RentIncentives.PercentOfContractRent = parent.GLA.RentIncentives.PercentOfContractRent
+		// }
 		if tempUnitModel.Void == -1 {
 			tempUnitModel.Void = parent.GLA.Void
 		}
-		if tempUnitModel.FitOutCosts.AmountPerTotalArea == -1 {
-			tempUnitModel.FitOutCosts.AmountPerTotalArea = parent.GLA.FitOutCosts.AmountPerTotalArea
-		}
+		// if tempUnitModel.FitOutCosts.AmountPerTotalArea == -1 {
+		// 	tempUnitModel.FitOutCosts.AmountPerTotalArea = parent.GLA.FitOutCosts.AmountPerTotalArea
+		// }
 		if tempUnitModel.DiscountRate == -1 {
 			tempUnitModel.DiscountRate = parent.GLA.DiscountRate
 		}
 		if tempUnitModel.UnitStatus == "Vacant" {
 			tempUnitModel.LeaseExpiryDate = Dateadd(parent.StartDate, tempUnitModel.EXTDuration)
 		}
+		tempUnitModel.CostInput = make(map[string]CostInput)
+		tempUnitModel.CostInput = CreateCosts(DB, tempUnitModel.MasterID, "unit")
 		// create datetypes
 		tempUnitModel.LeaseStartDate.Add(0)
 		tempUnitModel.LeaseExpiryDate.Add(0)
@@ -375,25 +383,178 @@ func CreateUnitModels(db *sql.DB, entitymodel int, unitmodel int) {
 	}
 }
 
+// CreateLoans - em is the MasterID for the EntityModel
+func CreateLoans(db *sql.DB, em int) (loanArray []DebtInput) {
+	query := `
+		select
+			"masterID",
+			"ltv",
+			"loan_amount", 
+			"fixed_rate",
+			"interest_type", 
+			"loan_type", 
+			"loan_start_month", 
+			"loan_start_year", 
+			"loan_end_month",
+			"loan_end_year", 
+			"float_basis", 
+			"spread", 
+			"amortization_period", 
+			"active",
+			"loan_basis"
+		from debt where entity_model_id = 
+		`
+	loans, err := db.Query(query + fmt.Sprint(em))
+	if err != nil {
+		fmt.Println("CreateLoan.Query: ", err)
+	}
+	tempLoan := DebtInput{}
+	defer loans.Close()
+	for loans.Next() {
+		err2 := loans.Scan(
+			&tempLoan.MasterID,
+			&tempLoan.LTV,
+			&tempLoan.Amount,
+			&tempLoan.InterestRate,
+			&tempLoan.InterestType,
+			&tempLoan.LoanType,
+			&tempLoan.LoanStart.Month,
+			&tempLoan.LoanStart.Year,
+			&tempLoan.LoanEnd.Month,
+			&tempLoan.LoanEnd.Year,
+			&tempLoan.FloatBasis,
+			&tempLoan.Spread,
+			&tempLoan.AmortizationPeriod,
+			&tempLoan.Active,
+			&tempLoan.LoanBasis,
+		)
+		if err2 != nil {
+			fmt.Println("CreateLoan.Scan: ", err2)
+		}
+		// tempLoan.LoanStart.Add(0)
+		// tempLoan.LoanEnd.Add(0)
+		loanArray = append(loanArray, tempLoan)
+	}
+	return loanArray
+}
+
+// CreateCapex - model is the MasterID for the EntityModel OR UnitModel, modelType is either "entity" or "unit"
+func CreateCosts(db *sql.DB, masterID int, modelType string) (capexMap map[string]CostInput) {
+	capexMap = make(map[string]CostInput)
+	query := `
+		select
+			"masterID",
+			"name",
+			"type",
+			"name",
+			"amount",
+			"coa_item_basis",
+			"coa_item_target", 
+			"duration", 
+			"start_month", 
+			"start_year",
+			"start_event",
+			"end_month", 
+			"end_year", 
+			"end_event",
+			"growth_item"
+		from cost where
+		`
+	modelTypeQuery := ""
+	switch modelType {
+	case "entity":
+		modelTypeQuery = ` entity_modelID = ` + fmt.Sprint(masterID)
+	case "unit":
+		modelTypeQuery = ` unit_modelID = ` + fmt.Sprint(masterID)
+	}
+	tempCost := CostInput{}
+	name := ""
+	costs, err := db.Query(query + modelTypeQuery)
+	if err != nil {
+		fmt.Println("CreateCosts.Query: ", err)
+		fmt.Println(query + modelTypeQuery)
+	}
+	defer costs.Close()
+	for costs.Next() {
+		err2 := costs.Scan(
+			&tempCost.MasterID,
+			&tempCost.Name,
+			&tempCost.Type,
+			&name,
+			&tempCost.Amount,
+			&tempCost.COAItemBasis,
+			&tempCost.COAItemTarget,
+			&tempCost.Duration,
+			&tempCost.Start.Month,
+			&tempCost.Start.Year,
+			&tempCost.StartEvent,
+			&tempCost.End.Month,
+			&tempCost.End.Year,
+			&tempCost.EndEvent,
+			&tempCost.GrowthItem,
+		)
+		if err2 != nil {
+			fmt.Println("CreateCosts.Scan: ", err2)
+		}
+		tempCost.Start.Add(0)
+		tempCost.End.Add(0)
+		capexMap[name] = tempCost
+	}
+	return capexMap
+}
+
+// YearlyRates - currently not called
+func YearlyRates(db *sql.DB, loanID int) (result IntFloatMap) {
+	result = make(IntFloatMap)
+	query := `
+		select
+			period,
+			rate
+		from yearly_rates
+		where loanID = 
+	`
+	rates, err := db.Query(query + fmt.Sprint(loanID))
+	if err != nil {
+		fmt.Println("YearlyRates.Query: ", err)
+	}
+	defer rates.Close()
+	for rates.Next() {
+		period := 0
+		value := 0.0
+		err2 := rates.Scan(
+			&period,
+			&value,
+		)
+		if err2 != nil {
+			fmt.Println("YearlyRates.Scan: ", err2)
+		}
+		result[period] = value
+	}
+	return result
+}
+
 // DBAssociations - Reads from entity_model_associations table, and then adds relevant entries to EntityModelsMap
 func DBAssociations(db *sql.DB) {
 	associations, err1 := db.Query(`
-	select parent, child, ownership from entity_model_associations
+	select masterID, parent, child, ownership from entity_model_associations
 	`)
 	if err1 != nil {
-		fmt.Println(err1)
+		fmt.Println("DBAssociations.Query: ", err1)
 	}
+	defer associations.Close()
 	for associations.Next() {
 		parent := 0
 		child := 0
 		ownership := 0.0
+		masterID := 0
 		err := associations.Scan(
+			&masterID,
 			&parent,
 			&child,
 			&ownership,
 		)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("DBAssociations.Scan", err)
 		}
 		EntityModelsMap[parent].EntityModel.ChildEntityModels[child] = EntityModelsMap[child].EntityModel
 		EntityModelsMap[child].EntityModel.Parent = EntityModelsMap[parent].EntityModel
@@ -401,28 +562,38 @@ func DBAssociations(db *sql.DB) {
 	}
 }
 
-// UpdateEntityModel -
-func (e *EntityModel) UpdateEntityModel() {
-	e.WriteDBEntityModel(DB)
+// UpdateEntityModel - dbWrite determines if the EntityModel is written back to the db.
+// UnitModels are always queried from the db, and then EntityModelCalc is executed
+func (e *EntityModel) UpdateEntityModel(dbWrite bool) {
+	if dbWrite {
+		e.WriteDBEntityModel(DB)
+	}
 	CreateUnitModels(DB, e.MasterID, 0)
 	e.EntityModelCalc(false, "Internal")
 }
 
-// WriteDBEntityModel - writes changes to the entity_model table for a specific entity model
+// WriteDBEntityModel - writes changes to the entity_model table, unit_model table and debt table for a specific entity model
 func (e *EntityModel) WriteDBEntityModel(db *sql.DB) {
-	queryEntityModel := "update entity_model set start_month = " + fmt.Sprint(e.StartDate.Month) + " , start_year = " + fmt.Sprint(e.StartDate.Year) + " , sales_month = " + fmt.Sprint(e.SalesDate.Month) + " , sales_year = " + fmt.Sprint(e.SalesDate.Year) + " , entry_yield = " + fmt.Sprint(e.Valuation.EntryYield) + " , valuation_method = '" + fmt.Sprint(e.Valuation.Method) + "' , yield_shift = " + fmt.Sprint(e.Valuation.YieldShift) + " , yield_shift_sigma = " + fmt.Sprint(e.MCSetup.YieldShift) + " , rett = " + fmt.Sprint(e.Tax.RETT) + " , vat = " + fmt.Sprint(e.Tax.VAT) + " , woz = " + fmt.Sprint(e.Tax.MinValue) + " , depr_period = " + fmt.Sprint(e.Tax.UsablePeriod) + " , land_value = " + fmt.Sprint(e.Tax.LandValue) + " , carryback_yrs = " + fmt.Sprint(e.Tax.CarryBackYrs) + " , carryforward_yrs = " + fmt.Sprint(e.Tax.CarryForwardYrs) + " , ltv = " + fmt.Sprint(e.DebtInput.LTV) + " , loan_rate = " + fmt.Sprint(e.DebtInput.InterestRate) + " , opex_percent = " + fmt.Sprint(e.OpEx.PercentOfTRI) + " , opex_sigma = " + fmt.Sprint(e.MCSetup.OpEx) + " , strategy = '" + fmt.Sprint(e.Strategy) + "' , fees = " + fmt.Sprint(e.Fees.PercentOfGAV) + " , balloon = " + fmt.Sprint(e.BalloonPercent) + " , sims = " + fmt.Sprint(e.MCSetup.Sims) + " where masterID = " + fmt.Sprint(e.MasterID)
+	queryEntityModel := "update entity_model set start_month = " + fmt.Sprint(e.StartDate.Month) + " , start_year = " + fmt.Sprint(e.StartDate.Year) + " , sales_month = " + fmt.Sprint(e.SalesDate.Month) + " , sales_year = " + fmt.Sprint(e.SalesDate.Year) + " , entry_yield = " + fmt.Sprint(e.Valuation.EntryYield) + " , acq_price = " + fmt.Sprint(e.Valuation.AcqPrice) + " , valuation_method = '" + fmt.Sprint(e.Valuation.Method) + "' , yield_shift = " + fmt.Sprint(e.Valuation.YieldShift) + " , yield_shift_sigma = " + fmt.Sprint(e.MCSetup.YieldShift) + " , rett = " + fmt.Sprint(e.Tax.RETT) + " , vat = " + fmt.Sprint(e.Tax.VAT) + " , woz = " + fmt.Sprint(e.Tax.MinValue) + " , depr_period = " + fmt.Sprint(e.Tax.UsablePeriod) + " , land_value = " + fmt.Sprint(e.Tax.LandValue) + " , carryback_yrs = " + fmt.Sprint(e.Tax.CarryBackYrs) + " , carryforward_yrs = " + fmt.Sprint(e.Tax.CarryForwardYrs) + " , strategy = '" + fmt.Sprint(e.Strategy) + "' , balloon = " + fmt.Sprint(e.BalloonPercent) + " , sims = " + fmt.Sprint(e.MCSetup.Sims) + " where masterID = " + fmt.Sprint(e.MasterID) // + " , opex_percent = " + fmt.Sprint(e.OpEx.PercentOfTRI) + " , opex_sigma = " + fmt.Sprint(e.MCSetup.OpEx) + "' , fees = " + fmt.Sprint(e.Fees.PercentOfGAV)
 	_, err := DB.Exec(queryEntityModel)
 	if err != nil {
 		fmt.Println("WriteDBEntityModel.queryEntityModel: ", err)
 		fmt.Println(queryEntityModel)
 	}
-	queryUnitModel := "update unit_models set incomeToSell = " + fmt.Sprint(e.GLA.PercentSoldRent) + " , void = " + fmt.Sprint(e.GLA.Void) + " , void_sigma = " + fmt.Sprint(e.MCSetup.Void) + " , ext_dur = " + fmt.Sprint(e.GLA.EXTDuration) + " , rent_revision_erv = " + fmt.Sprint(e.GLA.RentRevisionERV) + " , probability = " + fmt.Sprint(e.GLA.Probability) + " , probability_sigma = " + fmt.Sprint(e.MCSetup.Probability) + " , hazard = " + fmt.Sprint(e.GLA.Default.Hazard) + " , incentives_months = " + fmt.Sprint(e.GLA.RentIncentives.Duration) + " , incentives_percent = " + fmt.Sprint(e.GLA.RentIncentives.PercentOfContractRent) + " , fitout_costs = " + fmt.Sprint(e.GLA.FitOutCosts.AmountPerTotalArea) + " , discount_rate = " + fmt.Sprint(e.GLA.DiscountRate) + ` where unit_name like "%GLA%" and entity_model_ID = ` + fmt.Sprint(e.MasterID)
+	queryUnitModel := "update unit_models set incomeToSell = " + fmt.Sprint(e.GLA.PercentSoldRent) + " , void = " + fmt.Sprint(e.GLA.Void) + " , void_sigma = " + fmt.Sprint(e.MCSetup.Void) + " , ext_dur = " + fmt.Sprint(e.GLA.EXTDuration) + " , rent_revision_erv = " + fmt.Sprint(e.GLA.RentRevisionERV) + " , probability = " + fmt.Sprint(e.GLA.Probability) + " , probability_sigma = " + fmt.Sprint(e.MCSetup.Probability) + " , hazard = " + fmt.Sprint(e.GLA.Default.Hazard) + " , discount_rate = " + fmt.Sprint(e.GLA.DiscountRate) + ` where unit_name like "%GLA%" and entity_model_ID = ` + fmt.Sprint(e.MasterID) // + " , incentives_percent = " + fmt.Sprint(e.GLA.RentIncentives.PercentOfContractRent) + " , fitout_costs = " + fmt.Sprint(e.GLA.FitOutCosts.AmountPerTotalArea)+ " , incentives_months = " + fmt.Sprint(e.GLA.RentIncentives.Duration)
 	_, err2 := DB.Exec(queryUnitModel)
 	if err2 != nil {
-		fmt.Println("WriteDBEntityModel.queryUnitModel: ", err)
-		// fmt.Println(queryUnitModel)
+		fmt.Println("WriteDBEntityModel.queryUnitModel: ", err2)
+		fmt.Println(queryUnitModel)
 	}
-
+	for _, loan := range e.DebtInput {
+		queryDebt := "update debt set ltv = " + fmt.Sprint(loan.LTV) + " , loan_amount = " + fmt.Sprint(loan.Amount) + " , loan_type = " + fmt.Sprint("'", loan.LoanType, "'") + " , fixed_rate = " + fmt.Sprint(loan.InterestRate) + " , interest_type = " + fmt.Sprint("'", loan.InterestType, "'") + " , loan_start_month = " + fmt.Sprint(loan.LoanStart.Month) + " , loan_start_year = " + fmt.Sprint(loan.LoanStart.Year) + " , loan_end_month = " + fmt.Sprint(loan.LoanEnd.Month) + " , loan_end_year = " + fmt.Sprint(loan.LoanEnd.Year) + " , float_basis = " + fmt.Sprint("'", loan.FloatBasis, "'") + " , spread = " + fmt.Sprint(loan.Spread) + " , active = " + fmt.Sprint("'", loan.Active, "'") + " , amortization_period = " + fmt.Sprint(loan.AmortizationPeriod) + " where masterID = " + fmt.Sprint(loan.MasterID)
+		_, err3 := DB.Exec(queryDebt)
+		if err3 != nil {
+			fmt.Println("WriteDBEntityModel.queryDebt: ", err3)
+			fmt.Println(queryDebt)
+		}
+	}
 }
 
 // WriteDBUnitModelSingleValue - updates a particular value for a specific unit, then updates the units map
@@ -432,6 +603,32 @@ func WriteDBUnitModelSingleValue(unit int, field string, value string) {
 	_, err := DB.Exec(query)
 	if err != nil {
 		fmt.Println("WriteDBUnitModelSingleValue: ", err)
+		fmt.Println(query)
 	}
 	CreateUnitModels(DB, 0, unit)
+}
+
+// creates a new unit model
+func (u *UnitModel) WriteDBUnitModel() {
+	query :=
+		`insert into unit_models (
+			"unit_name", 
+			"entity_model_ID", 
+			"lease_start_month", 
+			"lease_start_year", 
+			"lease_end_month", 
+			"lease_end_year", 
+			"unit_status", 
+			"tenant", 
+			"passing_rent", 
+			"erv_area", 
+			"erv_amount")
+			values(`
+	s := string("' , '")
+	query = query + fmt.Sprint(" '", u.Name, s, u.Parent.MasterID, s, u.LeaseStartDate.Month, s, u.LeaseStartDate.Year, s, u.LeaseExpiryDate.Month, s, u.LeaseExpiryDate.Year, s, u.UnitStatus, s, u.Tenant, s, u.PassingRent, s, u.ERVArea, s, u.ERVAmount, "' );")
+	_, err := DB.Exec(query)
+	if err != nil {
+		fmt.Println("WriteDBUnitModel: ", err)
+		fmt.Println(query)
+	}
 }

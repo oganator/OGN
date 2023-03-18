@@ -5,8 +5,9 @@ func (e *EntityModel) EntityModelCalc(mc bool, compute string) {
 	e.HoldPeriod = dateintdiff(e.SalesDate.Dateint, e.StartDate.Dateint)
 	e.EndDate = Dateadd(e.SalesDate, 144)
 	e.GrowthCalc(mc)
+	// e.CostMapSetup()
+	e.Merge()
 	e.AssetRentCalc(mc, compute)
-	// e.Valuation.Method = "DCF"
 	e.Valuation.IncomeCapSetup = FloatCOA{TotalERV: 1}
 	switch e.Valuation.Method {
 	case "DirectCap":
@@ -14,8 +15,14 @@ func (e *EntityModel) EntityModelCalc(mc bool, compute string) {
 	case "DCF":
 		e.DCFCalc()
 	}
+	for i := range e.DebtInput {
+		e.DebtInput[i].TempRate = e.DebtInput[i].InterestRate
+		e.DebtInput[i].COA = make(IntFloatCOAMap)
+		e.DebtInput[i].LoanStart = Dateadd(e.DebtInput[i].LoanStart, 0)
+		e.DebtInput[i].LoanEnd = Dateadd(e.DebtInput[i].LoanEnd, 0)
+		e.DebtInput[i].LastIndex = Dateadd(e.DebtInput[i].LoanStart, 0)
+	}
 	e.Acquisition()
-	// e.DebtCalc()
 	e.PropertyCFCalc()
 	e.Disposal()
 	e.SumCOA()
@@ -26,19 +33,19 @@ func (e *EntityModel) EntityModelCalc(mc bool, compute string) {
 		coas := BoolCOA{
 			MarketValue:             true,
 			TotalERV:                true,
-			OccupiedERV:             false,
-			VacantERV:               false,
-			TopSlice:                false,
-			TotalArea:               false,
-			OccupiedArea:            false,
-			VacantArea:              false,
+			OccupiedERV:             true,
+			VacantERV:               true,
+			TopSlice:                true,
+			TotalArea:               true,
+			OccupiedArea:            true,
+			VacantArea:              true,
 			PassingRent:             true,
 			Indexation:              true,
 			TheoreticalRentalIncome: true,
 			BPUplift:                true,
 			Vacancy:                 true,
 			ContractRent:            true,
-			RentFree:                false,
+			RentFree:                true,
 			TurnoverRent:            false,
 			MallRent:                false,
 			ParkingIncome:           false,
@@ -46,18 +53,19 @@ func (e *EntityModel) EntityModelCalc(mc bool, compute string) {
 			OperatingIncome:         false,
 			OperatingExpenses:       true,
 			NetOperatingIncome:      true,
-			AcqDispProperty:         true,
-			AcqDispCosts:            false,
-			LoanProceeds:            false,
-			InterestExpense:         true,
-			LoanBalance:             false,
-			Debt:                    false,
-			Tax:                     true,
-			TaxableIncome:           false,
-			TaxableIncomeCarryBack:  false,
-			DTA:                     false,
-			Depreciation:            false,
 			Capex:                   true,
+			AcqDispProperty:         true,
+			AcqDispCosts:            true,
+			LoanProceeds:            true,
+			InterestExpense:         true,
+			PrincipalRepayment:      true,
+			LoanBalance:             true,
+			Debt:                    true,
+			Tax:                     true,
+			TaxableIncome:           true,
+			TaxableIncomeCarryBack:  true,
+			DTA:                     true,
+			Depreciation:            true,
 			Fees:                    true,
 			NetCashFlow:             true,
 			CashBalance:             true,

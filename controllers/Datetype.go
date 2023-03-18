@@ -76,7 +76,7 @@ func (date *Datetype) Add(n int) {
 	*date = Dateadd(*date, n)
 }
 
-//a - b
+// a - b
 func dateintdiff(a, b int) (result int) {
 	aa := strconv.Itoa(a)
 	bb := strconv.Itoa(b)

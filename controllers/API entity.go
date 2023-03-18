@@ -75,9 +75,9 @@ func (c *ViewEntityController) Post() {
 	EntityDataStore[key].GLA.EXTDuration = GetInt(c, "duration")
 	EntityDataStore[key].GLA.RentRevisionERV = GetFloat(c, "rentrevision") / 100
 	EntityDataStore[key].GLA.Probability = GetFloat(c, "probability") / 100
-	EntityDataStore[key].GLA.RentIncentives.Duration = GetInt(c, "incentivemonths")
-	EntityDataStore[key].GLA.RentIncentives.PercentOfContractRent = GetFloat(c, "incentivepercent") / 100
-	EntityDataStore[key].GLA.FitOutCosts.AmountPerTotalArea = GetFloat(c, "fitoutcosts")
+	// EntityDataStore[key].GLA.RentIncentives.Duration = GetInt(c, "incentivemonths")
+	// EntityDataStore[key].GLA.RentIncentives.PercentOfContractRent = GetFloat(c, "incentivepercent") / 100
+	// EntityDataStore[key].GLA.FitOutCosts.AmountPerTotalArea = GetFloat(c, "fitoutcosts")
 	EntityDataStore[key].OpExpercent = GetFloat(c, "opex") / 100
 	EntityDataStore[key].Fees = GetFloat(c, "fees")
 	EntityDataStore[key].GLA.Default.Hazard = GetFloat(c, "hazard") / 100

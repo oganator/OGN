@@ -160,10 +160,9 @@ func GetFloatAddChildUnit(c *AddChildUnitController, field string) (result float
 
 // Post -
 func (c *AddChildUnitController) Post() {
-	temp := make(map[interface{}]interface{})
-	unit := UnitModelData{}
+	unit := UnitModel{}
 	parentmasterid := AssetModelsList[GetStringAddChildUnit(c, "parent")]
-	unit.ParentMasterID = parentmasterid
+	unit.Parent = EntityModelsMap[parentmasterid].EntityModel
 	unit.Name = GetStringAddChildUnit(c, "unitname")
 	unit.Tenant = GetStringAddChildUnit(c, "tenant")
 	if unit.Tenant == "" {
@@ -172,24 +171,19 @@ func (c *AddChildUnitController) Post() {
 		unit.UnitStatus = "Occupied"
 	}
 	unit.PassingRent = GetFloatAddChildUnit(c, "rent")
-	unit.LeaseStartMonth = GetIntAddChildUnit(c, "startmonth")
-	unit.LeaseStartYear = GetIntAddChildUnit(c, "startyear")
-	unit.LeaseEndMonth = GetIntAddChildUnit(c, "expirymonth")
-	unit.LeaseEndYear = GetIntAddChildUnit(c, "expiryyear")
+	unit.LeaseStartDate.Month = GetIntAddChildUnit(c, "startmonth")
+	unit.LeaseStartDate.Year = GetIntAddChildUnit(c, "startyear")
+	unit.LeaseExpiryDate.Month = GetIntAddChildUnit(c, "expirymonth")
+	unit.LeaseExpiryDate.Year = GetIntAddChildUnit(c, "expiryyear")
 	unit.ERVAmount = GetFloatAddChildUnit(c, "amount")
 	unit.ERVArea = GetFloatAddChildUnit(c, "area")
-	UnitStore[unit.MasterID] = unit
-	unit.WriteXLSXUnits()
-	EntityModelsMap[parentmasterid].Mutex.Lock()
-	EntityModelsMap[parentmasterid].EntityModel.CalculateModel(false, "Internal")
-	EntityModelsMap[parentmasterid].Mutex.Unlock()
+	Units[unit.MasterID] = unit
+	unit.WriteDBUnitModel()
+	// EntityModelsMap[parentmasterid].Mutex.Lock()
+	EntityModelsMap[parentmasterid].EntityModel.UpdateEntityModel(false)
+	// EntityModelsMap[parentmasterid].Mutex.Unlock()
 	//
-	c.TplName = "EntityView.tpl"
-	temp["entity"] = EntityModelsMap[parentmasterid].EntityModel
-	temp["modelslist"] = AssetModelsList
-	temp["fundslist"] = FundModelsList
-	// temp["baseURL"] = BaseURL
-	c.Data = temp
+	c.TplName = "test.tpl"
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -227,6 +221,6 @@ func (c *UpdateUnitController) Post() {
 	field := GetStringUpdateUnit(c, "field")
 	value := GetStringUpdateUnit(c, "value")
 	WriteDBUnitModelSingleValue(unit, field, value)
-	EntityModelsMap[Units[unit].Parent.MasterID].EntityModel.UpdateEntityModel()
+	EntityModelsMap[Units[unit].Parent.MasterID].EntityModel.UpdateEntityModel(false)
 	c.TplName = "test.tpl"
 }

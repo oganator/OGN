@@ -39,6 +39,7 @@ func (e *EntityModel) MakeTable(coas BoolCOA, quarterly bool, yearly bool) {
 	bpuplift := make(map[int]string)
 	loanproceeds := make(map[int]string)
 	interestexpense := make(map[int]string)
+	principalrepayments := make(map[int]string)
 	loanbalance := make(map[int]string)
 	netcashflow := make(map[int]string)
 	cashbalance := make(map[int]string)
@@ -81,6 +82,7 @@ func (e *EntityModel) MakeTable(coas BoolCOA, quarterly bool, yearly bool) {
 			bpuplift[date.Year] = RenderFloat("#,###.", e.COA[date.Year].BPUplift)
 			loanproceeds[date.Year] = RenderFloat("#,###.", e.COA[date.Year].LoanProceeds)
 			interestexpense[date.Year] = RenderFloat("#,###.", e.COA[date.Year].InterestExpense)
+			principalrepayments[date.Year] = RenderFloat("#,###.", e.COA[date.Year].PrincipalRepayment)
 			loanbalance[date.Year] = RenderFloat("#,###.", e.COA[date.Year].LoanBalance)
 			netcashflow[date.Year] = RenderFloat("#,###.", e.COA[date.Year].NetCashFlow)
 			blank[date.Year] = ""
@@ -124,6 +126,7 @@ func (e *EntityModel) MakeTable(coas BoolCOA, quarterly bool, yearly bool) {
 			bpuplift[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].BPUplift)
 			loanproceeds[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].LoanProceeds)
 			interestexpense[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].InterestExpense)
+			principalrepayments[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].PrincipalRepayment)
 			loanbalance[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].LoanBalance)
 			netcashflow[date.Dateint] = RenderFloat("#,###.", e.COA[date.Dateint].NetCashFlow)
 			blank[date.Dateint] = ""
@@ -323,6 +326,13 @@ func (e *EntityModel) MakeTable(coas BoolCOA, quarterly bool, yearly bool) {
 		}
 		e.Table = append(e.Table, x)
 	}
+	if coas.PrincipalRepayment == true {
+		x := TableJSON{
+			COA:   "Principal Repayment",
+			Value: principalrepayments,
+		}
+		e.Table = append(e.Table, x)
+	}
 	if coas.LoanBalance == true {
 		x := TableJSON{
 			COA:   "Loan Balance",
@@ -413,8 +423,9 @@ func (e *EntityModel) MakeTable(coas BoolCOA, quarterly bool, yearly bool) {
 
 // TableJSON -  used for output. Value is map[dateint]formattedvalue
 type TableJSON struct {
-	COA   string
-	Value IntStringMap
+	COA      string       `json:"COA,omitempty"`      //
+	Value    IntStringMap `json:"Value,omitempty"`    //
+	Selected bool         `json:"Selected,omitempty"` //
 }
 
 // IntStringMap - used for value field of TableJSON
@@ -449,6 +460,7 @@ type BoolCOA struct {
 	AcqDispCosts            bool `json:"AcqDispCosts,omitempty"`            //
 	LoanProceeds            bool `json:"LoanProceeds,omitempty"`            //
 	InterestExpense         bool `json:"InterestExpense,omitempty"`         //
+	PrincipalRepayment      bool `json:"PrincipalRepayment,omitempty"`      //
 	LoanBalance             bool `json:"LoanBalance,omitempty"`             //
 	Debt                    bool `json:"Debt,omitempty"`                    //
 	Tax                     bool `json:"Tax,omitempty"`                     //
@@ -492,7 +504,8 @@ type FloatCOA struct {
 	AcqDispCosts            float64 `json:"AcqDispCosts,omitempty"`            //
 	LoanProceeds            float64 `json:"LoanProceeds,omitempty"`            //
 	InterestExpense         float64 `json:"InterestExpense,omitempty"`         //
-	LoanBalance             float64 `json:"LoanBalance,omitempty"`             //
+	PrincipalRepayment      float64 `json:"PrincipalRepayment,omitempty"`      //
+	LoanBalance             float64 `json:"LoanBalance,omitempty"`             // Ending balance
 	Debt                    float64 `json:"Debt,omitempty"`                    //
 	Tax                     float64 `json:"Tax,omitempty"`                     //
 	TaxableIncome           float64 `json:"TaxableIncome,omitempty"`           //

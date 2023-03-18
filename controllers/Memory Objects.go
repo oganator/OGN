@@ -71,6 +71,8 @@ var Compute = "Internal" // Internal or Azure
 
 var InitVersion = ""
 
+var Debug = false
+
 type SimIDType struct {
 	Mutex *sync.Mutex
 	ID    int

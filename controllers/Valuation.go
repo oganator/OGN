@@ -47,6 +47,9 @@ func MonthlyDCFCalc(e *EntityModel, start Datetype, ch chan DateFloat) {
 		monthincome = monthincome / math.Pow(discount, i/12) // apply discount
 		i++
 		tempvalue = tempvalue + monthincome
+		if start.Dateint == e.SalesDate.Dateint {
+			e.Valuation.ExitYield = yield
+		}
 	}
 	ch <- DateFloat{Date: start, Float: tempvalue}
 }
@@ -60,8 +63,8 @@ type DateFloat struct {
 func (e *EntityModel) SumDCF(ch chan DateFloat) {
 	for v := range ch {
 		temp := FloatCOA{MarketValue: v.Float}
-		temp.Add(e.COA[v.Date.Dateint])
 		e.Mutex.Lock()
+		temp.Add(e.COA[v.Date.Dateint])
 		e.COA[v.Date.Dateint] = temp
 		e.Mutex.Unlock()
 	}

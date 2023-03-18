@@ -16,7 +16,9 @@ func (e *EntityModel) SumCOA() {
 		if date.Month == 1 {
 			x = FloatCOA{}
 		}
+		// e.Mutex.Lock()
 		x = SumCOAAcross(x, e.COA[date.Dateint])
+		// e.Mutex.Unlock()
 		if date.Month == 12 || date.Dateint == e.SalesDate.Dateint {
 			e.COA[date.Year] = x
 		}
@@ -27,7 +29,9 @@ func (e *EntityModel) SumCOA() {
 func (e *EntityModel) SumNCF() {
 	cashbalance := e.COA[Dateadd(e.StartDate, -1).Dateint].NetCashFlow
 	for date := e.StartDate; date.Dateint <= e.SalesDate.Dateint; date.Add(1) {
-		ncf := e.COA[date.Dateint].NetOperatingIncome + e.COA[date.Dateint].Capex + e.COA[date.Dateint].AcqDispProperty + e.COA[date.Dateint].AcqDispCosts + e.COA[date.Dateint].InterestExpense + e.COA[date.Dateint].Debt + e.COA[date.Dateint].Tax + e.COA[date.Dateint].Fees
+		e.Mutex.Lock()
+		ncf := e.COA[date.Dateint].NetOperatingIncome + e.COA[date.Dateint].Capex + e.COA[date.Dateint].AcqDispProperty + e.COA[date.Dateint].AcqDispCosts + e.COA[date.Dateint].Debt + e.COA[date.Dateint].Tax + e.COA[date.Dateint].Fees
+		e.Mutex.Unlock()
 		if date.Dateint == e.SalesDate.Dateint && e.Strategy == "Balloon" {
 			ncf = ncf + (e.COA[date.Dateint].BPUplift-e.COA[Dateadd(e.StartDate, -1).Dateint].BPUplift)*e.BalloonPercent
 		}
@@ -86,6 +90,7 @@ func AddCOA(x, y FloatCOA) FloatCOA {
 		AcqDispCosts:            x.AcqDispCosts + y.AcqDispCosts,
 		LoanProceeds:            x.LoanProceeds + y.LoanProceeds,
 		InterestExpense:         x.InterestExpense + y.InterestExpense,
+		PrincipalRepayment:      x.PrincipalRepayment + y.PrincipalRepayment,
 		LoanBalance:             x.LoanBalance + y.LoanBalance,
 		Debt:                    x.Debt + y.Debt,
 		Tax:                     x.Tax + y.Tax,
@@ -131,6 +136,7 @@ func MultiplyCOA(x, y FloatCOA) FloatCOA {
 		AcqDispCosts:            x.AcqDispCosts * y.AcqDispCosts,
 		LoanProceeds:            x.LoanProceeds * y.LoanProceeds,
 		InterestExpense:         x.InterestExpense * y.InterestExpense,
+		PrincipalRepayment:      x.PrincipalRepayment * y.PrincipalRepayment,
 		LoanBalance:             x.LoanBalance * y.LoanBalance,
 		Debt:                    x.Debt * y.Debt,
 		Tax:                     x.Tax * y.Tax,
@@ -176,7 +182,8 @@ func SumCOAAcross(x, y FloatCOA) FloatCOA {
 		AcqDispCosts:            x.AcqDispCosts + y.AcqDispCosts,
 		LoanProceeds:            x.LoanProceeds + y.LoanProceeds,
 		InterestExpense:         x.InterestExpense + y.InterestExpense,
-		LoanBalance:             x.LoanBalance + y.LoanBalance,
+		PrincipalRepayment:      x.PrincipalRepayment + y.PrincipalRepayment,
+		LoanBalance:             y.LoanBalance,
 		Debt:                    x.Debt + y.Debt,
 		Tax:                     x.Tax + y.Tax,
 		TaxableIncome:           x.TaxableIncome + y.TaxableIncome,
@@ -220,6 +227,7 @@ func SumCOADown(x FloatCOA) float64 {
 		x.AcqDispCosts +
 		x.LoanProceeds +
 		x.InterestExpense +
+		x.PrincipalRepayment +
 		x.LoanBalance +
 		x.Debt +
 		x.Tax +
@@ -245,12 +253,23 @@ func (coa *FloatCOA) Multiply(x FloatCOA) {
 }
 
 // ReturnCOAArray -
-func ReturnCOAArray(coa IntFloatCOAMap, setup FloatCOA, start, end Datetype) (array []float64) {
-	duration := dateintdiff(end.Dateint, start.Dateint)
+func ReturnCOAArray(coa IntFloatCOAMap, setup FloatCOA, start, end Datetype, yearly bool) (array []float64) {
+	duration := dateintdiff(end.Dateint, start.Dateint+1)
+	if yearly {
+		duration = end.Year - start.Year
+	}
 	array = make([]float64, duration)
+	date := start.Dateint
 	for i := 0; i < duration; i++ {
-		array[i] = SumCOADown(MultiplyCOA(coa[start.Dateint], setup))
-		start.Add(1)
+		if yearly {
+			date = start.Year
+		}
+		array[i] = SumCOADown(MultiplyCOA(coa[date], setup))
+		if yearly {
+			start.Year++
+		} else {
+			start.Add(1)
+		}
 	}
 	return array
 }

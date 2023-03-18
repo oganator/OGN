@@ -27,10 +27,11 @@ var ognApp = angular.module('ognApp', []);
 		$scope.mcdetailsorder = "";
 		$scope.path = [[.path]];
 		$scope.strategy = [[.entity.Strategy]];
+		$scope.coaSelection = [];
 
 		// getModels - gets the fund or asset models of a specified entity (not childEntityModels).
-		$scope.getModels = function(entity) {
-			$http.post("?entity="+entity).then(
+		$scope.getModels = async function(entity) {
+			await $http.post("?entity="+entity).then(
 				function successCallback(response) {
 					$scope.entityModelTableResponse = $sce.trustAsHtml(response.data);
 				},
@@ -56,16 +57,17 @@ var ognApp = angular.module('ognApp', []);
 		};
 
 		// getRequest - used to update the table (cf, irr...etc)
-		$scope.getRequest = function(route) {
+		$scope.getRequest = async function(route) {
 			var url = $scope.baseURL + "MCTabs?tab="
 			var entity = "&name="+$scope.entity
 			$scope.tableTab = route;
 			if (route == 'details'){
-				$scope.post($scope.baseURL + "MCDetails?name="+$scope.entity+"&page=1");
+				await $scope.post($scope.baseURL + "MCDetails?name="+$scope.entity+"&page=1");
 				$scope.mcdetailspage = 1;
 			} else {
-				$scope.post(url+route+entity);
+				await $scope.post(url+route+entity+"&coa="+$scope.coaSelection);
 			}
+			await $scope.getChart();
 		}; // /getRequest
 
 		// getSettings - gets settings tab
@@ -87,15 +89,16 @@ var ognApp = angular.module('ognApp', []);
 			await $scope.getSettings(entityModel);
 			if ($scope.tableTab == "units"){
 				await $scope.getUnitTable(-1);
+				await $scope.getChart();
 			}else {
 				await $scope.getRequest($scope.tableTab);
 			}
 		}; // /changeEntityModel
 
 		// getUnitTable - index is used for selecting the MC simulation, and getting its unit table
-		$scope.getUnitTable = function(index){
+		$scope.getUnitTable = async function(index){
 			$scope.tableTab = "units";
-			$http.post($scope.baseURL + "ViewUnitTable?name="+$scope.entity+"&index="+index).then(
+			await $http.post($scope.baseURL + "ViewUnitTable?name="+$scope.entity+"&index="+index).then(
 				function successCallback(response) {
 					// $scope.unittable = $sce.trustAsHtml(response.data);
 					$scope.response = $sce.trustAsHtml(response.data);
@@ -112,8 +115,8 @@ var ognApp = angular.module('ognApp', []);
 		}; // /updateSettingsTab
 
 		// get
-		$scope.get = function(url){
-			$http.get(url).then(
+		$scope.get = async function(url){
+			await $http.get(url).then(
 				function successCallback(response) {
 					$scope.response = $sce.trustAsHtml(response.data);
 				},
@@ -124,8 +127,8 @@ var ognApp = angular.module('ognApp', []);
 		}; // /get
 
 		// post
-		$scope.post = function(url){
-			$http.post(url).then(
+		$scope.post = async function(url){
+			await $http.post(url).then(
 				function successCallback(response) {
 					$scope.response = $sce.trustAsHtml(response.data);
 				},
@@ -136,10 +139,10 @@ var ognApp = angular.module('ognApp', []);
 		}; // /post
 
 		// viewCFIndex
-		$scope.viewCFIndex = function(index){
+		$scope.viewCFIndex = async function(index){
 			$scope.data = '';
 			var body = "?name="+$scope.entity+"&index="+index*$scope.mcdetailspage;
-			$http.post($scope.baseURL + "MCIndex"+body).then(
+			await $http.post($scope.baseURL + "MCIndex"+body).then(
 				function successCallback(response) {
 					$scope.data = $sce.trustAsHtml(response.data);
 				},
@@ -150,32 +153,32 @@ var ognApp = angular.module('ognApp', []);
 		}; // /viewCFIndex
 	   
 		// sortMCDetails
-		$scope.sortMCDetails = function(order){
+		$scope.sortMCDetails = async function(order){
 			if ($scope.mcdetailsorder == order){
 				order = order+"-r";
 			}
 			$scope.mcdetailsorder = order;
-			$scope.post($scope.baseURL + "MCDetails?name="+$scope.entity+"&page=1"+"&order="+order);
+			await $scope.post($scope.baseURL + "MCDetails?name="+$scope.entity+"&page=1"+"&order="+order);
 			$scope.mcdetailspage = 1;
 		}; // /sortMCDetails
 
 		// nextMCDetails
-		$scope.nextMCDetails = function(direction){
+		$scope.nextMCDetails = async function(direction){
 			if (direction === '+'){
 			$scope.mcdetailspage++;
 			} else if (direction === '-'){
 				$scope.mcdetailspage--;
 			}
-			$scope.post($scope.baseURL + "MCDetails?name="+$scope.entity+"&page="+$scope.mcdetailspage);
+			await $scope.post($scope.baseURL + "MCDetails?name="+$scope.entity+"&page="+$scope.mcdetailspage);
 		}; // /nextMCDetails
 
 		// getRentSchedule
-		$scope.getRentSchedule = function(unit, index){
+		$scope.getRentSchedule = async function(unit, index){
 			var url = $scope.baseURL + "ViewRentSchedule?unit="+unit+"&name="+$scope.entity+"&index="+index
 			if (typeof index == 'undefined'){
 				url = $scope.baseURL + "ViewRentSchedule?unit="+unit+"&name="+$scope.entity
 			}
-			$http.post(url).then(
+			await $http.post(url).then(
 				function successCallback(response) {
 					$scope.rentschedule = $sce.trustAsHtml(response.data);
 				},
@@ -186,8 +189,8 @@ var ognApp = angular.module('ognApp', []);
 		}; // /getRentSchedule
 
 		// getUnitCF
-		$scope.getUnitCF = function(unit){
-			$http.post($scope.baseURL + "ViewUnitCF?unit="+unit+"&name="+$scope.entity).then(
+		$scope.getUnitCF = async function(unit){
+			await $http.post($scope.baseURL + "ViewUnitCF?unit="+unit+"&name="+$scope.entity).then(
 				function successCallback(response) {
 					$scope.unitcf = $sce.trustAsHtml(response.data);
 				},
@@ -214,73 +217,171 @@ var ognApp = angular.module('ognApp', []);
 
 		// updateEntity - calls the Post method for ViewEntity2 controller
 		$scope.updateEntity = async function(entity){
-			var startmonth = document.getElementById("startmonth").value;
-			var startyear = document.getElementById("startyear").value;
-			var salesmonth = document.getElementById("salesmonth").value;
-			var salesyear = document.getElementById("salesyear").value;
-			var entryyield = (document.getElementById("entryyield")) ? document.getElementById("entryyield").value : "0";
-			var ltv = (document.getElementById("settings_ltv")) ? document.getElementById("settings_ltv").value : "0";
-			var rate = (document.getElementById("settings_rate")) ? document.getElementById("settings_rate").value : "0";
-			var discount = (document.getElementById("settings_discount")) ? document.getElementById("settings_discount").value : "0";
-			var soldrent = (document.getElementById("settings_soldrent")) ? document.getElementById("settings_soldrent").value : "0";
-			var strategy = (document.getElementById("strategy")) ? document.getElementById("strategy").value : "0";
-			var balpercent = (document.getElementById("settings_balpercent")) ? document.getElementById("settings_balpercent").value : "0";
-			var ervshorttermrate = (document.getElementById("ervshorttermrate")) ? document.getElementById("ervshorttermrate").value : "0";
-			var ervshorttermratesigma = (document.getElementById("ervshorttermratesigma")) ? document.getElementById("ervshorttermratesigma").value : "0";
-			var ervshorttermperiod = (document.getElementById("ervshorttermperiod")) ? document.getElementById("ervshorttermperiod").value : "0";
-			var ervshorttermperiodsigma = (document.getElementById("ervshorttermperiodsigma")) ? document.getElementById("ervshorttermperiodsigma").value : "0";
-			var ervtransitionperiod = (document.getElementById("ervtransitionperiod")) ? document.getElementById("ervtransitionperiod").value : "0";
-			var ervtransitionperiodsigma = (document.getElementById("ervtransitionperiodsigma")) ? document.getElementById("ervtransitionperiodsigma").value : "0";
-			var ervlongtermrate = (document.getElementById("ervlongtermrate")) ? document.getElementById("ervlongtermrate").value : "0";
-			var ervlongtermratesigma = (document.getElementById("ervlongtermratesigma")) ? document.getElementById("ervlongtermratesigma").value : "0";
-			var cpishorttermrate = (document.getElementById("cpishorttermrate")) ? document.getElementById("cpishorttermrate").value : "0";
-			var cpishorttermratesigma = (document.getElementById("cpishorttermratesigma")) ? document.getElementById("cpishorttermratesigma").value : "0";
-			var cpishorttermperiod = (document.getElementById("cpishorttermperiod")) ? document.getElementById("cpishorttermperiod").value : "0";
-			var cpishorttermperiodsigma = (document.getElementById("cpishorttermperiodsigma")) ? document.getElementById("cpishorttermperiodsigma").value : "0";
-			var cpitransitionperiod = (document.getElementById("cpitransitionperiod")) ? document.getElementById("cpitransitionperiod").value : "0";
-			var cpilongtermrate = (document.getElementById("cpilongtermrate")) ? document.getElementById("cpilongtermrate").value : "0";
-			var yieldshift = (document.getElementById("yieldshift")) ? document.getElementById("yieldshift").value : "0";
-			var valuationmethod = (document.getElementById("valuationmethod")) ? document.getElementById("valuationmethod").value : "0";
-			var discountrate = (document.getElementById("entitydiscountrate")) ? document.getElementById("entitydiscountrate").value : "0";
-			var void2 = (document.getElementById("void")) ? document.getElementById("void").value : "0";
-			var duration = (document.getElementById("duration")) ? document.getElementById("duration").value : "0";
-			var rentrevision = (document.getElementById("rentrevision")) ? document.getElementById("rentrevision").value : "0";
-			var probability = (document.getElementById("probability")) ? document.getElementById("probability").value : "0";
-			var incentivemonths = (document.getElementById("incentivemonths")) ? document.getElementById("incentivemonths").value : "0";
-			var incentivepercent = (document.getElementById("incentivepercent")) ? document.getElementById("incentivepercent").value : "0";
-			var fitoutcosts = (document.getElementById("fitoutcosts")) ? document.getElementById("fitoutcosts").value : "0";
-			var opex = (document.getElementById("settings_opex")) ? document.getElementById("settings_opex").value : "0";
-			var fees = (document.getElementById("settings_fees")) ? document.getElementById("settings_fees").value : "0";
-			var hazard = (document.getElementById("hazard")) ? document.getElementById("hazard").value : "0";
-			var rett = (document.getElementById("rett")) ? document.getElementById("rett").value : "0";
-			var landvalue = (document.getElementById("landvalue")) ? document.getElementById("landvalue").value : "0";
-			var minvalue = (document.getElementById("minvalue")) ? document.getElementById("minvalue").value : "0";
-			var usableperiod = (document.getElementById("usableperiod")) ? document.getElementById("usableperiod").value : "0";
-			var vat = (document.getElementById("vat")) ? document.getElementById("vat").value : "0";
-			var carrybackyrs = (document.getElementById("carrybackyrs")) ? document.getElementById("carrybackyrs").value : "0";
-			var carryforwardyrs = (document.getElementById("carryforwardyrs")) ? document.getElementById("carryforwardyrs").value : "0";
-			var sims = (document.getElementById("sims")) ? document.getElementById("sims").value : "0";
 			var a = "&";
 			var e = "=";
-			var params = a+"startmonth"+e+startmonth+a+"startyear"+e+startyear+a+"salesmonth"+e+salesmonth+a+"salesyear"+e+salesyear+a+"entryyield"+e+entryyield+a+"ltv"+e+ltv+a+"rate"+e+rate+a+"discount"+e+discount+a+"soldrent"+e+soldrent+a+"strategy"+e+strategy+a+"balpercent"+e+balpercent+a+"ervshorttermrate"+e+ervshorttermrate+a+"ervshorttermperiod"+e+ervshorttermperiod+a+"ervtransitionperiod"+e+ervtransitionperiod+a+"ervlongtermrate"+e+ervlongtermrate+a+"cpishorttermrate"+e+cpishorttermrate+a+"cpishorttermperiod"+e+cpishorttermperiod+a+"cpitransitionperiod"+e+cpitransitionperiod+a+"cpilongtermrate"+e+cpilongtermrate+a+"yieldshift"+e+yieldshift+a+"discountrate"+e+discountrate+a+"valuationmethod"+e+valuationmethod+a+"void"+e+void2+a+"duration"+e+duration+a+"rentrevision"+e+rentrevision+a+"probability"+e+probability+a+"incentivemonths"+e+incentivemonths+a+"incentivepercent"+e+incentivepercent+a+"fitoutcosts"+e+fitoutcosts+a+"opex"+e+opex+a+"fees"+e+fees+a+"hazard"+e+hazard+a+"rett"+e+rett+a+"landvalue"+e+landvalue+a+"minvalue"+e+minvalue+a+"usableperiod"+e+usableperiod+a+"vat"+e+vat+a+"carrybackyrs"+e+carrybackyrs+a+"carryforwardyrs"+e+carryforwardyrs+a+"sims"+e+sims
-			await $http.post($scope.baseURL + "ViewEntity2?name="+$scope.entity+params);
+			var paramString = ""
+			paramString = paramString.concat(a,"startmonth",e,document.getElementById("startmonth").value)
+			paramString = paramString.concat(a,"startyear",e,document.getElementById("startyear").value)
+			paramString = paramString.concat(a,"salesmonth",e,document.getElementById("salesmonth").value)
+			paramString = paramString.concat(a,"salesyear",e,document.getElementById("salesyear").value)
+			paramString = paramString.concat(a,"entryyield",e,(document.getElementById("entryyield")) ? document.getElementById("entryyield").value : "0")
+			paramString = paramString.concat(a,"ltv",e,(document.getElementById("settings_ltv")) ? document.getElementById("settings_ltv").value : "0")
+			paramString = paramString.concat(a,"rate",e,(document.getElementById("settings_rate")) ? document.getElementById("settings_rate").value : "0")
+			paramString = paramString.concat(a,"discount",e,(document.getElementById("settings_discount")) ? document.getElementById("settings_discount").value : "0")
+			paramString = paramString.concat(a,"soldrent",e,(document.getElementById("settings_soldrent")) ? document.getElementById("settings_soldrent").value : "0")
+			paramString = paramString.concat(a,"strategy",e,(document.getElementById("strategy")) ? document.getElementById("strategy").value : "0")
+			paramString = paramString.concat(a,"balpercent",e,(document.getElementById("settings_balpercent")) ? document.getElementById("settings_balpercent").value : "0")
+			paramString = paramString.concat(a,"ervshorttermrate",e,(document.getElementById("ervshorttermrate")) ? document.getElementById("ervshorttermrate").value : "0")
+			paramString = paramString.concat(a,"ervshorttermratesigma",e,(document.getElementById("ervshorttermratesigma")) ? document.getElementById("ervshorttermratesigma").value : "0")
+			paramString = paramString.concat(a,"ervshorttermperiod",e,(document.getElementById("ervshorttermperiod")) ? document.getElementById("ervshorttermperiod").value : "0")
+			paramString = paramString.concat(a,"ervshorttermperiodsigma",e,(document.getElementById("ervshorttermperiodsigma")) ? document.getElementById("ervshorttermperiodsigma").value : "0")
+			paramString = paramString.concat(a,"ervtransitionperiod",e,(document.getElementById("ervtransitionperiod")) ? document.getElementById("ervtransitionperiod").value : "0")
+			paramString = paramString.concat(a,"ervtransitionperiodsigma",e,(document.getElementById("ervtransitionperiodsigma")) ? document.getElementById("ervtransitionperiodsigma").value : "0")
+			paramString = paramString.concat(a,"ervlongtermrate",e,(document.getElementById("ervlongtermrate")) ? document.getElementById("ervlongtermrate").value : "0")
+			paramString = paramString.concat(a,"ervlongtermratesigma",e,(document.getElementById("ervlongtermratesigma")) ? document.getElementById("ervlongtermratesigma").value : "0")
+			paramString = paramString.concat(a,"cpishorttermrate",e,(document.getElementById("cpishorttermrate")) ? document.getElementById("cpishorttermrate").value : "0")
+			paramString = paramString.concat(a,"cpishorttermratesigma",e,(document.getElementById("cpishorttermratesigma")) ? document.getElementById("cpishorttermratesigma").value : "0")
+			paramString = paramString.concat(a,"cpishorttermperiod",e,(document.getElementById("cpishorttermperiod")) ? document.getElementById("cpishorttermperiod").value : "0")
+			paramString = paramString.concat(a,"cpishorttermperiodsigma",e,(document.getElementById("cpishorttermperiodsigma")) ? document.getElementById("cpishorttermperiodsigma").value : "0")
+			paramString = paramString.concat(a,"cpitransitionperiod",e,(document.getElementById("cpitransitionperiod")) ? document.getElementById("cpitransitionperiod").value : "0")
+			paramString = paramString.concat(a,"cpilongtermrate",e,(document.getElementById("cpilongtermrate")) ? document.getElementById("cpilongtermrate").value : "0")
+			paramString = paramString.concat(a,"yieldshift",e,(document.getElementById("yieldshift")) ? document.getElementById("yieldshift").value : "0")
+			paramString = paramString.concat(a,"valuationmethod",e,(document.getElementById("valuationmethod")) ? document.getElementById("valuationmethod").value : "0")
+			paramString = paramString.concat(a,"discountrate",e,(document.getElementById("entitydiscountrate")) ? document.getElementById("entitydiscountrate").value : "0")
+			paramString = paramString.concat(a,"acqprice",e,(document.getElementById("settingsacqprice")) ? document.getElementById("settingsacqprice").value.replace(/,/g,'') : "0")
+			paramString = paramString.concat(a,"void",e,(document.getElementById("void")) ? document.getElementById("void").value : "0")
+			paramString = paramString.concat(a,"duration",e,(document.getElementById("duration")) ? document.getElementById("duration").value : "0")
+			paramString = paramString.concat(a,"rentrevision",e,(document.getElementById("rentrevision")) ? document.getElementById("rentrevision").value : "0")
+			paramString = paramString.concat(a,"probability",e,(document.getElementById("probability")) ? document.getElementById("probability").value : "0")
+			paramString = paramString.concat(a,"incentivemonths",e,(document.getElementById("incentivemonths")) ? document.getElementById("incentivemonths").value : "0")
+			paramString = paramString.concat(a,"incentivepercent",e,(document.getElementById("incentivepercent")) ? document.getElementById("incentivepercent").value : "0")
+			paramString = paramString.concat(a,"fitoutcosts",e,(document.getElementById("fitoutcosts")) ? document.getElementById("fitoutcosts").value : "0")
+			paramString = paramString.concat(a,"opex",e,(document.getElementById("settings_opex")) ? document.getElementById("settings_opex").value : "0")
+			paramString = paramString.concat(a,"fees",e,(document.getElementById("settings_fees")) ? document.getElementById("settings_fees").value : "0")
+			paramString = paramString.concat(a,"hazard",e,(document.getElementById("hazard")) ? document.getElementById("hazard").value : "0")
+			paramString = paramString.concat(a,"rett",e,(document.getElementById("rett")) ? document.getElementById("rett").value : "0")
+			paramString = paramString.concat(a,"landvalue",e,(document.getElementById("landvalue")) ? document.getElementById("landvalue").value : "0")
+			paramString = paramString.concat(a,"minvalue",e,(document.getElementById("minvalue")) ? document.getElementById("minvalue").value : "0")
+			paramString = paramString.concat(a,"usableperiod",e,(document.getElementById("usableperiod")) ? document.getElementById("usableperiod").value : "0")
+			paramString = paramString.concat(a,"vat",e,(document.getElementById("vat")) ? document.getElementById("vat").value : "0")
+			paramString = paramString.concat(a,"carrybackyrs",e,(document.getElementById("carrybackyrs")) ? document.getElementById("carrybackyrs").value : "0")
+			paramString = paramString.concat(a,"carryforwardyrs",e,(document.getElementById("carryforwardyrs")) ? document.getElementById("carryforwardyrs").value : "0")
+			paramString = paramString.concat(a,"sims",e,(document.getElementById("sims")) ? document.getElementById("sims").value : "0")
+			var loans = $scope.getLoans();	
+			var costs = $scope.getCosts();		
+			await $http.post($scope.baseURL + "ViewEntity2?name="+$scope.entity+paramString+loans+costs);
 			if ($scope.tableTab == "units"){
 				await $scope.getUnitTable(-1);
 			}else {
 				await $scope.getRequest($scope.tableTab);
 			}
 			await $scope.getSettings($scope.entity);
-		
 		}; // /updateEntity
+
+		$scope.getLoans = function() {
+			var table = document.getElementById('loansTable');
+			var loanString = "";
+			var a = "&";
+			var e = "=";
+			for (var r = 1, n = table.rows.length; r < n; r++) {
+				var loan = table.rows[r].id.replace('row_loan_','')
+				loanString = loanString.concat(a,"loanAmount",loan,e,document.getElementById("loan_amount_" + loan).value.replace(/,/g,''))
+				loanString = loanString.concat(a,"interestRate",loan,e,document.getElementById("interestrate_" + loan).value/100)
+				loanString = loanString.concat(a,"interestType",loan,e,document.getElementById("interest_type_" + loan).value)
+				loanString = loanString.concat(a,"loanType",loan,e,document.getElementById("loan_type_" + loan).value)
+				loanString = loanString.concat(a,"acqLoan",loan,e,document.getElementById("acqloan_" + loan).checked)
+				loanString = loanString.concat(a,"loanStartMonth",loan,e,document.getElementById("loan_start_month_" + loan).value)
+				loanString = loanString.concat(a,"loanStartYear",loan,e,document.getElementById("loan_start_year_" + loan).value)
+				loanString = loanString.concat(a,"loanEndMonth",loan,e,document.getElementById("loan_end_month_" + loan).value)
+				loanString = loanString.concat(a,"loanEndYear",loan,e,document.getElementById("loan_end_year_" + loan).value)
+				loanString = loanString.concat(a,"floatBasis",loan,e,document.getElementById("float_basis_" + loan).value)
+				loanString = loanString.concat(a,"spread",loan,e,document.getElementById("spread_" + loan).value)
+				loanString = loanString.concat(a,"amortizationPeriod",loan,e,document.getElementById("amortization_period_" + loan).value)
+				loanString = loanString.concat(a,"active",loan,e,document.getElementById("active_" + loan).checked)
+			}
+			return loanString
+		};
+
+		$scope.getCosts = function() {
+			var table = document.getElementsByName('costInputRow');
+			var costString = "";
+			var a = "&";
+			var e = "=";
+			for (var r = 0, n = table.length; r < n; r++){
+				var rowID = table[r].id
+				costString = costString.concat(a,`${rowID}_masterID=`,document.getElementById(`${rowID}_masterID`).value)
+				costString = costString.concat(a,`${rowID}_type=`,document.getElementById(`${rowID}_type`).value)
+				costString = costString.concat(a,`${rowID}_name=`,document.getElementById(`${rowID}_name`).value) 
+				costString = costString.concat(a,`${rowID}_amount=`,document.getElementById(`${rowID}_amount`).value)
+				costString = costString.concat(a,`${rowID}_coaItemBasis=`,document.getElementById(`${rowID}_coaItemBasis`).value)
+				costString = costString.concat(a,`${rowID}_coaItemTarget=`,document.getElementById(`${rowID}_coaItemTarget`).value)
+				costString = costString.concat(a,`${rowID}_growthItem=`,document.getElementById(`${rowID}_growthItem`).value)
+				costString = costString.concat(a,`${rowID}_duration=`,document.getElementById(`${rowID}_duration`).value)
+				costString = costString.concat(a,`${rowID}_startMonth=`,document.getElementById(`${rowID}_startMonth`).value)
+				costString = costString.concat(a,`${rowID}_startYear=`,document.getElementById(`${rowID}_startYear`).value)
+				costString = costString.concat(a,`${rowID}_endMonth=`,document.getElementById(`${rowID}_endMonth`).value)
+				costString = costString.concat(a,`${rowID}_endYear=`,document.getElementById(`${rowID}_endYear`).value) 
+			}
+			return costString
+		};
 
 		$scope.updateUnit = async function(unit,field){
 			var value = document.getElementById(`unit${unit}.${field}`).value;
-			value = value.replace(',','')
+			value = value.replace(/,/g,'')
 			await $http.post(`UpdateUnit?unit=${unit}&field=${field}&value="${value}"`);
 			await $scope.getUnitTable(-1);
-			await $scope.getSettings($scope.entity);
-		
+			await $scope.getSettings($scope.entity);	
+			await $scope.getChart();	
 		};
+
+		$scope.addUnit = async function(){
+			var params = "AddChildUnit?";
+			var a = "&";
+			var e = "=";
+			params = params.concat("parent=",document.getElementById("new_unit_parent").value)
+			params = params.concat(a,"tenant",e,document.getElementById("new_unit_tenant").value)
+			params = params.concat(a,"unitname",e,document.getElementById("new_unit_unitname").value)
+			params = params.concat(a,"rent",e,document.getElementById("new_unit_rent").value)
+			params = params.concat(a,"startmonth",e,document.getElementById("new_unit_startmonth").value)
+			params = params.concat(a,"startyear",e,document.getElementById("new_unit_startyear").value)
+			params = params.concat(a,"expirymonth",e,document.getElementById("new_unit_expirymonth").value)
+			params = params.concat(a,"expiryyear",e,document.getElementById("new_unit_expiryyear").value)
+			params = params.concat(a,"amount",e,document.getElementById("new_unit_amount").value)
+			params = params.concat(a,"area",e,document.getElementById("new_unit_area").value)
+            document.querySelector('.jw-modal.open').classList.remove('open');
+            document.body.classList.remove('jw-modal-open');
+			await $http.post(params);
+			await $scope.getUnitTable(-1);
+			await $scope.getSettings($scope.entity);
+		};
+
+		$scope.selectForChart = async function(coa) {
+			if ($scope.coaSelection.includes(coa)){
+				$scope.coaSelection = $scope.coaSelection.filter(e => e !== coa);
+				document.getElementById(`${coa} row`).classList.remove("fifth-bg");
+			} else {
+				$scope.coaSelection.push(coa)
+				document.getElementById(`${coa} row`).classList.add("fifth-bg");
+			}
+			await $scope.getChart();
+		}
+
+		$scope.getChart = async function(){
+			await $http.post("/Chart?coa="+$scope.coaSelection+"&entityModel="+$scope.entity).then(
+				function successCallback(response) {
+					$scope.settingsChart = $sce.trustAsHtml(response.data);
+				},
+				function errorCallback(response) {
+					console.log("selectForChart.post failed");
+				}
+			);
+		}
+
+		$scope.updateChartCOASelections = function(){
+			for (coa in $scope.coaSelection){
+				document.getElementById(`${coa} row`).classList.add("fifth-bg");
+			}
+		}
 
 		init();
 
@@ -310,3 +411,4 @@ var ognApp = angular.module('ognApp', []);
 </script>
 </html>
 [[end]]
+

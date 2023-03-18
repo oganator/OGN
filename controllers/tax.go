@@ -42,7 +42,9 @@ func (e *EntityModel) CIT() {
 				//
 				temp := e.COA[date.Dateint]
 				temp.DTA = e.Tax.DTA[date.Dateint]
+				e.Mutex.Lock()
 				e.COA[date.Dateint] = temp
+				e.Mutex.Unlock()
 				//
 				dta = -math.Min(taxableincome-taxespayable, 0.0)
 			}

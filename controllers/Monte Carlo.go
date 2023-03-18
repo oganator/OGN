@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"html/template"
 	"math"
 	"time"
 
@@ -148,7 +149,7 @@ func (e *EntityModel) MonteCarlo(compute string) {
 			// e.MCResultSlice.NCFFund[index-1] = ReturnCOAArray(temp.COA, FloatCOA{NetCashFlow: 1.0}, temp.StartDate, temp.SalesDate)
 			// e.MCResultSlice.MarketValueFund[index-1] = ReturnCOAArray(temp.COA, FloatCOA{MarketValue: 1.0}, temp.StartDate, temp.SalesDate)
 			if e.Strategy != "Standard" {
-				e.MCResultSlice.BondExpense[index-1] = ReturnCOAArray(temp.COA, FloatCOA{BondExpense: 1.0}, Dateadd(temp.StartDate, -1), temp.SalesDate)
+				e.MCResultSlice.BondExpense[index-1] = ReturnCOAArray(temp.COA, FloatCOA{BondExpense: 1.0}, Dateadd(temp.StartDate, -1), temp.SalesDate, false)
 				e.MCResultSlice.YTM[index-1] = e.MCSlice[index-1].Metrics.BondHolder.YTM
 				e.MCResultSlice.Duration[index-1] = e.MCSlice[index-1].Metrics.BondHolder.Duration
 				e.MCResultSlice.YTMDUR[index-1] = e.MCSlice[index-1].Metrics.BondHolder.YTMDUR
@@ -163,7 +164,7 @@ func (e *EntityModel) MonteCarlo(compute string) {
 			e.MCResultSlice.Void[index-1] = float64(e.MCSlice[index-1].GLA.Void)
 			e.MCResultSlice.Probability[index-1] = e.MCSlice[index-1].GLA.Probability
 			e.MCResultSlice.NumberOfDefaults[index-1] = float64(e.MCSlice[index-1].GLA.Default.NumberOfDefaults)
-			e.MCResultSlice.OpEx[index-1] = e.MCSlice[index-1].OpEx.PercentOfTRI
+			// e.MCResultSlice.OpEx[index-1] = e.MCSlice[index-1].OpEx.PercentOfTRI
 			e.MCResultSlice.CPI[index-1] = e.MCSlice[index-1].Growth["CPI"][e.SalesDate.Dateint]
 			e.MCResultSlice.ERV[index-1] = e.MCSlice[index-1].Growth["ERV"][e.SalesDate.Dateint]
 			e.MCResultSlice.Hazard[index-1] = e.MCSlice[index-1].GLA.Default.Hazard
@@ -283,7 +284,7 @@ func (tempentitydata *EntityModelData) SampleForEntity(e *EntityModel) {
 	tempentitydata.CPIGrowth.ShortTermPeriod = int(NormalSample(float64(e.GrowthInput["CPI"].ShortTermPeriod), float64(e.MCSetup.CPI.ShortTermPeriod), 0.0, 10.0))
 	tempentitydata.CPIGrowth.TransitionPeriod = int(NormalSample(float64(e.GrowthInput["CPI"].TransitionPeriod), float64(e.MCSetup.CPI.TransitionPeriod), 0.0, 10.0))
 	tempentitydata.CPIGrowth.LongTermRate = NormalSample(e.GrowthInput["CPI"].LongTermRate, e.MCSetup.CPI.LongTermRate, 0.0, 10.0)
-	tempentitydata.OpExpercent = NormalSample(e.OpEx.PercentOfTRI, e.MCSetup.OpEx, 0.0, 100.0)
+	// tempentitydata.OpExpercent = NormalSample(e.OpEx.PercentOfTRI, e.MCSetup.OpEx, 0.0, 100.0)
 	tempentitydata.YieldShift = NormalSample(e.Valuation.YieldShift, e.MCSetup.YieldShift, -99.9, 100.0)
 	tempentitydata.GLA.Void = int(NormalSample(float64(e.GLA.Void), e.MCSetup.Void, 0.0, 100.0))
 	tempentitydata.GLA.Probability = NormalSample(e.GLA.Probability, e.MCSetup.Probability, 0.0, 1.0)
@@ -431,8 +432,10 @@ type VaRPercentile struct {
 
 // XYFloatSlice -
 type XYFloatSlice struct {
-	X []float64 `json:"x,omitempty"`
-	Y []float64 `json:"y,omitempty"`
+	X     []float64   `json:"x,omitempty"`
+	Y     []float64   `json:"y,omitempty"`
+	Name  string      `json:"Name,omitempty"`
+	Index template.JS `json:"Index,omitempty"`
 }
 
 // RibbonPlot -

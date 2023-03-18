@@ -54,6 +54,7 @@ func Init2() {
 	for _, v := range ogn.FundModelsList {
 		ogn.EntityModelsMap[v].EntityModel.UpdateFundModel()
 	}
+	ogn.Debug = true
 }
 
 func main() {

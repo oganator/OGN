@@ -15,6 +15,7 @@ func init() {
 	beego.Router("/ViewEntity", &controllers.ViewEntityController{})
 	beego.Router("/ViewEntity2", &controllers.ViewEntity2Controller{})
 	beego.Router("/ChangeEntity", &controllers.ChangeEntityController{})
+	beego.Router("/Chart", &controllers.ChartController{})
 	// UNIT
 	beego.Router("/ViewUnitCF", &controllers.ViewUnitCFController{})
 	beego.Router("/UpdateUnit", &controllers.UpdateUnitController{})

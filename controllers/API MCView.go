@@ -3,6 +3,7 @@ package controllers
 import (
 	"sort"
 	"strconv"
+	"strings"
 
 	beego "github.com/astaxie/beego"
 )
@@ -53,10 +54,10 @@ func (c *MCDetailsController) Post() {
 		sort.Sort(ByHazard(EntityModelsMap[tempkey].EntityModel.MCSlice))
 	case "hazard-r":
 		sort.Sort(ByHazardr(EntityModelsMap[tempkey].EntityModel.MCSlice))
-	case "opex":
-		sort.Sort(ByOpEx(EntityModelsMap[tempkey].EntityModel.MCSlice))
-	case "opex-r":
-		sort.Sort(ByOpExr(EntityModelsMap[tempkey].EntityModel.MCSlice))
+	// case "opex":
+	// 	sort.Sort(ByOpEx(EntityModelsMap[tempkey].EntityModel.MCSlice))
+	// case "opex-r":
+	// 	sort.Sort(ByOpExr(EntityModelsMap[tempkey].EntityModel.MCSlice))
 	case "cpi":
 		sort.Sort(ByCPI(EntityModelsMap[tempkey].EntityModel.MCSlice))
 	case "cpi-r":
@@ -125,6 +126,16 @@ func (c *MCTabsController) Post() {
 	tab := c.Data["tab"].(string)
 	switch tab {
 	case "cf":
+		// coa selections
+		selections := GetStringMCTabs(c, "coa")
+		selectionArray := strings.Split(selections, ",")
+		for i, v := range EntityModelsMap[tempkey].EntityModel.Table {
+			if stringInSlice(v.COA, selectionArray) && v.COA != "" {
+				EntityModelsMap[tempkey].EntityModel.Table[i].Selected = true
+			} else {
+				EntityModelsMap[tempkey].EntityModel.Table[i].Selected = false
+			}
+		}
 		temp["entity"] = EntityModelsMap[tempkey].EntityModel
 		c.TplName = "CFTable.tpl"
 	case "endcash":
