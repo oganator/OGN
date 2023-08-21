@@ -158,8 +158,10 @@ func (e *EntityModel) MonteCarlo(compute string) {
 			e.MCResultSlice.EndCash[index-1] = e.MCSlice[index-1].COA[temp.SalesDate.Dateint].CashBalance
 			e.MCResultSlice.EndNCF[index-1] = e.MCSlice[index-1].COA[temp.SalesDate.Dateint].NetCashFlow
 			e.MCResultSlice.EndMarketValue[index-1] = e.MCSlice[index-1].COA[temp.SalesDate.Dateint].MarketValue
-			e.MCResultSlice.IRR[index-1] = e.MCSlice[index-1].Metrics.IRR.NetLeveredAfterTax
-			e.MCResultSlice.EM[index-1] = e.MCSlice[index-1].Metrics.EM.NetLeveredAfterTax
+			irr := e.MCSlice[index-1].Metrics.IRR.NetLeveredAfterTax
+			e.MCResultSlice.IRR[index-1] = irr
+			em := e.MCSlice[index-1].Metrics.EM.NetLeveredAfterTax
+			e.MCResultSlice.EM[index-1] = em
 			//
 			e.MCResultSlice.Void[index-1] = float64(e.MCSlice[index-1].GLA.Void)
 			e.MCResultSlice.Probability[index-1] = e.MCSlice[index-1].GLA.Probability

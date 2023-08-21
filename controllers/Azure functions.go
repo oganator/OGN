@@ -79,12 +79,12 @@ func (e *EntityModel) AzureSimReceive(ch chan MCResultSlice, duration int) {
 				"ERV": {EndingIndex: v.ERV[vIndex]},
 			}
 			e.MCSlice[eIndex] = &EntityModel{
-				Metrics: Metrics{
-					IRR: ReturnType{
+				Metrics: Metrics[float64]{
+					IRR: ReturnType[float64]{
 						GrossUnleveredBeforeTax: 0,
 						NetLeveredAfterTax:      v.IRR[vIndex],
 					},
-					EM: ReturnType{
+					EM: ReturnType[float64]{
 						GrossUnleveredBeforeTax: 0,
 						NetLeveredAfterTax:      v.EM[vIndex],
 					},
@@ -173,7 +173,7 @@ func CreateShellEntity(e *EntityModel, compute string) EntityModel {
 		Name:              e.Name,
 		ChildEntityModels: map[int]*EntityModel{},
 		ChildUnitModels:   childunits,
-		Metrics:           Metrics{},
+		Metrics:           Metrics[float64]{},
 		ParentID:          e.ParentID,
 		Parent:            e.Parent,
 		StartDate:         Dateadd(e.StartDate, 0),

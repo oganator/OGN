@@ -224,9 +224,9 @@ func CreateEntityModels(db *sql.DB, entitymodel int) {
 		// tempModel.HoldPeriod = dateintdiff(tempModel.SalesDate.Dateint, tempModel.StartDate.Dateint) / 12
 		tempModel.EndDate = Dateadd(tempModel.SalesDate, 60)
 		tempModel.Growth = map[string]map[int]float64{}
-		tempModel.CostInput = make(map[string]CostInput)
+		tempModel.CostInput = make(map[int]CostInput)
 		tempModel.CostInput = CreateCosts(DB, tempModel.MasterID, "entity")
-		tempModel.GLA.CostInput = make(map[string]CostInput)
+		tempModel.GLA.CostInput = make(map[int]CostInput)
 		tempModel.GLA.CostInput = CreateCosts(DB, tempModel.GLA.MasterID, "unit")
 		tempModel.Tax.DTA = map[int]float64{}
 		tempModel.COA = map[int]FloatCOA{}
@@ -265,6 +265,7 @@ func CreateUnitModels(db *sql.DB, entitymodel int, unitmodel int) {
 		"unit_models"."lease_end_year", 
 		"unit_models"."unit_status", 
 		"unit_models"."tenant", 
+		"unit_models"."tenant_type", 
 		"unit_models"."passing_rent", 
 		"unit_models"."erv_area", 
 		"unit_models"."erv_amount", 
@@ -308,6 +309,7 @@ func CreateUnitModels(db *sql.DB, entitymodel int, unitmodel int) {
 			&tempUnitModel.LeaseExpiryDate.Year,
 			&tempUnitModel.UnitStatus,
 			&tempUnitModel.Tenant,
+			&tempUnitModel.TenantType,
 			&tempUnitModel.PassingRent,
 			&tempUnitModel.ERVArea,
 			&tempUnitModel.ERVAmount,
@@ -371,7 +373,7 @@ func CreateUnitModels(db *sql.DB, entitymodel int, unitmodel int) {
 		if tempUnitModel.UnitStatus == "Vacant" {
 			tempUnitModel.LeaseExpiryDate = Dateadd(parent.StartDate, tempUnitModel.EXTDuration)
 		}
-		tempUnitModel.CostInput = make(map[string]CostInput)
+		tempUnitModel.CostInput = make(map[int]CostInput)
 		tempUnitModel.CostInput = CreateCosts(DB, tempUnitModel.MasterID, "unit")
 		// create datetypes
 		tempUnitModel.LeaseStartDate.Add(0)
@@ -388,6 +390,7 @@ func CreateLoans(db *sql.DB, em int) (loanArray []DebtInput) {
 	query := `
 		select
 			"masterID",
+			"name",
 			"ltv",
 			"loan_amount", 
 			"fixed_rate",
@@ -401,8 +404,10 @@ func CreateLoans(db *sql.DB, em int) (loanArray []DebtInput) {
 			"spread", 
 			"amortization_period", 
 			"active",
-			"loan_basis"
-		from debt where entity_model_id = 
+			"loan_basis",
+			"start_event",
+			"end_event"
+			from debt where entity_model_id = 
 		`
 	loans, err := db.Query(query + fmt.Sprint(em))
 	if err != nil {
@@ -413,6 +418,7 @@ func CreateLoans(db *sql.DB, em int) (loanArray []DebtInput) {
 	for loans.Next() {
 		err2 := loans.Scan(
 			&tempLoan.MasterID,
+			&tempLoan.Name,
 			&tempLoan.LTV,
 			&tempLoan.Amount,
 			&tempLoan.InterestRate,
@@ -427,6 +433,8 @@ func CreateLoans(db *sql.DB, em int) (loanArray []DebtInput) {
 			&tempLoan.AmortizationPeriod,
 			&tempLoan.Active,
 			&tempLoan.LoanBasis,
+			&tempLoan.StartEvent,
+			&tempLoan.EndEvent,
 		)
 		if err2 != nil {
 			fmt.Println("CreateLoan.Scan: ", err2)
@@ -439,8 +447,8 @@ func CreateLoans(db *sql.DB, em int) (loanArray []DebtInput) {
 }
 
 // CreateCapex - model is the MasterID for the EntityModel OR UnitModel, modelType is either "entity" or "unit"
-func CreateCosts(db *sql.DB, masterID int, modelType string) (capexMap map[string]CostInput) {
-	capexMap = make(map[string]CostInput)
+func CreateCosts(db *sql.DB, masterID int, modelType string) (capexMap map[int]CostInput) {
+	capexMap = make(map[int]CostInput)
 	query := `
 		select
 			"masterID",
@@ -448,9 +456,11 @@ func CreateCosts(db *sql.DB, masterID int, modelType string) (capexMap map[strin
 			"type",
 			"name",
 			"amount",
+			"amount_sigma",
 			"coa_item_basis",
 			"coa_item_target", 
 			"duration", 
+			"duration_sigma",
 			"start_month", 
 			"start_year",
 			"start_event",
@@ -482,9 +492,11 @@ func CreateCosts(db *sql.DB, masterID int, modelType string) (capexMap map[strin
 			&tempCost.Type,
 			&name,
 			&tempCost.Amount,
+			&tempCost.AmountSigma,
 			&tempCost.COAItemBasis,
 			&tempCost.COAItemTarget,
 			&tempCost.Duration,
+			&tempCost.DurationSigma,
 			&tempCost.Start.Month,
 			&tempCost.Start.Year,
 			&tempCost.StartEvent,
@@ -498,12 +510,12 @@ func CreateCosts(db *sql.DB, masterID int, modelType string) (capexMap map[strin
 		}
 		tempCost.Start.Add(0)
 		tempCost.End.Add(0)
-		capexMap[name] = tempCost
+		capexMap[tempCost.MasterID] = tempCost
 	}
 	return capexMap
 }
 
-// YearlyRates - currently not called
+// YearlyRates - currently not called as the HModel is used instead
 func YearlyRates(db *sql.DB, loanID int) (result IntFloatMap) {
 	result = make(IntFloatMap)
 	query := `
@@ -587,11 +599,19 @@ func (e *EntityModel) WriteDBEntityModel(db *sql.DB) {
 		fmt.Println(queryUnitModel)
 	}
 	for _, loan := range e.DebtInput {
-		queryDebt := "update debt set ltv = " + fmt.Sprint(loan.LTV) + " , loan_amount = " + fmt.Sprint(loan.Amount) + " , loan_type = " + fmt.Sprint("'", loan.LoanType, "'") + " , fixed_rate = " + fmt.Sprint(loan.InterestRate) + " , interest_type = " + fmt.Sprint("'", loan.InterestType, "'") + " , loan_start_month = " + fmt.Sprint(loan.LoanStart.Month) + " , loan_start_year = " + fmt.Sprint(loan.LoanStart.Year) + " , loan_end_month = " + fmt.Sprint(loan.LoanEnd.Month) + " , loan_end_year = " + fmt.Sprint(loan.LoanEnd.Year) + " , float_basis = " + fmt.Sprint("'", loan.FloatBasis, "'") + " , spread = " + fmt.Sprint(loan.Spread) + " , active = " + fmt.Sprint("'", loan.Active, "'") + " , amortization_period = " + fmt.Sprint(loan.AmortizationPeriod) + " where masterID = " + fmt.Sprint(loan.MasterID)
+		queryDebt := "update debt set ltv = " + fmt.Sprint(loan.LTV) + " , name = " + fmt.Sprint("'", loan.Name, "'") + " , loan_amount = " + fmt.Sprint(loan.Amount) + " , loan_type = " + fmt.Sprint("'", loan.LoanType, "'") + " , fixed_rate = " + fmt.Sprint(loan.InterestRate) + " , interest_type = " + fmt.Sprint("'", loan.InterestType, "'") + " , loan_start_month = " + fmt.Sprint(loan.LoanStart.Month) + " , loan_start_year = " + fmt.Sprint(loan.LoanStart.Year) + " , loan_end_month = " + fmt.Sprint(loan.LoanEnd.Month) + " , loan_end_year = " + fmt.Sprint(loan.LoanEnd.Year) + " , float_basis = " + fmt.Sprint("'", loan.FloatBasis, "'") + " , spread = " + fmt.Sprint(loan.Spread) + " , active = " + fmt.Sprint("'", loan.Active, "'") + " , amortization_period = " + fmt.Sprint(loan.AmortizationPeriod) + " , start_event = " + fmt.Sprint("'", loan.StartEvent, "'") + " , end_event = " + fmt.Sprint("'", loan.EndEvent, "'") + " where masterID = " + fmt.Sprint(loan.MasterID)
 		_, err3 := DB.Exec(queryDebt)
 		if err3 != nil {
 			fmt.Println("WriteDBEntityModel.queryDebt: ", err3)
 			fmt.Println(queryDebt)
+		}
+	}
+	for _, cost := range e.CostInput {
+		queryCost := "update cost set type = " + fmt.Sprint("'", cost.Type, "'") + " , name = " + fmt.Sprint("'", cost.Name, "'") + " , amount = " + fmt.Sprint("'", cost.Amount, "'") + " , amount_sigma = " + fmt.Sprint(cost.AmountSigma) + " , coa_item_basis = " + fmt.Sprint("'", cost.COAItemBasis, "'") + " , coa_item_target = " + fmt.Sprint("'", cost.COAItemTarget, "'") + " , duration = " + fmt.Sprint(cost.Duration) + " , duration_sigma = " + fmt.Sprint(cost.DurationSigma) + " , start_month = " + fmt.Sprint(cost.Start.Month) + " , start_year = " + fmt.Sprint("'", cost.Start.Year, "'") + " , start_event = " + fmt.Sprint("'", cost.StartEvent, "'") + " , end_month = " + fmt.Sprint("'", cost.End.Month, "'") + " , end_year = " + fmt.Sprint(cost.End.Year) + " , end_event = " + fmt.Sprint("'", cost.EndEvent, "'") + " , growth_item = " + fmt.Sprint("'", cost.GrowthItem, "'") + " where masterID = " + fmt.Sprint(cost.MasterID)
+		_, err3 := DB.Exec(queryCost)
+		if err3 != nil {
+			fmt.Println("WriteDBEntityModel.queryCost: ", err3)
+			fmt.Println(queryCost)
 		}
 	}
 }
@@ -620,15 +640,58 @@ func (u *UnitModel) WriteDBUnitModel() {
 			"lease_end_year", 
 			"unit_status", 
 			"tenant", 
+			"tenant_type
 			"passing_rent", 
 			"erv_area", 
 			"erv_amount")
 			values(`
 	s := string("' , '")
-	query = query + fmt.Sprint(" '", u.Name, s, u.Parent.MasterID, s, u.LeaseStartDate.Month, s, u.LeaseStartDate.Year, s, u.LeaseExpiryDate.Month, s, u.LeaseExpiryDate.Year, s, u.UnitStatus, s, u.Tenant, s, u.PassingRent, s, u.ERVArea, s, u.ERVAmount, "' );")
+	query = query + fmt.Sprint(" '", u.Name, s, u.Parent.MasterID, s, u.LeaseStartDate.Month, s, u.LeaseStartDate.Year, s, u.LeaseExpiryDate.Month, s, u.LeaseExpiryDate.Year, s, u.UnitStatus, s, u.Tenant, s, u.TenantType, s, u.PassingRent, s, u.ERVArea, s, u.ERVAmount, "' );")
 	_, err := DB.Exec(query)
 	if err != nil {
 		fmt.Println("WriteDBUnitModel: ", err)
 		fmt.Println(query)
 	}
+}
+
+// Adds a new Cost to the DB, and returns that cost back to the caller
+func AddCostInput(e, u int) CostInput {
+	query :=
+		`insert into cost (
+		"entity_modelID", 
+		"unit_modelID")
+		values(`
+	s := string("' , '")
+	query = query + fmt.Sprint(" '", e, s, u, "' );")
+	cost, err := DB.Query(query)
+	if err != nil {
+		fmt.Println("AddCostInput: ", err)
+		fmt.Println(query)
+	}
+	defer cost.Close()
+	resultCost := CostInput{}
+	for cost.Next() {
+		err := cost.Scan(
+			&resultCost.MasterID,
+			&resultCost.Type,
+			&resultCost.Name,
+			&resultCost.Amount,
+			&resultCost.AmountSigma,
+			&resultCost.COAItemBasis,
+			&resultCost.COAItemTarget,
+			&resultCost.Duration,
+			&resultCost.DurationSigma,
+			&resultCost.Start.Month,
+			&resultCost.Start.Year,
+			&resultCost.StartEvent,
+			&resultCost.End.Month,
+			&resultCost.End.Year,
+			&resultCost.EndEvent,
+			&resultCost.GrowthItem,
+		)
+		if err != nil {
+			fmt.Println("AddCostInput.Scan", err)
+		}
+	}
+	return resultCost
 }

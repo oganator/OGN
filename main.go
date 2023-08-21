@@ -3,12 +3,11 @@ package main
 import (
 	// "runtime/debug"
 
+	ogn "OGN/controllers"
 	_ "OGN/routers"
 	"database/sql"
 	"fmt"
 	"sync"
-
-	ogn "OGN/controllers"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/plugins/cors"
@@ -54,7 +53,7 @@ func Init2() {
 	for _, v := range ogn.FundModelsList {
 		ogn.EntityModelsMap[v].EntityModel.UpdateFundModel()
 	}
-	ogn.Debug = true
+	// ogn.Debug = true
 }
 
 func main() {
@@ -73,6 +72,6 @@ func main() {
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
-	// browser.OpenURL("http://localhost:8080/")
+	beego.AddFuncMap("GetGrowthItems", ogn.GetGrowthItems)
 	beego.Run()
 }

@@ -76,8 +76,16 @@
                                 </div>
                             </div>
                             <div class="form-group row-sm-2">
+                            [[if .MCActive]]
                                 <label for="sims">Simulations</label>
                                 <input type="text" class="form-control" id="sims" name="sims" Value="[[.entity.MCSetup.Sims]]">
+                            [[end]]
+                            [[if not .MCActive]]
+                            <br>
+                            <br>
+                            <br>
+                            <br>
+                            [[end]]
                             </div>
                         </td>
                         <td colspan="10">

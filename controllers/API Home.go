@@ -27,6 +27,11 @@ func (c *HomeController) Get() {
 	case "v2":
 		temp["path"] = "/ViewEntity2"
 	}
+	temp["Monthly"] = Monthly
+	temp["AzureURL"] = AzureURL
+	temp["Compute"] = Compute
+	temp["MCActive"] = MCActive
+	temp["Debug"] = Debug
 	// temp["baseURL"] = BaseURL
 	c.TplName = "Home.tpl"
 	c.Data = temp
@@ -57,8 +62,8 @@ func (c *SettingsController) Post() {
 	temp := make(map[interface{}]interface{})
 	tempkey := EntityModelsList[GetStringSettings(c, "entity")]
 	temp["tab"] = GetStringSettings(c, "tab")
+	temp["MCActive"] = MCActive
 	temp["entity"] = EntityModelsMap[tempkey].EntityModel
-	// temp["baseURL"] = BaseURL
 	c.TplName = "Settings.tpl"
 	c.Data = temp
 }
@@ -78,6 +83,10 @@ func (c *AppSettingsController) Post() {
 	Monthly, _ = strconv.ParseBool(tempmonthly)
 	Compute = GetStringAppSettings(c, "compute")
 	AzureURL = GetStringAppSettings(c, "azureurl")
+	tempMCActive := GetStringAppSettings(c, "mcActive")
+	MCActive, _ = strconv.ParseBool(tempMCActive)
+	tempDebug := GetStringAppSettings(c, "debug")
+	Debug, _ = strconv.ParseBool(tempDebug)
 	temp := make(map[interface{}]interface{})
 	temp["modelslist"] = AssetModelsList
 	temp["fundslist"] = FundModelsList

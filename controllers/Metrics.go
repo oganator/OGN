@@ -4,6 +4,28 @@ import (
 	"math"
 )
 
+// Metrics -
+type Metrics[r any] struct {
+	IRR        ReturnType[r]  `json:"irr,omitempty"`
+	EM         ReturnType[r]  `json:"em,omitempty"`
+	CoC        ReturnType[r]  `json:"coc,omitempty"`
+	TWR        ReturnType[r]  `json:"twr,omitempty"`
+	BondHolder BondReturnType `json:"bondholder,omitempty"`
+}
+
+// ReturnType -
+type ReturnType[r any] struct {
+	GrossUnleveredBeforeTax r `json:"GrossUnleveredBeforeTax,omitempty"`
+	NetLeveredAfterTax      r `json:"NetLeveredAfterTax,omitempty"`
+}
+
+// BondReturnType -
+type BondReturnType struct {
+	Duration float64 `json:"Duration,omitempty"`
+	YTM      float64 `json:"YTM,omitempty"`
+	YTMDUR   float64 `json:"YTMDUR,omitempty"`
+}
+
 // MetricsCalc -
 func (e *EntityModel) MetricsCalc() {
 	e.Metrics.IRR.NetLeveredAfterTax = math.Round(IRR(&e.COA, Dateadd(e.StartDate, -1), e.SalesDate, FloatCOA{NetCashFlow: 1})*10000) / 10000
@@ -93,4 +115,12 @@ func EquityMultipleCalc(start Datetype, end Datetype, coa IntFloatCOAMap) float6
 		}
 	}
 	return math.Round((numerator/-denominator)*100000) / 100000
+}
+
+func TWRCalc() {
+
+}
+
+func CoCYieldCalc() {
+
 }

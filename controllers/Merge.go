@@ -13,16 +13,21 @@ func (u *UnitModel) Merge() {
 		_, exists := u.CostInput[i]
 		if !exists {
 			u.CostInput[i] = CostInput{
-				Name:          v.Name,
-				MasterID:      v.MasterID,
-				Type:          v.Type,
-				Amount:        v.Amount,
-				COAItemBasis:  v.COAItemBasis,
-				COAItemTarget: v.COAItemTarget,
-				Duration:      v.Duration,
-				Start:         v.Start,
-				End:           v.End,
-				GrowthItem:    v.GrowthItem,
+				Name:              v.Name,
+				MasterID:          v.MasterID,
+				Type:              v.Type,
+				Amount:            v.Amount,
+				AmountSigma:       v.AmountSigma,
+				COAItemBasis:      v.COAItemBasis,
+				COAItemTarget:     v.COAItemTarget,
+				Duration:          v.Duration,
+				DurationSigma:     v.DurationSigma,
+				Start:             v.Start,
+				StartEvent:        v.StartEvent,
+				End:               v.End,
+				EndEvent:          v.EndEvent,
+				GrowthItem:        v.GrowthItem,
+				GrowthItemOptions: v.GrowthItemOptions,
 			}
 		}
 	}

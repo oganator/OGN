@@ -41,7 +41,7 @@ func CreateEntity(v EntityModelData) (e EntityModel) {
 		ChildEntityModels: map[int]*EntityModel{},
 		ChildUnitModels:   map[int]*UnitModel{},
 		ChildUnitsMC:      map[int]UnitModel{},
-		Metrics:           Metrics{},
+		Metrics:           Metrics[float64]{},
 		ParentID:          v.Parent,
 		Parent:            EntityModelsMap[v.Parent].EntityModel,
 		StartDate:         startdate,
@@ -107,7 +107,7 @@ func (e *EntityModel) UpdateEntity(mc bool, v *EntityModelData, compute string) 
 		ChildEntityModels: childentitiesmap,
 		ChildUnitModels:   childunits,
 		ChildUnitsMC:      childunitsMC,
-		Metrics:           Metrics{},
+		Metrics:           Metrics[float64]{},
 		ParentID:          parentID,
 		Parent:            &parentFinal,
 		StartDate:         startdate,
@@ -143,7 +143,7 @@ func (e *EntityModel) UpdateEntity(mc bool, v *EntityModelData, compute string) 
 			EXTDuration:     v.GLA.EXTDuration,
 			IndexDetails: IndexDetails{
 				Frequency:  v.GLA.IndexDetails.Frequency,
-				Type:       v.GLA.IndexDetails.Type,
+				Base:       v.GLA.IndexDetails.Base,
 				StartMonth: 0, Anniversary: "",
 			},
 			// RentIncentives: CostInput{

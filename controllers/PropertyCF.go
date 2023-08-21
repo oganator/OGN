@@ -23,6 +23,10 @@ func (e *EntityModel) PropertyCFCalc() {
 		}
 		secondPass := e.CostInput.CostMapCalc(date, e.Growth, e.COA[date.Dateint])
 		firstPass.Add(secondPass)
+		thirdPass := FloatCOA{
+			NetOperatingIncome: firstPass.OperatingExpenses,
+		}
+		firstPass.Add(thirdPass)
 		firstPass.Add(e.COA[date.Dateint])
 		e.COA[date.Dateint] = firstPass
 		e.Mutex.Unlock()

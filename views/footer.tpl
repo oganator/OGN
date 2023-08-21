@@ -28,6 +28,11 @@ var ognApp = angular.module('ognApp', []);
 		$scope.path = [[.path]];
 		$scope.strategy = [[.entity.Strategy]];
 		$scope.coaSelection = [];
+		$scope.monthly = [[.Monthly]];
+		$scope.azureURL = [[.AzureURL]];
+		$scope.compute = [[.Compute]];
+		$scope.mcActive = [[.MCActive]];
+		$scope.debug = [[.Debug]];
 
 		// getModels - gets the fund or asset models of a specified entity (not childEntityModels).
 		$scope.getModels = async function(entity) {
@@ -213,6 +218,7 @@ var ognApp = angular.module('ognApp', []);
 		// init
 		var init = function () {
 			$scope.getSettings([[.entity.Name]]);
+			console.log($scope);
 		};// /init
 
 		// updateEntity - calls the Post method for ViewEntity2 controller
@@ -244,15 +250,19 @@ var ognApp = angular.module('ognApp', []);
 			paramString = paramString.concat(a,"cpishorttermperiod",e,(document.getElementById("cpishorttermperiod")) ? document.getElementById("cpishorttermperiod").value : "0")
 			paramString = paramString.concat(a,"cpishorttermperiodsigma",e,(document.getElementById("cpishorttermperiodsigma")) ? document.getElementById("cpishorttermperiodsigma").value : "0")
 			paramString = paramString.concat(a,"cpitransitionperiod",e,(document.getElementById("cpitransitionperiod")) ? document.getElementById("cpitransitionperiod").value : "0")
+			paramString = paramString.concat(a,"cpitransitionperiodsigma",e,(document.getElementById("cpitransitionperiodsigma")) ? document.getElementById("cpitransitionperiodsigma").value : "0")
 			paramString = paramString.concat(a,"cpilongtermrate",e,(document.getElementById("cpilongtermrate")) ? document.getElementById("cpilongtermrate").value : "0")
+			paramString = paramString.concat(a,"cpilongtermratesigma",e,(document.getElementById("cpilongtermratesigma")) ? document.getElementById("cpilongtermratesigma").value : "0")
 			paramString = paramString.concat(a,"yieldshift",e,(document.getElementById("yieldshift")) ? document.getElementById("yieldshift").value : "0")
 			paramString = paramString.concat(a,"valuationmethod",e,(document.getElementById("valuationmethod")) ? document.getElementById("valuationmethod").value : "0")
 			paramString = paramString.concat(a,"discountrate",e,(document.getElementById("entitydiscountrate")) ? document.getElementById("entitydiscountrate").value : "0")
 			paramString = paramString.concat(a,"acqprice",e,(document.getElementById("settingsacqprice")) ? document.getElementById("settingsacqprice").value.replace(/,/g,'') : "0")
 			paramString = paramString.concat(a,"void",e,(document.getElementById("void")) ? document.getElementById("void").value : "0")
+			paramString = paramString.concat(a,"voidsigma",e,(document.getElementById("voidsigma")) ? document.getElementById("voidsigma").value : "0")
 			paramString = paramString.concat(a,"duration",e,(document.getElementById("duration")) ? document.getElementById("duration").value : "0")
 			paramString = paramString.concat(a,"rentrevision",e,(document.getElementById("rentrevision")) ? document.getElementById("rentrevision").value : "0")
 			paramString = paramString.concat(a,"probability",e,(document.getElementById("probability")) ? document.getElementById("probability").value : "0")
+			paramString = paramString.concat(a,"probabilitysigma",e,(document.getElementById("probabilitysigma")) ? document.getElementById("probabilitysigma").value : "0")
 			paramString = paramString.concat(a,"incentivemonths",e,(document.getElementById("incentivemonths")) ? document.getElementById("incentivemonths").value : "0")
 			paramString = paramString.concat(a,"incentivepercent",e,(document.getElementById("incentivepercent")) ? document.getElementById("incentivepercent").value : "0")
 			paramString = paramString.concat(a,"fitoutcosts",e,(document.getElementById("fitoutcosts")) ? document.getElementById("fitoutcosts").value : "0")
@@ -289,7 +299,6 @@ var ognApp = angular.module('ognApp', []);
 				loanString = loanString.concat(a,"interestRate",loan,e,document.getElementById("interestrate_" + loan).value/100)
 				loanString = loanString.concat(a,"interestType",loan,e,document.getElementById("interest_type_" + loan).value)
 				loanString = loanString.concat(a,"loanType",loan,e,document.getElementById("loan_type_" + loan).value)
-				loanString = loanString.concat(a,"acqLoan",loan,e,document.getElementById("acqloan_" + loan).checked)
 				loanString = loanString.concat(a,"loanStartMonth",loan,e,document.getElementById("loan_start_month_" + loan).value)
 				loanString = loanString.concat(a,"loanStartYear",loan,e,document.getElementById("loan_start_year_" + loan).value)
 				loanString = loanString.concat(a,"loanEndMonth",loan,e,document.getElementById("loan_end_month_" + loan).value)
@@ -313,9 +322,9 @@ var ognApp = angular.module('ognApp', []);
 				costString = costString.concat(a,`${rowID}_type=`,document.getElementById(`${rowID}_type`).value)
 				costString = costString.concat(a,`${rowID}_name=`,document.getElementById(`${rowID}_name`).value) 
 				costString = costString.concat(a,`${rowID}_amount=`,document.getElementById(`${rowID}_amount`).value)
-				costString = costString.concat(a,`${rowID}_coaItemBasis=`,document.getElementById(`${rowID}_coaItemBasis`).value)
-				costString = costString.concat(a,`${rowID}_coaItemTarget=`,document.getElementById(`${rowID}_coaItemTarget`).value)
-				costString = costString.concat(a,`${rowID}_growthItem=`,document.getElementById(`${rowID}_growthItem`).value)
+				costString = costString.concat(a,`${rowID}_coaItemBasis=`,document.getElementById(`${rowID}_coaItemBasis`).value.trim())
+				costString = costString.concat(a,`${rowID}_coaItemTarget=`,document.getElementById(`${rowID}_coaItemTarget`).value.trim())
+				costString = costString.concat(a,`${rowID}_growthItem=`,document.getElementById(`${rowID}_growthItem`).value.trim())
 				costString = costString.concat(a,`${rowID}_duration=`,document.getElementById(`${rowID}_duration`).value)
 				costString = costString.concat(a,`${rowID}_startMonth=`,document.getElementById(`${rowID}_startMonth`).value)
 				costString = costString.concat(a,`${rowID}_startYear=`,document.getElementById(`${rowID}_startYear`).value)
@@ -323,6 +332,11 @@ var ognApp = angular.module('ognApp', []);
 				costString = costString.concat(a,`${rowID}_endYear=`,document.getElementById(`${rowID}_endYear`).value) 
 			}
 			return costString
+		};
+
+		$scope.addCost = async function() {
+			await $http.post(`/AddCost?entityModel=${$scope.entity}`);
+			await $scope.getSettings($scope.entity);			
 		};
 
 		$scope.updateUnit = async function(unit,field){
@@ -377,6 +391,17 @@ var ognApp = angular.module('ognApp', []);
 			);
 		}
 
+		$scope.getSensitivity = async function(){
+			await $http.post("/Sensitivity?name="+$scope.entity+"&iterations="+3).then(
+				function successCallback(response) {
+					$scope.response = $sce.trustAsHtml(response.data);
+				},
+				function errorCallback(response) {
+					console.log("getSensitivity failed");
+				}
+			);
+		}
+
 		$scope.updateChartCOASelections = function(){
 			for (coa in $scope.coaSelection){
 				document.getElementById(`${coa} row`).classList.add("fifth-bg");
@@ -384,6 +409,10 @@ var ognApp = angular.module('ognApp', []);
 		}
 
 		init();
+
+		$scope.updateAppSettings = async function(){
+			await $http.post(`AppSettings?monthly=${$scope.monthly}&compute=${$scope.compute}&azureurl="${$scope.azureURL}"&mcActive=${$scope.mcActive}&debug=${$scope.debug}`);
+		}
 
 	}]); // /testController
 

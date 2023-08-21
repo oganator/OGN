@@ -40,6 +40,7 @@ func (c *ViewEntity2Controller) Get() {
 	temp := make(map[interface{}]interface{})
 	temp["entity"] = EntityModelsMap[key].EntityModel
 	temp["modelslist"] = AssetModelsList
+	temp["mcActive"] = MCActive
 	// temp["baseURL"] = BaseURL
 	c.TplName = "EntityView.tpl"
 	c.Data = temp
@@ -173,10 +174,10 @@ func (c *ViewEntity2Controller) Post() {
 		OpEx:        GetFloat2(c, "opexsigma") / 100,
 		Hazard:      GetFloat2(c, "hazardsigma") / 100,
 	}
-	EntityModelsMap[key].EntityModel.MCSetup = mcsetup
-	go EntityModelsMap[key].EntityModel.MonteCarlo2("Internal")
 	// TODO: write updated values to DB, Monte Carlo
 	EntityModelsMap[key].EntityModel.SalesDate = Dateadd(EntityModelsMap[key].EntityModel.StartDate, EntityModelsMap[key].EntityModel.HoldPeriod)
+	EntityModelsMap[key].EntityModel.MCSetup = mcsetup
+	EntityModelsMap[key].EntityModel.MonteCarlo2("Internal")
 	switch EntityModelsMap[key].EntityModel.Entity.EntityType {
 	case "Asset":
 		EntityModelsMap[key].EntityModel.UpdateEntityModel(true)

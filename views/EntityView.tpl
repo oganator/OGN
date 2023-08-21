@@ -28,7 +28,7 @@
 							<a class="nav-link" id="[[.Name]]-tab" data-toggle="tab" href="#[[.Name]]" role="tab" aria-controls="[[.Name]]" aria-selected="true" ng-click="changeEntityModel('[[.Name]]')">[[.Name]]</a>
 						</li>[[end]]
                 [[end]]
-            [[end]]			
+            [[end]]
         </ul>
     </div>
     <div bind-html-compile = settingsResponse></div>
@@ -40,7 +40,10 @@
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" id="units-tab" data-toggle="tab" href="#units" role="tab" aria-controls="units" aria-selected="false" ng-click="getUnitTable(-1)">Units</a>
-				</li>				
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" id="sensitivity-tab" data-toggle="tab" href="#sensitivity" role="tab" aria-controls="sensitivity" aria-selected="false" ng-click="getSensitivity()">Sensitivity</a>
+				</li>
 				<li class="nav-item">
 					<a class="nav-link" id="endcash-tab" data-toggle="tab" href="#endcash" role="tab" aria-controls="endcash" aria-selected="false" ng-click="getRequest('endcash')">Cash Balance</a>
 				</li>
@@ -84,6 +87,7 @@
 					<a class="nav-link" id="ytmdurtabletab" data-toggle="tab" href="#ytmdurtabletab" role="tab" aria-controls="summary" aria-selected="false" ng-click="getRequest('ytmdur')">YTM/DUR</a>
 				</li>
 				[[end]]
+				
 			</ul>
 		</div>
 		<div class="container-fluid shadow-lg rounded" style="width: 95%; overflow-x:scroll;">

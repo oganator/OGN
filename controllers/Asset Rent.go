@@ -136,6 +136,7 @@ func BPUplift(passingrent float64, indexation float64, uu *UnitModel, void float
 	return bpuplift, bondexpense, interestexpense, bondincome
 }
 
+// only for commercial, if TenantType == 'Residential' then break
 func IndexCalc(uu *UnitModel, date Datetype, ee *EntityModel, mcmc bool, compute string) (float64, float64) {
 	renewrent := uu.RentSchedule.RenewRent
 	rotaterent := uu.RentSchedule.RotateRent
@@ -177,30 +178,36 @@ func VacancyCalc(mcmc bool, uu *UnitModel, date Datetype, ee *EntityModel, capex
 		if r := recover(); r != nil {
 		}
 	}()
-	void = 1.0
-	switch {
-	case mcmc && uu.RSStore[len(uu.RSStore)-1].DefaultDate.Year > 1: // case - tenant has just defaulted
-		if date.Dateint <= uu.RentSchedule.VacancyEnd.Dateint {
-			vacancy = -uu.ERVAmount * uu.ERVArea * ee.Growth["ERV"][date.Dateint] / 12
-			// duration := dateintdiff(uu.RSStore[len(uu.RSStore)-1].DefaultDate.Dateint, uu.RSStore[len(uu.RSStore)-1].StartDate.Dateint)
-			// *capex = *capex + FitOutCostsCalc(uu, date)*float64((duration/uu.EXTDuration))
-			// *capex = *capex + uu.CostInput.CostMapCalc(date, "Fit Out Costs", uu.COA[date.Dateint], uu.Parent.Growth)*float64((duration/uu.EXTDuration))
-			void = 0.0
+	if uu.TenantType == "Residential" {
+		void = uu.Probability
+		vacancy = -uu.ERVAmount * uu.ERVArea * (1 - uu.Probability) / 12 * ee.Growth["ERV"][date.Dateint]
+	} else {
+		void = 1.0
+		switch {
+		case mcmc && uu.RSStore[len(uu.RSStore)-1].DefaultDate.Year > 1: // case - tenant has just defaulted
+			if date.Dateint <= uu.RentSchedule.VacancyEnd.Dateint {
+				vacancy = -uu.ERVAmount * uu.ERVArea * ee.Growth["ERV"][date.Dateint] / 12
+				// duration := dateintdiff(uu.RSStore[len(uu.RSStore)-1].DefaultDate.Dateint, uu.RSStore[len(uu.RSStore)-1].StartDate.Dateint)
+				// *capex = *capex + FitOutCostsCalc(uu, date)*float64((duration/uu.EXTDuration))
+				// *capex = *capex + uu.CostInput.CostMapCalc(date, "Fit Out Costs", uu.COA[date.Dateint], uu.Parent.Growth)*float64((duration/uu.EXTDuration))
+				void = 0.0
+			}
+		case mcmc:
+			if date.Dateint <= uu.RentSchedule.VacancyEnd.Dateint {
+				vacancy = -uu.ERVAmount * uu.ERVArea * uu.RentSchedule.ProbabilitySim / 12 * ee.Growth["ERV"][date.Dateint]
+				void = 0.0
+				// *capex = *capex + FitOutCostsCalc(uu, date)
+				// *capex = *capex + uu.CostInput.CostMapCalc(date, "Fit Out Costs", uu.COA[date.Dateint], uu.Parent.Growth)
+			}
+		case !mcmc:
+			if date.Dateint <= uu.RentSchedule.VacancyEnd.Dateint {
+				vacancy = -uu.ERVAmount * uu.ERVArea * (1 - uu.RentSchedule.Probability) / 12 * ee.Growth["ERV"][date.Dateint]
+				void = 0.0
+				// *capex = *capex + FitOutCostsCalc(uu, date)
+				// *capex = *capex + uu.CostInput.CostMapCalc(date, "Fit Out Costs", uu.COA[date.Dateint], uu.Parent.Growth)
+			}
 		}
-	case mcmc:
-		if date.Dateint <= uu.RentSchedule.VacancyEnd.Dateint {
-			vacancy = -uu.ERVAmount * uu.ERVArea * uu.RentSchedule.ProbabilitySim / 12 * ee.Growth["ERV"][date.Dateint]
-			void = 0.0
-			// *capex = *capex + FitOutCostsCalc(uu, date)
-			// *capex = *capex + uu.CostInput.CostMapCalc(date, "Fit Out Costs", uu.COA[date.Dateint], uu.Parent.Growth)
-		}
-	case !mcmc:
-		if date.Dateint <= uu.RentSchedule.VacancyEnd.Dateint {
-			vacancy = -uu.ERVAmount * uu.ERVArea * (1 - uu.RentSchedule.Probability) / 12 * ee.Growth["ERV"][date.Dateint]
-			void = 0.0
-			// *capex = *capex + FitOutCostsCalc(uu, date)
-			// *capex = *capex + uu.CostInput.CostMapCalc(date, "Fit Out Costs", uu.COA[date.Dateint], uu.Parent.Growth)
-		}
+
 	}
 	return vacancy, void
 }
@@ -228,6 +235,10 @@ func (u *UnitModel) InitialRentScheduleCalc() {
 		prob = 0.0
 		vacancyvoid = u.Void - 1
 	}
+	base := "CPI"
+	if u.TenantType == "Residential" {
+		base = "ERV"
+	}
 	temp := RentSchedule{
 		EXTNumber:  0,
 		StartDate:  u.Parent.StartDate,
@@ -243,19 +254,35 @@ func (u *UnitModel) InitialRentScheduleCalc() {
 		EndContractRent: 0,
 		RentRevisionERV: u.RentRevisionERV,
 		Probability:     prob,
-		RenewIndex:      Indexation{IndexNumber: 0, StartDate: indexdate, EndDate: Dateadd(indexdate, 12), Amount: 1, RentSchedule: &u.RentSchedule},
-		RotateIndex:     Indexation{IndexNumber: 0, StartDate: indexdate, EndDate: Dateadd(indexdate, 12), Amount: 1, RentSchedule: &u.RentSchedule},
+		RenewIndex:      Indexation{IndexNumber: 0, StartDate: indexdate, EndDate: Dateadd(indexdate, 12), Amount: 1, RentSchedule: &u.RentSchedule, Base: base},
+		RotateIndex:     Indexation{IndexNumber: 0, StartDate: indexdate, EndDate: Dateadd(indexdate, 12), Amount: 1, RentSchedule: &u.RentSchedule, Base: base},
 		ParentUnit:      u,
 	}
 	if u.UnitStatus == "Vacant" {
-		rotation := u.CostInput["Rent Incentives Rotation"]
-		rotation.Start = Dateadd(temp.StartDate, u.Void)
-		rotation.End = Dateadd(temp.StartDate, rotation.Duration+u.Void-1)
-		u.CostInput["Rent Incentives Rotation"] = rotation
-		fitoutcosts := u.CostInput["Fit Out Costs"]
-		fitoutcosts.Start = temp.StartDate
-		fitoutcosts.End = Dateadd(temp.StartDate, 0)
-		u.CostInput["Fit Out Costs"] = fitoutcosts
+		for i, v := range u.CostInput {
+			switch v.Name {
+			case "Rent Incentives Rotation":
+				start := Dateadd(temp.StartDate, u.Void)
+				end := Dateadd(start, u.CostInput[i].Duration-1)
+				u.CostInput[i] = CostInput{
+					Name:              v.Name,
+					MasterID:          v.MasterID,
+					Type:              v.Type,
+					Amount:            v.Amount * u.Probability,
+					AmountSigma:       v.AmountSigma,
+					COAItemBasis:      v.COAItemBasis,
+					COAItemTarget:     v.COAItemTarget,
+					Duration:          v.Duration,
+					DurationSigma:     v.DurationSigma,
+					Start:             start,
+					StartEvent:        v.StartEvent,
+					End:               end,
+					EndEvent:          v.EndEvent,
+					GrowthItem:        v.GrowthItem,
+					GrowthItemOptions: v.GrowthItemOptions,
+				}
+			}
+		}
 	}
 	//
 	u.RentSchedule = temp
@@ -284,6 +311,10 @@ func (u *UnitModel) RentScheduleCalc(date Datetype, mc bool, compute string) {
 			prob = 0.0
 		}
 	}
+	base := "CPI"
+	if u.TenantType == "Residential" {
+		base = "ERV"
+	}
 	temp := RentSchedule{
 		EXTNumber:  u.RentSchedule.EXTNumber + 1,
 		StartDate:  Dateadd(u.RentSchedule.EndDate, 1),
@@ -300,24 +331,56 @@ func (u *UnitModel) RentScheduleCalc(date Datetype, mc bool, compute string) {
 		RentRevisionERV: u.RentSchedule.RentRevisionERV,
 		Probability:     u.Probability,
 		ProbabilitySim:  prob,
-		RenewIndex:      Indexation{IndexNumber: 0, StartDate: indexdate, EndDate: Dateadd(indexdate, 12), Amount: 1, RentSchedule: &u.RentSchedule},
-		RotateIndex:     Indexation{IndexNumber: 0, StartDate: Dateadd(indexdate, u.Void), EndDate: Dateadd(indexdate, 12+u.Void), Amount: 1, RentSchedule: &u.RentSchedule},
+		RenewIndex:      Indexation{IndexNumber: 0, StartDate: indexdate, EndDate: Dateadd(indexdate, 12), Amount: 1, RentSchedule: &u.RentSchedule, Base: base},
+		RotateIndex:     Indexation{IndexNumber: 0, StartDate: Dateadd(indexdate, u.Void), EndDate: Dateadd(indexdate, 12+u.Void), Amount: 1, RentSchedule: &u.RentSchedule, Base: base},
 		ParentUnit:      u,
 	}
 	u.RentSchedule = temp
 	u.RSStore = append(u.RSStore, temp)
-	renewal := u.CostInput["Rent Incentives Renewal"]
-	renewal.Start = temp.StartDate
-	renewal.End = Dateadd(temp.StartDate, renewal.Duration)
-	u.CostInput["Rent Incentives Renewal"] = renewal
-	rotation := u.CostInput["Rent Incentives Rotation"]
-	rotation.Start = Dateadd(temp.StartDate, u.Void)
-	rotation.End = Dateadd(temp.StartDate, rotation.Duration+u.Void)
-	u.CostInput["Rent Incentives Rotation"] = rotation
-	fitoutcosts := u.CostInput["Fit Out Costs"]
-	fitoutcosts.Start = temp.StartDate
-	fitoutcosts.End = Dateadd(temp.StartDate, fitoutcosts.Duration)
-	u.CostInput["Fit Out Costs"] = fitoutcosts
+	for i, v := range u.CostInput {
+		switch v.Name {
+		case "Rent Incentives Renewal":
+			start := Dateadd(temp.StartDate, -1)
+			end := Dateadd(start, u.CostInput[i].Duration)
+			u.CostInput[i] = CostInput{
+				Name:              v.Name,
+				MasterID:          v.MasterID,
+				Type:              v.Type,
+				Amount:            v.Amount,
+				AmountSigma:       v.AmountSigma,
+				COAItemBasis:      v.COAItemBasis,
+				COAItemTarget:     v.COAItemTarget,
+				Duration:          v.Duration,
+				DurationSigma:     v.DurationSigma,
+				Start:             start,
+				StartEvent:        v.StartEvent,
+				End:               end,
+				EndEvent:          v.EndEvent,
+				GrowthItem:        v.GrowthItem,
+				GrowthItemOptions: v.GrowthItemOptions,
+			}
+		case "Rent Incentives Rotation":
+			start := Dateadd(temp.StartDate, u.Void)
+			end := Dateadd(start, u.CostInput[i].Duration-1)
+			u.CostInput[i] = CostInput{
+				Name:              v.Name,
+				MasterID:          v.MasterID,
+				Type:              v.Type,
+				Amount:            v.Amount * (1 - u.Probability),
+				AmountSigma:       v.AmountSigma,
+				COAItemBasis:      v.COAItemBasis,
+				COAItemTarget:     v.COAItemTarget,
+				Duration:          v.Duration,
+				DurationSigma:     v.DurationSigma,
+				Start:             start,
+				StartEvent:        v.StartEvent,
+				End:               end,
+				EndEvent:          v.EndEvent,
+				GrowthItem:        v.GrowthItem,
+				GrowthItemOptions: v.GrowthItemOptions,
+			}
+		}
+	}
 }
 
 // RentScheduleDefaultCalc -
@@ -348,14 +411,30 @@ func (u *UnitModel) RentScheduleDefaultCalc(date Datetype) {
 		ParentUnit:      u,
 	}
 	u.RentSchedule = temp
-	rotation := u.CostInput["Rent Incentives Rotation"]
-	rotation.Start = Dateadd(temp.StartDate, u.Void)
-	rotation.End = Dateadd(temp.StartDate, rotation.Duration+u.Void)
-	u.CostInput["Rent Incentives Rotation"] = rotation
-	fitoutcosts := u.CostInput["Fit Out Costs"]
-	fitoutcosts.Start = temp.StartDate
-	fitoutcosts.End = Dateadd(temp.StartDate, fitoutcosts.Duration)
-	u.CostInput["Fit Out Costs"] = fitoutcosts
+	for i, v := range u.CostInput {
+		switch u.CostInput[i].Name {
+		case "Rent Incentives Rotation":
+			start := Dateadd(temp.StartDate, u.Void)
+			end := Dateadd(start, u.CostInput[i].Duration-1)
+			u.CostInput[i] = CostInput{
+				Name:              v.Name,
+				MasterID:          v.MasterID,
+				Type:              v.Type,
+				Amount:            v.Amount, // do not multiply by renewal probability as in this case, the tenant has defaulted
+				AmountSigma:       v.AmountSigma,
+				COAItemBasis:      v.COAItemBasis,
+				COAItemTarget:     v.COAItemTarget,
+				Duration:          v.Duration,
+				DurationSigma:     v.DurationSigma,
+				Start:             start,
+				StartEvent:        v.StartEvent,
+				End:               end,
+				EndEvent:          v.EndEvent,
+				GrowthItem:        v.GrowthItem,
+				GrowthItemOptions: v.GrowthItemOptions,
+			}
+		}
+	}
 }
 
 // IndexationCalc - Calculates the next index. Date is startdate
@@ -364,7 +443,7 @@ func (i *Indexation) IndexationCalc(e *EntityModel, date Datetype, debug bool) {
 	i.StartDate = i.RentSchedule.StartDate
 	i.EndDate = Dateadd(date, 12)
 	// i.Amount = math.Pow(1+e.GrowthInput["CPI"], float64(i.IndexNumber))
-	i.Amount = e.Growth["CPI"][i.EndDate.Dateint] / e.Growth["CPI"][i.StartDate.Dateint]
+	i.Amount = e.Growth[i.Base][i.EndDate.Dateint] / e.Growth[i.Base][i.StartDate.Dateint]
 	// if !e.MC && debug {
 	// 	fmt.Println(i.StartDate.Dateint, "-", i.EndDate.Dateint, " : ", e.Growth["CPI"][i.StartDate.Dateint], ": ", e.Growth["CPI"][i.EndDate.Dateint])
 	// }

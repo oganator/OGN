@@ -33,8 +33,8 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="query_form" class="form-horizontal form-well" role="form" action="/AppSettings" method="post">
-
+<!--                    
+<form id="query_form" class="form-horizontal form-well" role="form" action="/AppSettings" method="post"> 
                         <div class="form-group col-sm-8">
                             <label for="monthly">Show Monthly Cash Flow</label>
                             <input type="text" class="form-control" id="monthly" name="monthly">
@@ -55,6 +55,40 @@
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         </div>
                     </form>
+-->
+                    <form id="AppSettingsModal" class="form-horizontal form-well" >
+                        <div class="form-group col-sm-8">
+                            <label for="monthly">Show Monthly Cash Flow</label>
+                            <input type="checkbox"  ng-model="monthly" class="form-control"></input>
+                        </div>
+
+                        <div class="form-group col-sm-8">
+                            <label for="compute">Compute Method</label>
+                            <input type="text" class="form-control" ng-model="compute">
+                        </div>
+
+                        <div class="form-group col-sm-8">
+                            <label for="azureurl">Azure Function URL</label>
+                            <input type="text" class="form-control" ng-model="azureURL" >
+                        </div>
+
+                        <div class="form-group col-sm-8">
+                            <label for="debug">Debug</label>
+                            <input type="checkbox" [[if .Debug]] checked [[end]] ng-model="debug" class="form-control"></input>
+                        </div>
+                        
+                        <div class="form-group col-sm-8">
+                            <label for="mcActive">Show Monte Carlo</label>
+                            <input type="checkbox" [[if .MCActive]] checked [[end]] ng-model="mcActive" class="form-control"></input>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" ng-click='updateAppSettings()' data-dismiss="modal" class="btn secondary-bg">Submit</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+
+                    </form>
+
                 </div>
             </div>
         </div>

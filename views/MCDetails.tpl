@@ -14,7 +14,7 @@
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("void")'>Void</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("prob")'>Probability</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("hazard")'>Number of Defaults</button></th>
-				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("opex")'>OpEx %TRI</button></th>
+				
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("cpi")'>CPI Ending Index</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("erv")'>ERV Ending Index</button></th>
 				<th scope="col" data-sortable="true"><button type="button" class="btn" ng-click='sortMCDetails("hazard")'>Hazard Rate</button></th>
@@ -37,7 +37,7 @@
 				<td>[[$value.GLA.Void]]</td>
 				<td>{{[[$value.GLA.Probability]] *100 | number:2}}</td>
 				<td>{{[[$value.GLA.Default.NumberOfDefaults]] | number:0}}</td>
-				<td>{{[[$value.OpEx.PercentOfTRI]] *100 | number:2}}</td>
+				
 				[[range $value.GrowthInput]]
 				<td>{{[[.EndingIndex]] | number:4}}</td>
 				[[end]]

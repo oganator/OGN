@@ -5,8 +5,9 @@ func (e *EntityModel) EntityModelCalc(mc bool, compute string) {
 	e.HoldPeriod = dateintdiff(e.SalesDate.Dateint, e.StartDate.Dateint)
 	e.EndDate = Dateadd(e.SalesDate, 144)
 	e.GrowthCalc(mc)
-	// e.CostMapSetup()
+	e.CostMapSetup()
 	e.Merge()
+	e.DebtSetup()
 	e.AssetRentCalc(mc, compute)
 	e.Valuation.IncomeCapSetup = FloatCOA{TotalERV: 1}
 	switch e.Valuation.Method {
@@ -14,13 +15,6 @@ func (e *EntityModel) EntityModelCalc(mc bool, compute string) {
 		e.DirectCapCalc()
 	case "DCF":
 		e.DCFCalc()
-	}
-	for i := range e.DebtInput {
-		e.DebtInput[i].TempRate = e.DebtInput[i].InterestRate
-		e.DebtInput[i].COA = make(IntFloatCOAMap)
-		e.DebtInput[i].LoanStart = Dateadd(e.DebtInput[i].LoanStart, 0)
-		e.DebtInput[i].LoanEnd = Dateadd(e.DebtInput[i].LoanEnd, 0)
-		e.DebtInput[i].LastIndex = Dateadd(e.DebtInput[i].LoanStart, 0)
 	}
 	e.Acquisition()
 	e.PropertyCFCalc()

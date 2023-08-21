@@ -48,10 +48,12 @@ func (e *EntityModel) FactorAnalysisCalc(mcresults *MCResultSlice) {
 		e.FactorAnalysis[3] = FactorRegression("EndCash", mcresults, &mcresults.EndCash)
 		e.FactorAnalysis[4] = FactorRegression("EndNCF", mcresults, &mcresults.EndNCF)
 		e.FactorAnalysis[5] = FactorRegression("EndMV", mcresults, &mcresults.EndMarketValue)
-		if e.Metrics.IRR.NetLeveredAfterTax > 0.0 {
+		irr := e.Metrics.IRR.NetLeveredAfterTax
+		if irr > 0.0 {
 			e.FactorAnalysis = append(e.FactorAnalysis, FactorRegression("IRR", mcresults, &mcresults.IRR))
 		}
-		if e.Metrics.EM.NetLeveredAfterTax > 0.0 {
+		em := e.Metrics.EM.NetLeveredAfterTax
+		if em > 0.0 {
 			e.FactorAnalysis = append(e.FactorAnalysis, FactorRegression("EM", mcresults, &mcresults.EM))
 		}
 	}
