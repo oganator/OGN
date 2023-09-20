@@ -15,7 +15,7 @@
 <script src="static/js/app.js"></script>
 <script src="static/js/misc.js"></script>
 <script>
-var ognApp = angular.module('ognApp', []);
+let ognApp = angular.module('ognApp', []);
 	// testController
 	ognApp.controller('assetViewController', ['$scope', '$http', '$sce', function($scope, $http, $sce) {
 		$scope.baseURL = ""//[[.baseURL]];
@@ -63,8 +63,8 @@ var ognApp = angular.module('ognApp', []);
 
 		// getRequest - used to update the table (cf, irr...etc)
 		$scope.getRequest = async function(route) {
-			var url = $scope.baseURL + "MCTabs?tab="
-			var entity = "&name="+$scope.entity
+			let url = $scope.baseURL + "MCTabs?tab="
+			let entity = "&name="+$scope.entity
 			$scope.tableTab = route;
 			if (route == 'details'){
 				await $scope.post($scope.baseURL + "MCDetails?name="+$scope.entity+"&page=1");
@@ -77,7 +77,7 @@ var ognApp = angular.module('ognApp', []);
 
 		// getSettings - gets settings tab
 		$scope.getSettings = async function(entity){	
-			var url = $scope.baseURL + "GetSettings?entity="+entity+"&tab="+$scope.settingsTab;
+			let url = $scope.baseURL + "GetSettings?entity="+entity+"&tab="+$scope.settingsTab;
 			$scope.entity = entity;
 			await $http.post(url).then(
 				function successCallback(response) {
@@ -94,6 +94,9 @@ var ognApp = angular.module('ognApp', []);
 			await $scope.getSettings(entityModel);
 			if ($scope.tableTab == "units"){
 				await $scope.getUnitTable(-1);
+				await $scope.getChart();
+			}else if ($scope.tableTab == "sensitivity"){
+				await $scope.getSensitivity();
 				await $scope.getChart();
 			}else {
 				await $scope.getRequest($scope.tableTab);
@@ -146,7 +149,7 @@ var ognApp = angular.module('ognApp', []);
 		// viewCFIndex
 		$scope.viewCFIndex = async function(index){
 			$scope.data = '';
-			var body = "?name="+$scope.entity+"&index="+index*$scope.mcdetailspage;
+			let body = "?name="+$scope.entity+"&index="+index*$scope.mcdetailspage;
 			await $http.post($scope.baseURL + "MCIndex"+body).then(
 				function successCallback(response) {
 					$scope.data = $sce.trustAsHtml(response.data);
@@ -179,7 +182,7 @@ var ognApp = angular.module('ognApp', []);
 
 		// getRentSchedule
 		$scope.getRentSchedule = async function(unit, index){
-			var url = $scope.baseURL + "ViewRentSchedule?unit="+unit+"&name="+$scope.entity+"&index="+index
+			let url = $scope.baseURL + "ViewRentSchedule?unit="+unit+"&name="+$scope.entity+"&index="+index
 			if (typeof index == 'undefined'){
 				url = $scope.baseURL + "ViewRentSchedule?unit="+unit+"&name="+$scope.entity
 			}
@@ -216,16 +219,16 @@ var ognApp = angular.module('ognApp', []);
 		} // /hidePrevious
 
 		// init
-		var init = function () {
+		let init = function () {
 			$scope.getSettings([[.entity.Name]]);
 			console.log($scope);
 		};// /init
 
 		// updateEntity - calls the Post method for ViewEntity2 controller
 		$scope.updateEntity = async function(entity){
-			var a = "&";
-			var e = "=";
-			var paramString = ""
+			let a = "&";
+			let e = "=";
+			let paramString = ""
 			paramString = paramString.concat(a,"startmonth",e,document.getElementById("startmonth").value)
 			paramString = paramString.concat(a,"startyear",e,document.getElementById("startyear").value)
 			paramString = paramString.concat(a,"salesmonth",e,document.getElementById("salesmonth").value)
@@ -277,8 +280,8 @@ var ognApp = angular.module('ognApp', []);
 			paramString = paramString.concat(a,"carrybackyrs",e,(document.getElementById("carrybackyrs")) ? document.getElementById("carrybackyrs").value : "0")
 			paramString = paramString.concat(a,"carryforwardyrs",e,(document.getElementById("carryforwardyrs")) ? document.getElementById("carryforwardyrs").value : "0")
 			paramString = paramString.concat(a,"sims",e,(document.getElementById("sims")) ? document.getElementById("sims").value : "0")
-			var loans = $scope.getLoans();	
-			var costs = $scope.getCosts();		
+			let loans = $scope.getLoans();	
+			let costs = $scope.getCosts();		
 			await $http.post($scope.baseURL + "ViewEntity2?name="+$scope.entity+paramString+loans+costs);
 			if ($scope.tableTab == "units"){
 				await $scope.getUnitTable(-1);
@@ -289,16 +292,17 @@ var ognApp = angular.module('ognApp', []);
 		}; // /updateEntity
 
 		$scope.getLoans = function() {
-			var table = document.getElementById('loansTable');
-			var loanString = "";
-			var a = "&";
-			var e = "=";
-			for (var r = 1, n = table.rows.length; r < n; r++) {
-				var loan = table.rows[r].id.replace('row_loan_','')
+			let table = document.getElementById('loansTable');
+			let loanString = "";
+			let a = "&";
+			let e = "=";
+			for (let r = 1, n = table.rows.length; r < n; r++) {
+				let loan = table.rows[r].id.replace('row_loan_','')
 				loanString = loanString.concat(a,"loanAmount",loan,e,document.getElementById("loan_amount_" + loan).value.replace(/,/g,''))
 				loanString = loanString.concat(a,"interestRate",loan,e,document.getElementById("interestrate_" + loan).value/100)
 				loanString = loanString.concat(a,"interestType",loan,e,document.getElementById("interest_type_" + loan).value)
 				loanString = loanString.concat(a,"loanType",loan,e,document.getElementById("loan_type_" + loan).value)
+				loanString = loanString.concat(a,"loanName",loan,e,document.getElementById("loan_name_" + loan).value)
 				loanString = loanString.concat(a,"loanStartMonth",loan,e,document.getElementById("loan_start_month_" + loan).value)
 				loanString = loanString.concat(a,"loanStartYear",loan,e,document.getElementById("loan_start_year_" + loan).value)
 				loanString = loanString.concat(a,"loanEndMonth",loan,e,document.getElementById("loan_end_month_" + loan).value)
@@ -312,12 +316,12 @@ var ognApp = angular.module('ognApp', []);
 		};
 
 		$scope.getCosts = function() {
-			var table = document.getElementsByName('costInputRow');
-			var costString = "";
-			var a = "&";
-			var e = "=";
-			for (var r = 0, n = table.length; r < n; r++){
-				var rowID = table[r].id
+			let table = document.getElementsByName('costInputRow');
+			let costString = "";
+			let a = "&";
+			let e = "=";
+			for (let r = 0, n = table.length; r < n; r++){
+				let rowID = table[r].id
 				costString = costString.concat(a,`${rowID}_masterID=`,document.getElementById(`${rowID}_masterID`).value)
 				costString = costString.concat(a,`${rowID}_type=`,document.getElementById(`${rowID}_type`).value)
 				costString = costString.concat(a,`${rowID}_name=`,document.getElementById(`${rowID}_name`).value) 
@@ -340,7 +344,7 @@ var ognApp = angular.module('ognApp', []);
 		};
 
 		$scope.updateUnit = async function(unit,field){
-			var value = document.getElementById(`unit${unit}.${field}`).value;
+			let value = document.getElementById(`unit${unit}.${field}`).value;
 			value = value.replace(/,/g,'')
 			await $http.post(`UpdateUnit?unit=${unit}&field=${field}&value="${value}"`);
 			await $scope.getUnitTable(-1);
@@ -349,9 +353,9 @@ var ognApp = angular.module('ognApp', []);
 		};
 
 		$scope.addUnit = async function(){
-			var params = "AddChildUnit?";
-			var a = "&";
-			var e = "=";
+			let params = "AddChildUnit?";
+			let a = "&";
+			let e = "=";
 			params = params.concat("parent=",document.getElementById("new_unit_parent").value)
 			params = params.concat(a,"tenant",e,document.getElementById("new_unit_tenant").value)
 			params = params.concat(a,"unitname",e,document.getElementById("new_unit_unitname").value)
@@ -392,7 +396,8 @@ var ognApp = angular.module('ognApp', []);
 		}
 
 		$scope.getSensitivity = async function(){
-			await $http.post("/Sensitivity?name="+$scope.entity+"&iterations="+3).then(
+			$scope.tableTab = "sensitivity";
+			await $http.get("/Sensitivity?name="+$scope.entity).then(
 				function successCallback(response) {
 					$scope.response = $sce.trustAsHtml(response.data);
 				},
@@ -400,6 +405,42 @@ var ognApp = angular.module('ognApp', []);
 					console.log("getSensitivity failed");
 				}
 			);
+		}
+
+		$scope.postSensitivity = async function(){
+			let params = "Sensitivity?calc=true&entityModel="+$scope.entity;
+			let a = "&";
+			let e = "=";
+			let vertical = ""
+			let horizontal = ""
+			let iterations = document.getElementById("iterations").value
+			if (iterations != 0) {
+				params = params.concat(a,"iterations",e,iterations)
+				let table = document.getElementById("sensitivityInputTable");
+				for (let i = 1; i <= table.rows.length - 1; i ++){
+					let v = document.getElementById(`sensRowVertical_${i}`);
+					if (v.checked){
+						vertical = v.name
+					}
+					let h = document.getElementById(`sensRowHorizontal_${i}`);
+					if (h.checked){
+						horizontal = h.name
+					}
+					let input = document.getElementById(`sensRow${i}`)
+					console.log(input.name, input.value);
+					params = params.concat(a,input.name, e, input.value)
+				}
+				params = params.concat(a,"vertical",e,vertical)
+				params = params.concat(a,"horizontal",e,horizontal)
+				await $http.post(params).then(
+					function successCallback(response) {
+						$scope.response = $sce.trustAsHtml(response.data);
+					},
+					function errorCallback(response) {
+						console.log("getSensitivity failed");
+					}
+				);
+			}
 		}
 
 		$scope.updateChartCOASelections = function(){
@@ -425,11 +466,11 @@ var ognApp = angular.module('ognApp', []);
 					return scope.$eval(attrs.bindHtmlCompile);
 				}, function (value) {
 					if (!!value) {
-						var compileScope = scope;
+						let compileScope = scope;
 						if (attrs.bindHtmlScope) {
 							compileScope = scope.$eval(attrs.bindHtmlScope);
 						}
-						var html = $compile(value.toString())(compileScope);
+						let html = $compile(value.toString())(compileScope);
 						element.html(html);
 					}
 				});

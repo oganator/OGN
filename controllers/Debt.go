@@ -95,12 +95,15 @@ func (e *EntityModel) DebtCalc(period Datetype) (finalCOA FloatCOA) {
 	return finalCOA
 }
 
+// sets up each loan so it doesnt blow up - runs Dateadd to dates, makes a IntFloatCOAmap for coa, and sets up SensitivityInput.Debt
 func (e *EntityModel) DebtSetup() {
+	e.SensitivityInput.Debt = make([]DebtInput, len(e.DebtInput))
 	for i := range e.DebtInput {
 		e.DebtInput[i].TempRate = e.DebtInput[i].InterestRate
 		e.DebtInput[i].COA = make(IntFloatCOAMap)
 		e.DebtInput[i].LoanStart = Dateadd(e.DebtInput[i].LoanStart, 0)
 		e.DebtInput[i].LoanEnd = Dateadd(e.DebtInput[i].LoanEnd, 0)
 		e.DebtInput[i].LastIndex = Dateadd(e.DebtInput[i].LoanStart, 0)
+		e.SensitivityInput.Debt[i] = DebtInput{Spread: 0}
 	}
 }
